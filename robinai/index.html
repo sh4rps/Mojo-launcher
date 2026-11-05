@@ -1,0 +1,908 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RobinAi</title>
+<meta name="description" content="RobinAi is a build agent: it writes apps, websites and Minecraft mods, keeps the files, and pushes them to your GitHub.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 108 108'%3E%3Crect width='108' height='108' rx='24' fill='%2314110A'/%3E%3Cpath d='M30 50C30 36 40 28 50 28 64 28 74 40 72 58 71 70 60 78 48 76 36 74 30 62 30 50Z' fill='%23E3A416'/%3E%3Cpath d='M30 50C30 40 35 33 41 31 45 38 47 46 46 56 45 66 50 72 52 75 40 76 30 64 30 50Z' fill='%23F0701C'/%3E%3Cpath d='M31 41 20 45 31 49Z' fill='%23FFF1C2'/%3E%3Ccircle cx='38' cy='40' r='3' fill='%232A1A05'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  /* Layout: sidebar of chats | chat | workspace files. Phone: one pane with Chat / Files tabs. */
+  --bg:#FBF6E6; --panel:#FFFDF5; --panel2:#F3EBCF; --line:#E2D6AE;
+  --text:#2A2310; --muted:#6B5E2D; --gold:#9A7410; --gold-ink:#FFFFFF; --gold-soft:#F1E3B0;
+  --user:#F1E3B0; --danger:#B3362A; --ok:#3F7A3E; --code-bg:#1B170C; --code-text:#F3E9C6;
+  --f-display:'Fraunces',Georgia,serif; --f-body:'IBM Plex Sans',system-ui,sans-serif; --f-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#14110A; --panel:#1E1910; --panel2:#272010; --line:#3A3220;
+  --text:#F3E9C6; --muted:#B5A878; --gold:#D4AF37; --gold-ink:#14110A; --gold-soft:#3A2F12;
+  --user:#3A2F12; --danger:#F0877B; --ok:#8FC98E; --code-bg:#0E0C07; --code-text:#F3E9C6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14110A; --panel:#1E1910; --panel2:#272010; --line:#3A3220;
+  --text:#F3E9C6; --muted:#B5A878; --gold:#D4AF37; --gold-ink:#14110A; --gold-soft:#3A2F12;
+  --user:#3A2F12; --danger:#F0877B; --ok:#8FC98E; --code-bg:#0E0C07; --code-text:#F3E9C6; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font:15px/1.55 var(--f-body);-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+[hidden]{display:none!important}
+
+.app{height:100dvh;display:grid;grid-template-columns:260px minmax(0,1fr) 380px;grid-template-rows:auto minmax(0,1fr);
+  padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-right,0)}
+.top{grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:10px max(16px,env(safe-area-inset-left,0px));padding-top:max(10px,env(safe-area-inset-top,0px));border-bottom:1px solid var(--line);background:var(--bg)}
+.brand{display:flex;align-items:center;gap:10px;font:600 22px/1 var(--f-display);letter-spacing:.2px}
+.brand svg{width:34px;height:34px;flex:none}
+.sp{flex:1}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:8px 14px;min-height:40px}
+.btn:hover{border-color:var(--gold)}
+.btn.gold{background:var(--gold);color:var(--gold-ink);border-color:var(--gold);font-weight:600}
+.btn.small{padding:4px 10px;min-height:30px;font-size:13px}
+.btn.danger{color:var(--danger)}
+.tabs{display:none;gap:6px}
+.tabs .btn[aria-pressed="true"]{background:var(--gold-soft);border-color:var(--gold)}
+#menuBtn{display:none}
+
+.side{border-right:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;min-height:0}
+.side h2,.files h2{margin:0;font:600 12px/1 var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.side .hd{padding:14px 14px 8px;display:flex;align-items:center;justify-content:space-between}
+.chatlist{overflow:auto;padding:0 8px 12px;display:flex;flex-direction:column;gap:2px;min-height:0}
+.chatitem{display:flex;align-items:center;gap:4px;border-radius:8px;padding:2px 2px 2px 10px}
+.chatitem:hover,.chatitem.on{background:var(--panel2)}
+.chatitem button.t{flex:1;min-width:0;text-align:left;border:0;background:none;padding:8px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chatitem button.x{border:0;background:none;color:var(--muted);padding:6px 8px;border-radius:6px}
+.chatitem button.x:hover{color:var(--danger)}
+
+.main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.thread{flex:1;overflow:auto;padding:18px max(16px,env(safe-area-inset-left,0px)) 8px;min-height:0}
+.col{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.msg{min-width:0}
+.msg.user{align-self:flex-end;background:var(--user);padding:10px 14px;border-radius:16px 16px 4px 16px;max-width:88%;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.asst{overflow-wrap:anywhere}
+.msg.asst p,.msg.asst ul,.msg.asst ol,.msg.asst blockquote,.msg.asst h1,.msg.asst h2,.msg.asst h3,.msg.asst h4{margin:0 0 10px}
+.msg.asst h1,.msg.asst h2,.msg.asst h3,.msg.asst h4{font:600 17px/1.3 var(--f-body)}
+.msg.asst ul,.msg.asst ol{padding-left:22px}
+.msg.asst blockquote{border-left:3px solid var(--gold);padding-left:12px;color:var(--muted)}
+.msg.asst hr{border:0;border-top:1px solid var(--line);margin:12px 0}
+.msg.asst a{color:var(--gold)}
+code{font:13px var(--f-mono);background:var(--panel2);padding:1px 5px;border-radius:5px}
+.code{background:var(--code-bg);border-radius:10px;margin:0 0 12px;overflow:hidden}
+.code .ch{display:flex;justify-content:space-between;align-items:center;padding:4px 10px;color:#B5A878;font:12px var(--f-mono);border-bottom:1px solid #2a2412}
+.code .ch button{border:0;background:none;color:#D4AF37;padding:4px 6px}
+.code pre{margin:0;padding:12px;overflow-x:auto;color:var(--code-text)}
+.code pre code{background:none;padding:0;color:inherit;font-size:13px;line-height:1.5}
+.chip{display:flex;align-items:center;gap:8px;font:12.5px var(--f-mono);color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 10px;min-width:0;align-self:flex-start;max-width:100%}
+.chip b{color:var(--gold);font-weight:500;flex:none}
+.chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.chip.err{color:var(--danger);border-color:var(--danger);white-space:normal;align-items:flex-start}
+.chip.err span{white-space:pre-wrap;overflow:visible;overflow-wrap:anywhere}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex:none;animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.chip .dot{animation:none}}
+
+.empty{max-width:780px;margin:6vh auto 0;display:flex;flex-direction:column;gap:18px}
+.empty h1{margin:0;font:600 clamp(30px,6vw,46px)/1.1 var(--f-display);text-wrap:balance}
+.empty p{margin:0;color:var(--muted);max-width:56ch}
+.ideas{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.idea{text-align:left;border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.idea:hover{border-color:var(--gold)}
+.idea strong{font-weight:600}
+.idea span{color:var(--muted);font-size:13px}
+
+.composer{padding:8px max(16px,env(safe-area-inset-left,0px)) max(12px,env(safe-area-inset-bottom,0px))}
+.cbox{max-width:780px;margin:0 auto;display:flex;gap:8px;align-items:flex-end;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:8px 8px 8px 14px}
+.cbox:focus-within{border-color:var(--gold)}
+.cbox textarea{flex:1;min-width:0;border:0;background:none;resize:none;max-height:40vh;padding:8px 0;outline:none;line-height:1.45}
+.cbox .btn.gold{border-radius:12px}
+.foot{max-width:780px;margin:6px auto 0;color:var(--muted);font-size:12px;text-align:center}
+
+.files{border-left:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;min-height:0;min-width:0}
+.files .hd{padding:14px 14px 8px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.fact{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 10px}
+.flist{overflow:auto;padding:0 8px 8px;min-height:0;flex:0 1 38%}
+.frow{display:flex;width:100%;gap:8px;align-items:center;border:0;background:none;text-align:left;padding:6px 8px;border-radius:8px;font:13px var(--f-mono)}
+.frow:hover,.frow.on{background:var(--panel2)}
+.frow .d{color:var(--muted)}
+.frow span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.viewer{border-top:1px solid var(--line);display:flex;flex-direction:column;flex:1;min-height:0}
+.vbar{display:flex;gap:6px;align-items:center;padding:8px 14px;flex-wrap:wrap}
+.vbar .name{font:12.5px var(--f-mono);color:var(--muted);flex:1 1 100%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.viewer textarea{flex:1;min-height:120px;margin:0 14px 12px;border:1px solid var(--line);border-radius:10px;background:var(--code-bg);color:var(--code-text);font:12.5px/1.5 var(--f-mono);padding:10px;resize:none;white-space:pre;overflow:auto}
+.viewer iframe{flex:1;min-height:160px;margin:0 14px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.none{color:var(--muted);padding:6px 14px;font-size:13px}
+
+dialog{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:16px;padding:0;width:min(560px,calc(100vw - 24px));max-height:90dvh}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+.dlg{padding:18px 20px;display:flex;flex-direction:column;gap:12px;max-height:90dvh;overflow:auto}
+.dlg h3{margin:0;font:600 22px var(--f-display)}
+.dlg label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted)}
+.dlg input,.dlg select,.dlg textarea{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:9px 11px;font-size:15px;color:var(--text);min-width:0}
+.dlg textarea{min-height:110px;resize:vertical;font:13px/1.45 var(--f-mono)}
+.dlg .row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.dlg .note{font-size:12.5px;color:var(--muted);margin:0}
+.dlg .check{flex-direction:row;align-items:center;gap:8px;font-size:14px;color:var(--text)}
+.dlg .check input{width:18px;height:18px;padding:0}
+.result{font:13px var(--f-mono);overflow-wrap:anywhere}
+.result a{color:var(--gold)}
+
+@media (max-width:1180px){.app{grid-template-columns:240px minmax(0,1fr)}.files{display:none}.app[data-pane="files"] .main{display:none}
+  .app[data-pane="files"] .files{display:flex;grid-column:2}.tabs{display:flex}}
+@media (max-width:760px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{position:fixed;inset:0 auto 0 0;width:min(300px,86vw);z-index:20;transform:translateX(-102%);transition:transform .18s;padding-top:env(safe-area-inset-top,0px)}
+  .side.open{transform:none;box-shadow:0 0 40px rgba(0,0,0,.5)}
+  #themeBtn{display:none}
+  .app[data-pane="files"] .files{grid-column:1}
+  #menuBtn{display:inline-flex}
+  .brand span{display:none}
+}
+@media (prefers-reduced-motion:reduce){.side{transition:none}}
+</style>
+</head>
+<body>
+<div class="app" id="app" data-pane="chat">
+  <header class="top">
+    <button class="btn small" id="menuBtn" aria-label="Chats">Chats</button>
+    <div class="brand">
+      <svg viewBox="0 0 108 108" aria-hidden="true"><rect width="108" height="108" rx="24" fill="#14110A"/><defs><linearGradient id="gb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE08A"/><stop offset="1" stop-color="#E3A416"/></linearGradient><linearGradient id="gr" x1="0" y1="0" x2=".4" y2="1"><stop offset="0" stop-color="#FFB347"/><stop offset="1" stop-color="#F0701C"/></linearGradient><linearGradient id="gw" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C98B12"/><stop offset="1" stop-color="#8E5E08"/></linearGradient></defs><path d="M27 82Q54 87 82 80" fill="none" stroke="#8E5E08" stroke-width="3.4" stroke-linecap="round"/><path d="M66 60L86 70 82 76 62 68Z" fill="url(#gw)"/><path d="M30 50C30 36 40 28 50 28 64 28 74 40 72 58 71 70 60 78 48 76 36 74 30 62 30 50Z" fill="url(#gb)"/><path d="M30 50C30 40 35 33 41 31 45 38 47 46 46 56 45 66 50 72 52 75 40 76 30 64 30 50Z" fill="url(#gr)"/><path d="M50 50C60 44 71 48 74 58 70 68 58 72 50 66 46 62 46 54 50 50Z" fill="url(#gw)"/><path d="M31 41 20 45 31 49Z" fill="#FFF1C2"/><circle cx="38" cy="40" r="3" fill="#2A1A05"/><circle cx="39" cy="39" r="1" fill="#fff"/><path d="M50 76V83M57 75V83" stroke="#8E5E08" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>RobinAi</span>
+    </div>
+    <div class="tabs" role="group" aria-label="View">
+      <button class="btn small" id="tabChat" aria-pressed="true">Chat</button>
+      <button class="btn small" id="tabFiles" aria-pressed="false">Files <span id="fileCount"></span></button>
+    </div>
+    <div class="sp"></div>
+    <button class="btn small" id="themeBtn" aria-label="Switch theme">Theme</button>
+    <button class="btn small" id="settingsBtn">Settings</button>
+  </header>
+
+  <aside class="side" id="side">
+    <div class="hd"><h2>Chats</h2><button class="btn small gold" id="newChat">New</button></div>
+    <div class="chatlist" id="chatlist"></div>
+  </aside>
+
+  <main class="main">
+    <div class="thread" id="thread"><div class="col" id="col"></div></div>
+    <div class="composer">
+      <div class="cbox">
+        <textarea id="input" rows="1" placeholder="Tell RobinAi what to build" aria-label="Message"></textarea>
+        <button class="btn gold" id="sendBtn">Send</button>
+      </div>
+      <div class="foot" id="foot"></div>
+    </div>
+  </main>
+
+  <section class="files" id="files" aria-label="Workspace files">
+    <div class="hd"><h2>Workspace</h2><span id="wsSize" class="none" style="padding:0"></span></div>
+    <div class="fact">
+      <button class="btn small" id="zipBtn">Download ZIP</button>
+      <button class="btn small gold" id="pushBtn">Push to GitHub</button>
+      <button class="btn small" id="newFileBtn">New file</button>
+    </div>
+    <div class="flist" id="flist"></div>
+    <div class="viewer" id="viewer" hidden>
+      <div class="vbar">
+        <span class="name" id="vname"></span>
+        <button class="btn small" id="vPreview" hidden>Preview</button>
+        <button class="btn small" id="vCopy">Copy</button>
+        <button class="btn small" id="vDl">Save as file</button>
+        <button class="btn small gold" id="vSave">Save</button>
+        <button class="btn small danger" id="vDel">Delete</button>
+      </div>
+      <textarea id="vtext" spellcheck="false" aria-label="File content"></textarea>
+      <iframe id="vframe" sandbox="allow-scripts" title="Preview" hidden></iframe>
+    </div>
+  </section>
+</div>
+
+<dialog id="setDlg"><form method="dialog" class="dlg" id="setForm">
+  <h3>Settings</h3>
+  <p class="note">Your keys stay in this browser and go only to the provider you pick. RobinAi itself has no message or credit limit. Your provider decides what your key allows.</p>
+  <label>Provider
+    <select id="sProv"></select></label>
+  <label>Base URL <input id="sUrl" autocomplete="off" spellcheck="false"></label>
+  <label>Model <input id="sModel" autocomplete="off" spellcheck="false"></label>
+  <label>API key <input id="sKey" type="password" autocomplete="off" spellcheck="false" placeholder="sk-..."></label>
+  <label>GitHub token (to push code, optional) <input id="sGh" type="password" autocomplete="off" spellcheck="false" placeholder="ghp_... or github_pat_..."></label>
+  <p class="note">Create it at github.com/settings/tokens. Classic token: tick <b>repo</b> and <b>workflow</b>. Fine-grained: give the repos Contents, Workflows, Actions (read) and Administration (to create repos).</p>
+  <label>Steps per task (0 = no cap) <input id="sSteps" inputmode="numeric" autocomplete="off"></label>
+  <label>Max output tokens per reply <input id="sTokens" inputmode="numeric" autocomplete="off"></label>
+  <label>System prompt <textarea id="sSys" spellcheck="false"></textarea></label>
+  <div class="row"><button class="btn" type="button" id="sTheme">Switch theme</button><button class="btn" value="cancel" formnovalidate>Cancel</button><button class="btn gold" id="sSave" value="ok">Save</button></div>
+</form></dialog>
+
+<dialog id="pushDlg"><form method="dialog" class="dlg" id="pushForm">
+  <h3>Push to GitHub</h3>
+  <label>Repository (name or owner/name) <input id="pRepo" autocomplete="off" spellcheck="false"></label>
+  <label>Branch <input id="pBranch" value="main" autocomplete="off" spellcheck="false"></label>
+  <label>Commit message <input id="pMsg" value="Update from RobinAi" autocomplete="off"></label>
+  <label class="check"><input type="checkbox" id="pPrivate" checked> Private repository (if it has to be created)</label>
+  <div class="result" id="pOut" aria-live="polite"></div>
+  <div class="row"><button class="btn" value="cancel" formnovalidate id="pClose">Close</button><button class="btn gold" id="pGo" type="button">Push</button></div>
+</form></dialog>
+
+<dialog id="fileDlg"><form method="dialog" class="dlg">
+  <h3>New file</h3>
+  <label>Path <input id="nfPath" placeholder="src/main.js" autocomplete="off" spellcheck="false"></label>
+  <div class="row"><button class="btn" value="cancel" formnovalidate>Cancel</button><button class="btn gold" id="nfOk" value="ok">Create</button></div>
+</form></dialog>
+<script>
+/*CORE-START*/
+/* ---------- text helpers ---------- */
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+
+function inlineMd(t){
+  return String(t).split(/(`[^`\n]+`)/).map(function(part){
+    if(part.length>2&&part[0]==='`'&&part[part.length-1]==='`') return '<code>'+esc(part.slice(1,-1))+'</code>';
+    var s=esc(part);
+    s=s.replace(/\*\*([^*\n]+)\*\*/g,'<strong>$1</strong>');
+    s=s.replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s).,!?:;]|$)/g,'$1<em>$2</em>');
+    s=s.replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    return s;
+  }).join('');
+}
+
+function md(src){
+  var lines=String(src).replace(/\r/g,'').split('\n'),out=[],para=[],list=null,i=0;
+  function flushP(){if(para.length){out.push('<p>'+para.map(inlineMd).join('<br>')+'</p>');para=[]}}
+  function flushL(){if(list){out.push('<'+list.t+'>'+list.items.map(function(x){return '<li>'+inlineMd(x)+'</li>'}).join('')+'</'+list.t+'>');list=null}}
+  while(i<lines.length){
+    var l=lines[i],m;
+    if((m=/^\s*```\s*([\w+#.-]*)/.exec(l))){
+      flushP();flushL();var code=[];i++;
+      while(i<lines.length&&!/^\s*```\s*$/.test(lines[i])){code.push(lines[i]);i++}
+      i++;
+      out.push('<div class="code"><div class="ch"><span>'+esc(m[1]||'text')+'</span><button type="button" data-copy>Copy</button></div><pre><code>'+esc(code.join('\n'))+'</code></pre></div>');
+      continue;
+    }
+    if((m=/^(#{1,4})\s+(.*)$/.exec(l))){flushP();flushL();out.push('<h'+m[1].length+'>'+inlineMd(m[2])+'</h'+m[1].length+'>');i++;continue}
+    if((m=/^\s*([-*]|\d+\.)\s+(.*)$/.exec(l))){
+      flushP();var t=/\d/.test(m[1])?'ol':'ul';
+      if(list&&list.t!==t)flushL();
+      if(!list)list={t:t,items:[]};
+      list.items.push(m[2]);i++;continue;
+    }
+    if(/^\s*(---+|\*\*\*+)\s*$/.test(l)){flushP();flushL();out.push('<hr>');i++;continue}
+    if((m=/^>\s?(.*)$/.exec(l))){flushP();flushL();out.push('<blockquote>'+inlineMd(m[1])+'</blockquote>');i++;continue}
+    if(/^\s*$/.test(l)){flushP();flushL();i++;continue}
+    flushL();para.push(l);i++;
+  }
+  flushP();flushL();
+  return out.join('');
+}
+
+/* ---------- ZIP (store, no compression) ---------- */
+var CRC=(function(){var t=new Uint32Array(256);for(var n=0;n<256;n++){var c=n;for(var k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(b){var c=0xFFFFFFFF;for(var i=0;i<b.length;i++)c=CRC[(c^b[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0}
+function makeZip(files){
+  var enc=new TextEncoder(),parts=[],central=[],off=0,count=0,d=new Date();
+  var time=(d.getHours()<<11)|(d.getMinutes()<<5)|(d.getSeconds()>>1);
+  var date=((d.getFullYear()-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate();
+  Object.keys(files).forEach(function(name){
+    var nb=enc.encode(name),data=enc.encode(files[name]),crc=crc32(data);
+    var lh=new DataView(new ArrayBuffer(30));
+    lh.setUint32(0,0x04034b50,true);lh.setUint16(4,20,true);lh.setUint16(6,0x0800,true);lh.setUint16(8,0,true);
+    lh.setUint16(10,time,true);lh.setUint16(12,date,true);lh.setUint32(14,crc,true);
+    lh.setUint32(18,data.length,true);lh.setUint32(22,data.length,true);lh.setUint16(26,nb.length,true);lh.setUint16(28,0,true);
+    parts.push(new Uint8Array(lh.buffer),nb,data);
+    var ch=new DataView(new ArrayBuffer(46));
+    ch.setUint32(0,0x02014b50,true);ch.setUint16(4,(3<<8)|20,true);ch.setUint16(6,20,true);ch.setUint16(8,0x0800,true);ch.setUint16(10,0,true);
+    ch.setUint16(12,time,true);ch.setUint16(14,date,true);ch.setUint32(16,crc,true);
+    ch.setUint32(20,data.length,true);ch.setUint32(24,data.length,true);ch.setUint16(28,nb.length,true);
+    var exe=(name==='gradlew'||/\.sh$/.test(name));
+    ch.setUint32(38,(((exe?0o100755:0o100644)<<16)>>>0),true);ch.setUint32(42,off,true);
+    central.push(new Uint8Array(ch.buffer),nb);
+    off+=30+nb.length+data.length;count++;
+  });
+  var csize=0;central.forEach(function(c){csize+=c.length});
+  var end=new DataView(new ArrayBuffer(22));
+  end.setUint32(0,0x06054b50,true);end.setUint16(8,count,true);end.setUint16(10,count,true);end.setUint32(12,csize,true);end.setUint32(16,off,true);
+  return new Blob(parts.concat(central,[new Uint8Array(end.buffer)]),{type:'application/zip'});
+}
+
+/* ---------- streaming ---------- */
+async function readSSE(resp,onEvent){
+  var rd=resp.body.getReader(),dec=new TextDecoder(),buf='';
+  function handle(raw){
+    var ev='',data=[];
+    raw.split(/\r?\n/).forEach(function(l){
+      if(l.indexOf('event:')===0)ev=l.slice(6).trim();
+      else if(l.indexOf('data:')===0)data.push(l.slice(5).replace(/^ /,''));
+    });
+    if(data.length)onEvent(ev,data.join('\n'));
+  }
+  for(;;){
+    var r=await rd.read();
+    if(r.done)break;
+    buf+=dec.decode(r.value,{stream:true});
+    var m;
+    while((m=/\r?\n\r?\n/.exec(buf))){
+      var raw=buf.slice(0,m.index);buf=buf.slice(m.index+m[0].length);handle(raw);
+    }
+  }
+  if(buf.trim())handle(buf);
+}
+
+function parseArgs(s){
+  if(s&&typeof s==='object')return {ok:true,v:s};
+  if(!s||!String(s).trim())return {ok:true,v:{}};
+  try{var v=JSON.parse(s);return {ok:true,v:(v&&typeof v==='object')?v:{}}}catch(e){return {ok:false,v:{}}}
+}
+
+async function anthropicStep(cfg,system,messages,tools,h,signal){
+  var url=(cfg.url||'https://api.anthropic.com').replace(/\/+$/,'')+'/v1/messages';
+  var body={model:cfg.model,max_tokens:cfg.maxTokens||16000,system:system,messages:messages,stream:true,
+    tools:tools.map(function(t){return {name:t.name,description:t.description,input_schema:t.schema}})};
+  var r=await fetch(url,{method:'POST',signal:signal,headers:{'content-type':'application/json','x-api-key':cfg.key,
+    'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify(body)});
+  if(!r.ok)throw new Error('HTTP '+r.status+': '+(await r.text()).slice(0,800));
+  var blocks=[],stop='';
+  await readSSE(r,function(ev,data){
+    var j;try{j=JSON.parse(data)}catch(e){return}
+    if(j.type==='content_block_start'){
+      var b=j.content_block||{};
+      if(b.type==='tool_use'){blocks[j.index]={type:'tool_use',id:b.id,name:b.name,_json:''};h.toolStart(b.name)}
+      else if(b.type==='text'){blocks[j.index]={type:'text',text:b.text||''}}
+      else blocks[j.index]=null;
+    }else if(j.type==='content_block_delta'){
+      var c=blocks[j.index];if(!c)return;
+      if(j.delta.type==='text_delta'){c.text+=j.delta.text;h.text(j.delta.text)}
+      else if(j.delta.type==='input_json_delta'){c._json+=j.delta.partial_json}
+    }else if(j.type==='message_delta'){stop=(j.delta&&j.delta.stop_reason)||stop}
+    else if(j.type==='error'){throw new Error((j.error&&j.error.message)||'stream error')}
+  });
+  var content=[],calls=[];
+  blocks.forEach(function(b){
+    if(!b)return;
+    if(b.type==='text'){if(b.text)content.push({type:'text',text:b.text})}
+    else{
+      var p=parseArgs(b._json);
+      content.push({type:'tool_use',id:b.id,name:b.name,input:p.v});
+      calls.push({id:b.id,name:b.name,input:p.v,bad:!p.ok||stop==='max_tokens'&&!p.ok});
+    }
+  });
+  if(!content.length)content.push({type:'text',text:'(no reply)'});
+  return {message:{role:'assistant',content:content},calls:calls,stop:stop};
+}
+
+async function openaiStep(cfg,system,messages,tools,h,signal){
+  var url=(cfg.url||'').replace(/\/+$/,'')+'/chat/completions';
+  var msgs=[{role:'system',content:system}].concat(messages);
+  var body={model:cfg.model,messages:msgs,stream:true,
+    tools:tools.map(function(t){return {type:'function',function:{name:t.name,description:t.description,parameters:t.schema}}})};
+  if(cfg.maxTokens)body.max_tokens=cfg.maxTokens;
+  var r=await fetch(url,{method:'POST',signal:signal,headers:{'content-type':'application/json','authorization':'Bearer '+cfg.key},body:JSON.stringify(body)});
+  if(!r.ok)throw new Error('HTTP '+r.status+': '+(await r.text()).slice(0,800));
+  var text='',tcs=[],lastIdx=-1,finish='';
+  await readSSE(r,function(ev,data){
+    if(data.trim()==='[DONE]')return;
+    var j;try{j=JSON.parse(data)}catch(e){return}
+    if(j.error)throw new Error(j.error.message||JSON.stringify(j.error));
+    var ch=j.choices&&j.choices[0];if(!ch)return;
+    var d=ch.delta||{};
+    if(d.content){text+=d.content;h.text(d.content)}
+    if(d.tool_calls){
+      d.tool_calls.forEach(function(tc){
+        var idx=(typeof tc.index==='number')?tc.index:(tc.id&&tcs[lastIdx]&&tcs[lastIdx].id&&tcs[lastIdx].id!==tc.id?lastIdx+1:Math.max(lastIdx,0));
+        lastIdx=idx;
+        var cur=tcs[idx]||(tcs[idx]={id:'',name:'',args:''});
+        if(tc.id)cur.id=tc.id;
+        if(tc.function){
+          if(tc.function.name){cur.name+=tc.function.name;h.toolStart(cur.name)}
+          if(tc.function.arguments)cur.args+=tc.function.arguments;
+        }
+      });
+    }
+    if(ch.finish_reason)finish=ch.finish_reason;
+  });
+  var calls=[],tcOut=[];
+  tcs.forEach(function(c,n){
+    if(!c||!c.name)return;
+    if(!c.id)c.id='call_'+Date.now().toString(36)+n;
+    var p=parseArgs(c.args);
+    tcOut.push({id:c.id,type:'function',function:{name:c.name,arguments:c.args||'{}'}});
+    calls.push({id:c.id,name:c.name,input:p.v,bad:!p.ok});
+  });
+  var msg={role:'assistant',content:text||null};
+  if(tcOut.length)msg.tool_calls=tcOut;
+  if(!text&&!tcOut.length)msg.content='(no reply)';
+  return {message:msg,calls:calls,stop:finish};
+}
+
+/* keep long conversations small: shorten old tool output and old file bodies */
+function trimHistory(api,kind,keep){
+  var n=api.length-(keep||8);
+  for(var i=0;i<n;i++){
+    var m=api[i];
+    if(kind==='anthropic'){
+      if(!Array.isArray(m.content))continue;
+      m.content.forEach(function(b){
+        if(b.type==='tool_result'&&typeof b.content==='string'&&b.content.length>1500)b.content=b.content.slice(0,600)+'\n...[old output trimmed]';
+        if(b.type==='tool_use'&&b.input&&typeof b.input.content==='string'&&b.input.content.length>1500){b.input=Object.assign({},b.input,{content:'[file body already saved in the workspace]'})}
+      });
+    }else{
+      if(m.role==='tool'&&typeof m.content==='string'&&m.content.length>1500)m.content=m.content.slice(0,600)+'\n...[old output trimmed]';
+      if(m.tool_calls)m.tool_calls.forEach(function(c){
+        try{var a=JSON.parse(c.function.arguments);if(a&&typeof a.content==='string'&&a.content.length>1500){a.content='[file body already saved in the workspace]';c.function.arguments=JSON.stringify(a)}}catch(e){}
+      });
+    }
+  }
+}
+
+function schema(props,required){
+  var p={};
+  Object.keys(props).forEach(function(k){p[k]={type:'string',description:props[k]}});
+  return {type:'object',properties:p,required:required||[]};
+}
+var TOOLS=[
+  {name:'list_files',description:'List every file in the workspace with its size.',schema:schema({})},
+  {name:'read_file',description:'Read a text file from the workspace.',schema:schema({path:'File path, for example src/main.js'},['path'])},
+  {name:'write_file',description:'Create or overwrite a file in the workspace with the full content. Folders are implied by the path.',schema:schema({path:'File path',content:'Complete file content'},['path','content'])},
+  {name:'edit_file',description:'Change part of an existing file: replaces the exact text old_str (which must appear exactly once) with new_str. Cheaper than rewriting the whole file.',schema:schema({path:'File path',old_str:'Exact text to replace, appears once',new_str:'Replacement text'},['path','old_str','new_str'])},
+  {name:'delete_file',description:'Delete a file from the workspace.',schema:schema({path:'File path'},['path'])},
+  {name:'fetch_url',description:'Download a web page or text file with HTTP GET and return the first 20000 characters. Use it to read documentation or version lists.',schema:schema({url:'Full https URL'},['url'])},
+  {name:'github_push',description:'Commit every workspace file to a GitHub repository in one commit (creates the repo if it does not exist). Needs the GitHub token from settings. Files you deleted since the last push are removed from the repo. Returns the repo and commit URLs.',schema:schema({repo:'Repository name or owner/name. Optional if you already pushed in this chat',message:'Commit message',branch:'Branch, default main',private:'"true" or "false", only used when the repo has to be created. Default true'},[])},
+  {name:'github_status',description:'Show the latest GitHub Actions runs of the repository and the jobs and steps of the newest run, so you can see whether the build passed and which step failed.',schema:schema({repo:'Repository name or owner/name. Optional after a push'},[])},
+  {name:'github_logs',description:'Fetch the end of the log of one GitHub Actions job (use a job id from github_status) to find the real error message.',schema:schema({job_id:'Job id from github_status',repo:'Repository name or owner/name. Optional after a push'},['job_id'])},
+  {name:'github_releases',description:'List the newest releases of the repository with the download links of their files, for example a built APK or jar.',schema:schema({repo:'Repository name or owner/name. Optional after a push'},[])}
+];
+/*CORE-END*/
+/* ---------- app ---------- */
+var SYSTEM_DEFAULT=[
+'You are RobinAi, an autonomous build agent that runs in the user\'s browser. You turn requests into finished projects: apps, websites, scripts, servers and Minecraft mods.',
+'',
+'How you work',
+'- You have a workspace of files. Create and change files only with your tools (write_file, edit_file, delete_file). Never paste a whole file into the chat instead of saving it.',
+'- Plan briefly, then build. Write complete, working code with no placeholders, TODO stubs or "rest of the file" comments. Check your own code for bugs before you save it and fix anything you find.',
+'- Use edit_file for small changes and write_file for new or fully rewritten files.',
+'- If you are unsure about a version, API or file format, look it up with fetch_url before you write code. Never guess version numbers for Gradle, Minecraft, Fabric, Forge or Android.',
+'- You cannot run or compile code yourself. You build real binaries with GitHub Actions: write a workflow, call github_push, then call github_status, read failures with github_logs, fix the code and push again. Repeat until the build is green. Then call github_releases and give the user the download link.',
+'',
+'Building on GitHub',
+'- Workflows live in .github/workflows/. Use current action versions (actions/checkout, actions/setup-java, gradle/actions/setup-gradle). Do not rely on a gradle wrapper jar, because you cannot create binary files. Install Gradle with gradle/actions/setup-gradle (gradle-version input) and call "gradle", not "./gradlew".',
+'- To give the user a download, publish the built file as a GitHub Release from the workflow (set "permissions: contents: write" and use softprops/action-gh-release or "gh release create"), and also upload it with actions/upload-artifact.',
+'- Android apps: Gradle Android project, build the debug or signed-with-a-generated-key release APK, and attach it to a release.',
+'- Minecraft mods: pick the loader the user wants (Fabric by default). Create the whole project: build.gradle, settings.gradle, gradle.properties, fabric.mod.json or mods.toml, the main class, mixins if needed, assets, lang file, and a license. Look up the matching Minecraft, Loom/ForgeGradle, loader and API versions first.',
+'',
+'Style',
+'- Answer in the language the user writes in (Hinglish is fine). Be direct. When you finish, say in a few lines what you built, where the files are, and what the user does next.'
+].join('\n');
+
+var PRESETS=[
+  {id:'anthropic',label:'Anthropic (Claude)',kind:'anthropic',url:'https://api.anthropic.com',model:'claude-sonnet-5-5'},
+  {id:'openrouter',label:'OpenRouter',kind:'openai',url:'https://openrouter.ai/api/v1',model:'anthropic/claude-sonnet-4.5'},
+  {id:'gemini',label:'Google Gemini',kind:'openai',url:'https://generativelanguage.googleapis.com/v1beta/openai',model:'gemini-2.5-flash'},
+  {id:'openai',label:'OpenAI',kind:'openai',url:'https://api.openai.com/v1',model:'gpt-4.1'},
+  {id:'custom',label:'Custom (OpenAI compatible)',kind:'openai',url:'',model:''}
+];
+
+var $=function(s,r){return (r||document).querySelector(s)};
+var S={settings:{prov:'anthropic',url:PRESETS[0].url,model:PRESETS[0].model,key:'',gh:'',steps:'200',tokens:'16000',system:SYSTEM_DEFAULT},chats:[],active:null};
+var run=null; // {chatId, ctrl}
+var openFile=null,previewing=false;
+
+function load(){
+  try{var raw=localStorage.getItem('robinai.v1');if(raw){var j=JSON.parse(raw);if(j&&j.settings)S.settings=Object.assign(S.settings,j.settings);if(j&&j.chats)S.chats=j.chats;S.active=j&&j.active||null}}catch(e){}
+}
+var saveT=null;
+function save(){
+  clearTimeout(saveT);
+  saveT=setTimeout(function(){
+    try{localStorage.setItem('robinai.v1',JSON.stringify(S))}catch(e){warn('Browser storage is full or blocked. Download the ZIP so you do not lose your files.')}
+  },250);
+}
+function warn(t){var f=$('#foot');f.textContent=t}
+
+function chat(){return S.chats.find(function(c){return c.id===S.active})}
+function newChat(){
+  var c={id:'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),title:'New chat',api:[],ui:[],files:{},repo:'',pushed:[],kind:''};
+  S.chats.unshift(c);S.active=c.id;save();return c;
+}
+function kindOf(){var p=PRESETS.find(function(x){return x.id===S.settings.prov});return p?p.kind:'openai'}
+function cfg(){return {url:S.settings.url.trim(),model:S.settings.model.trim(),key:S.settings.key.trim(),maxTokens:parseInt(S.settings.tokens,10)||16000}}
+
+/* ---------- tools ---------- */
+function normPath(p){
+  p=String(p||'').replace(/\\/g,'/').replace(/^\.?\/+/,'');
+  if(!p||p.split('/').some(function(s){return s==='..'}))throw new Error('Bad path: '+p);
+  return p;
+}
+function kb(n){return n<1024?n+' B':(n/1024).toFixed(1)+' KB'}
+
+async function gh(path,opt){
+  opt=opt||{};
+  if(!S.settings.gh.trim())throw new Error('No GitHub token. Ask the user to add one in Settings.');
+  var r=await fetch(path.indexOf('http')===0?path:'https://api.github.com'+path,{method:opt.method||'GET',headers:{
+    'Authorization':'Bearer '+S.settings.gh.trim(),'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'},
+    body:opt.body?JSON.stringify(opt.body):undefined});
+  var t=await r.text(),j=null;try{j=t?JSON.parse(t):null}catch(e){}
+  if(!r.ok){var e=new Error('GitHub '+r.status+': '+((j&&j.message)||t.slice(0,300)));e.status=r.status;throw e}
+  return opt.raw?t:j;
+}
+var loginCache=null;
+async function repoRef(c,repo){
+  repo=(repo||c.repo||'').trim();
+  if(!repo)throw new Error('No repository given.');
+  if(repo.indexOf('/')<0){
+    if(!loginCache||loginCache.t!==S.settings.gh)loginCache={t:S.settings.gh,login:(await gh('/user')).login};
+    return {owner:loginCache.login,name:repo};
+  }
+  var p=repo.split('/');return {owner:p[0],name:p[1]};
+}
+async function ghPush(c,args){
+  var ref=await repoRef(c,args.repo),o=ref.owner,n=ref.name,branch=(args.branch||'main').trim();
+  var priv=String(args.private==null?'true':args.private)!=='false';
+  var msg=args.message||'Update from RobinAi';
+  var repo;
+  try{repo=await gh('/repos/'+o+'/'+n)}
+  catch(e){
+    if(e.status!==404)throw e;
+    repo=await gh('/user/repos',{method:'POST',body:{name:n,private:priv,auto_init:true,description:'Built with RobinAi'}});
+    await new Promise(function(r){setTimeout(r,1500)});
+  }
+  var base=null,baseTree=null;
+  async function getRef(b){try{return await gh('/repos/'+o+'/'+n+'/git/ref/heads/'+encodeURIComponent(b))}catch(e){if(e.status===404||e.status===409)return null;throw e}}
+  var r=await getRef(branch),createRef=false;
+  if(!r){
+    var def=repo.default_branch||'main';
+    var dr=def!==branch?await getRef(def):null;
+    if(dr){r=dr;createRef=true}
+    else if(def===branch){
+      await gh('/repos/'+o+'/'+n+'/contents/.robinai',{method:'PUT',body:{message:'Initialise repository',content:btoa('RobinAi'),branch:branch}});
+      r=await getRef(branch);
+    }
+  }
+  if(!r)throw new Error('Could not find or create the branch '+branch);
+  base=r.object.sha;
+  var bc=await gh('/repos/'+o+'/'+n+'/git/commits/'+base);baseTree=bc.tree.sha;
+  var paths=Object.keys(c.files);
+  if(!paths.length)throw new Error('The workspace is empty. Nothing to push.');
+  var tree=[],i=0;
+  async function worker(){
+    while(i<paths.length){
+      var p=paths[i++];
+      var b=await gh('/repos/'+o+'/'+n+'/git/blobs',{method:'POST',body:{content:c.files[p],encoding:'utf-8'}});
+      tree.push({path:p,mode:(p==='gradlew'||/\.sh$/.test(p))?'100755':'100644',type:'blob',sha:b.sha});
+    }
+  }
+  await Promise.all([worker(),worker(),worker(),worker()]);
+  (c.pushed||[]).forEach(function(p){if(!(p in c.files))tree.push({path:p,mode:'100644',type:'blob',sha:null})});
+  var t=await gh('/repos/'+o+'/'+n+'/git/trees',{method:'POST',body:{base_tree:baseTree,tree:tree}});
+  var cm=await gh('/repos/'+o+'/'+n+'/git/commits',{method:'POST',body:{message:msg,tree:t.sha,parents:[base]}});
+  if(createRef)await gh('/repos/'+o+'/'+n+'/git/refs',{method:'POST',body:{ref:'refs/heads/'+branch,sha:cm.sha}});
+  else await gh('/repos/'+o+'/'+n+'/git/refs/heads/'+encodeURIComponent(branch),{method:'PATCH',body:{sha:cm.sha}});
+  c.repo=o+'/'+n;c.pushed=paths.slice();save();
+  return {repo:o+'/'+n,url:'https://github.com/'+o+'/'+n,commit:'https://github.com/'+o+'/'+n+'/commit/'+cm.sha,files:paths.length,branch:branch};
+}
+async function ghStatus(c,args){
+  var ref=await repoRef(c,args.repo),base='/repos/'+ref.owner+'/'+ref.name;
+  var runs=await gh(base+'/actions/runs?per_page=3');
+  if(!runs.workflow_runs.length)return 'No workflow runs yet. A run appears a few seconds after a push that contains a workflow with an "on: push" trigger.';
+  var out=[];
+  runs.workflow_runs.forEach(function(r){out.push('run '+r.id+' "'+r.name+'" '+r.status+'/'+(r.conclusion||'-')+' commit '+r.head_sha.slice(0,7)+' '+r.html_url)});
+  var jobs=await gh(base+'/actions/runs/'+runs.workflow_runs[0].id+'/jobs');
+  jobs.jobs.forEach(function(j){
+    out.push('  job '+j.id+' "'+j.name+'" '+j.status+'/'+(j.conclusion||'-'));
+    (j.steps||[]).forEach(function(s){out.push('    step '+s.number+' '+s.name+': '+(s.conclusion||s.status))});
+  });
+  return out.join('\n');
+}
+async function ghLogs(c,args){
+  var ref=await repoRef(c,args.repo);
+  var t=await gh('/repos/'+ref.owner+'/'+ref.name+'/actions/jobs/'+encodeURIComponent(args.job_id)+'/logs',{raw:true});
+  return t.length>7000?'...[start cut]\n'+t.slice(-7000):t;
+}
+async function ghReleases(c,args){
+  var ref=await repoRef(c,args.repo);
+  var rel=await gh('/repos/'+ref.owner+'/'+ref.name+'/releases?per_page=3');
+  if(!rel.length)return 'No releases yet.';
+  return rel.map(function(r){return r.tag_name+' ('+r.html_url+')\n'+(r.assets.length?r.assets.map(function(a){return '  '+a.name+' '+kb(a.size)+'  '+a.browser_download_url}).join('\n'):'  (no files attached)')}).join('\n');
+}
+
+async function runTool(c,name,a,signal){
+  try{
+    if(name==='list_files'){
+      var ks=Object.keys(c.files).sort();
+      return ks.length?ks.map(function(k){return k+'  ('+kb(c.files[k].length)+')'}).join('\n'):'(workspace is empty)';
+    }
+    if(name==='read_file'){var p=normPath(a.path);if(!(p in c.files))return 'File not found: '+p;var t=c.files[p];return t.length>80000?t.slice(0,80000)+'\n...[file continues]':t}
+    if(name==='write_file'){var p2=normPath(a.path);if(typeof a.content!=='string')return 'Error: content is missing.';c.files[p2]=a.content;save();renderFiles();return 'Saved '+p2+' ('+kb(a.content.length)+')'}
+    if(name==='edit_file'){
+      var p3=normPath(a.path);if(!(p3 in c.files))return 'File not found: '+p3;
+      var src=c.files[p3],old=String(a.old_str==null?'':a.old_str);
+      if(!old)return 'Error: old_str is empty.';
+      var cnt=src.split(old).length-1;
+      if(cnt===0)return 'Error: old_str was not found in '+p3+'. Read the file and copy the exact text.';
+      if(cnt>1)return 'Error: old_str appears '+cnt+' times. Include more surrounding text so it is unique.';
+      c.files[p3]=src.replace(old,function(){return String(a.new_str==null?'':a.new_str)});save();renderFiles();return 'Edited '+p3;
+    }
+    if(name==='delete_file'){var p4=normPath(a.path);if(!(p4 in c.files))return 'File not found: '+p4;delete c.files[p4];save();renderFiles();return 'Deleted '+p4}
+    if(name==='fetch_url'){
+      var url=String(a.url||''),txt;
+      if(!/^https?:\/\//.test(url))return 'Error: give a full http(s) URL.';
+      try{var r=await fetch(url,{signal:signal});if(!r.ok)throw new Error('HTTP '+r.status);txt=await r.text()}
+      catch(e){
+        if(e.name==='AbortError')throw e;
+        try{var r2=await fetch('https://r.jina.ai/'+url,{signal:signal});if(!r2.ok)throw new Error('HTTP '+r2.status);txt=await r2.text()}
+        catch(e2){return 'Error: could not fetch (the site may block browsers). '+e2.message}
+      }
+      return txt.length>20000?txt.slice(0,20000)+'\n...[cut]':txt;
+    }
+    if(name==='github_push'){var res=await ghPush(c,a);return 'Pushed '+res.files+' files to '+res.repo+' ('+res.branch+'). Repo: '+res.url+' Commit: '+res.commit}
+    if(name==='github_status')return await ghStatus(c,a);
+    if(name==='github_logs')return await ghLogs(c,a);
+    if(name==='github_releases')return await ghReleases(c,a);
+    return 'Unknown tool: '+name;
+  }catch(e){
+    if(e.name==='AbortError')throw e;
+    return 'Error: '+(e&&e.message||e);
+  }
+}
+
+/* ---------- agent loop ---------- */
+async function agent(c,text){
+  var ctrl=new AbortController();run={chatId:c.id,ctrl:ctrl};setBusy(true);
+  var kind=kindOf();
+  if(c.kind&&c.kind!==kind){c.api=[]}
+  c.kind=kind;
+  c.api.push({role:'user',content:text});
+  c.ui.push({k:'user',text:text});
+  if(c.title==='New chat'){c.title=text.replace(/\s+/g,' ').slice(0,48)}
+  save();renderAll();
+  var max=parseInt(S.settings.steps,10);if(isNaN(max)||max<0)max=200;
+  var step=0,curNode=null,curText='',pendingChip=null;
+  var h={
+    text:function(d){
+      if(!curNode){curNode=addMsgNode();curText=''}
+      curText+=d;curNode.innerHTML=md(curText);scrollDown();
+    },
+    toolStart:function(n){
+      if(pendingChip&&pendingChip.parentNode)pendingChip.remove();
+      pendingChip=chipNode('<i class="dot"></i><span>preparing '+esc(n)+'...</span>');scrollDown();
+    }
+  };
+  try{
+    for(;;){
+      if(max&&step>=max){c.ui.push({k:'err',text:'Stopped after '+max+' steps. Send "continue" to go on.'});break}
+      step++;curNode=null;curText='';
+      trimHistory(c.api,kind);
+      var fn=kind==='anthropic'?anthropicStep:openaiStep;
+      var res=await fn(cfg(),S.settings.system||SYSTEM_DEFAULT,c.api,TOOLS,h,ctrl.signal);
+      if(pendingChip&&pendingChip.parentNode)pendingChip.remove();pendingChip=null;
+      c.api.push(res.message);
+      var said=kind==='anthropic'?res.message.content.filter(function(b){return b.type==='text'}).map(function(b){return b.text}).join('\n'):(res.message.content||'');
+      if(said&&said!=='(no reply)')c.ui.push({k:'asst',text:said});
+      if(!res.calls.length)break;
+      var results=[];
+      for(var i=0;i<res.calls.length;i++){
+        var call=res.calls[i],out;
+        if(call.bad)out='Error: your tool call arguments were cut off or invalid JSON (output limit reached). Write smaller files, one per call.';
+        else out=await runTool(c,call.name,call.input,ctrl.signal);
+        var arg=call.input.path||call.input.url||call.input.repo||call.input.job_id||'';
+        var u={k:'tool',name:call.name,arg:String(arg),ok:out.indexOf('Error')!==0,out:out.length>600?out.slice(0,600)+'...':out};
+        c.ui.push(u);chipNode(chipHtml(u));
+        results.push({call:call,out:out});
+      }
+      if(kind==='anthropic'){
+        c.api.push({role:'user',content:results.map(function(r){return {type:'tool_result',tool_use_id:r.call.id,content:r.out}})});
+      }else{
+        results.forEach(function(r){c.api.push({role:'tool',tool_call_id:r.call.id,content:r.out})});
+      }
+      save();
+    }
+  }catch(e){
+    if(pendingChip&&pendingChip.parentNode)pendingChip.remove();
+    if(e.name==='AbortError'){c.ui.push({k:'err',text:'Stopped.'})}
+    else{c.ui.push({k:'err',text:String(e.message||e)});
+      // drop a dangling user turn the API never answered so the next message works
+    }
+    var last=c.api[c.api.length-1];
+    if(last&&last.role==='assistant'&&((Array.isArray(last.content)&&last.content.some(function(b){return b.type==='tool_use'}))||last.tool_calls)){c.api.pop()}
+  }
+  run=null;setBusy(false);save();renderAll();
+}
+
+/* ---------- rendering ---------- */
+function chipHtml(u){return '<b>'+esc(u.name)+'</b><span>'+esc(u.arg||u.out.split('\n')[0])+'</span>'}
+function chipNode(html,cls){var d=document.createElement('div');d.className='chip'+(cls?' '+cls:'');d.innerHTML=html;$('#col').appendChild(d);scrollDown();return d}
+function addMsgNode(){var d=document.createElement('div');d.className='msg asst';$('#col').appendChild(d);return d}
+function scrollDown(){var t=$('#thread');if(t.scrollHeight-t.scrollTop-t.clientHeight<260)t.scrollTop=t.scrollHeight}
+
+var IDEAS=[
+  {t:'Minecraft mod',d:'Fabric mod with a new item, recipe and crafting table, built on GitHub',p:'Build a Fabric mod for the latest Minecraft release that adds a ruby gem, ruby tools and armor, an ore that generates underground, and recipes. Look up the right versions first, push it to GitHub, get the build green and give me the jar download link.'},
+  {t:'Android app',d:'Kotlin app with a built APK',p:'Make a simple Android notes app in Kotlin with Jetpack Compose (add, edit, delete, search). Add a GitHub Actions workflow that builds the APK and publishes it as a release, push it, fix any build errors and give me the APK link.'},
+  {t:'Website',d:'Responsive site, previewed here',p:'Build a responsive landing page for a small coffee roastery with a menu, an about section and a contact form. One index.html, no frameworks. I want to preview it here.'},
+  {t:'Discord bot',d:'Node.js bot with commands',p:'Write a Discord bot in Node.js with slash commands for /ping, /roll and /remind. Include README with setup steps and a Dockerfile.'}
+];
+function renderEmpty(){
+  var col=$('#col');
+  col.innerHTML='<div class="empty"><h1>What should we build?</h1><p>RobinAi writes the files, fixes its own build errors on GitHub and hands you the download. Add your API key in Settings to start.</p><div class="ideas" id="ideas"></div></div>';
+  var box=$('#ideas');
+  IDEAS.forEach(function(i){
+    var b=document.createElement('button');b.className='idea';b.type='button';
+    b.innerHTML='<strong>'+esc(i.t)+'</strong><span>'+esc(i.d)+'</span>';
+    b.onclick=function(){$('#input').value=i.p;autoSize();$('#input').focus()};
+    box.appendChild(b);
+  });
+}
+function renderChat(){
+  var c=chat(),col=$('#col');col.innerHTML='';
+  if(!c||!c.ui.length){renderEmpty();return}
+  c.ui.forEach(function(u){
+    if(u.k==='user'){var d=document.createElement('div');d.className='msg user';d.textContent=u.text;col.appendChild(d)}
+    else if(u.k==='asst'){var m=addMsgNode();m.innerHTML=md(u.text)}
+    else if(u.k==='tool'){chipNode(chipHtml(u))}
+    else if(u.k==='err'){chipNode('<b>!</b><span>'+esc(u.text)+'</span>','err')}
+  });
+  var t=$('#thread');t.scrollTop=t.scrollHeight;
+}
+function renderList(){
+  var l=$('#chatlist');l.innerHTML='';
+  S.chats.forEach(function(c){
+    var row=document.createElement('div');row.className='chatitem'+(c.id===S.active?' on':'');
+    var t=document.createElement('button');t.className='t';t.type='button';t.textContent=c.title;
+    t.onclick=function(){if(run)return;S.active=c.id;openFile=null;save();renderAll();$('#side').classList.remove('open')};
+    var x=document.createElement('button');x.className='x';x.type='button';x.textContent='Delete';x.setAttribute('aria-label','Delete chat');
+    x.onclick=function(){
+      if(run)return;
+      if(x.dataset.sure!=='1'){x.dataset.sure='1';x.textContent='Sure?';setTimeout(function(){x.dataset.sure='';x.textContent='Delete'},2500);return}
+      S.chats=S.chats.filter(function(k){return k.id!==c.id});
+      if(S.active===c.id)S.active=S.chats.length?S.chats[0].id:null;
+      save();renderAll();
+    };
+    row.appendChild(t);row.appendChild(x);l.appendChild(row);
+  });
+}
+function renderFiles(){
+  var c=chat(),fl=$('#flist'),files=c?c.files:{},ks=Object.keys(files).sort(),total=0;
+  fl.innerHTML='';
+  ks.forEach(function(k){
+    total+=files[k].length;
+    var b=document.createElement('button');b.type='button';b.className='frow'+(openFile===k?' on':'');
+    var i=k.lastIndexOf('/'),dir=i>=0?k.slice(0,i+1):'',nm=k.slice(i+1);
+    b.innerHTML='<span><i class="d">'+esc(dir)+'</i>'+esc(nm)+'</span>';
+    b.onclick=function(){openFile=k;previewing=false;renderFiles()};
+    fl.appendChild(b);
+  });
+  if(!ks.length)fl.innerHTML='<div class="none">No files yet. They appear here as RobinAi writes them.</div>';
+  $('#fileCount').textContent=ks.length?'('+ks.length+')':'';
+  $('#wsSize').textContent=ks.length?kb(total):'';
+  $('#zipBtn').disabled=!ks.length;$('#pushBtn').disabled=!ks.length;
+  var v=$('#viewer');
+  if(openFile&&files[openFile]!=null){
+    v.hidden=false;$('#vname').textContent=openFile;
+    var isHtml=/\.html?$/i.test(openFile);$('#vPreview').hidden=!isHtml;
+    $('#vPreview').textContent=previewing?'Edit':'Preview';
+    $('#vtext').hidden=previewing;$('#vframe').hidden=!previewing;
+    if(previewing)$('#vframe').srcdoc=files[openFile];
+    else if($('#vtext').dataset.path!==openFile||$('#vtext').dataset.len!==String(files[openFile].length)){
+      $('#vtext').value=files[openFile];$('#vtext').dataset.path=openFile;$('#vtext').dataset.len=String(files[openFile].length);
+    }
+  }else{v.hidden=true;openFile=null}
+}
+function renderAll(){renderList();renderChat();renderFiles();updateFoot()}
+function updateFoot(){
+  var f=$('#foot');
+  if(!S.settings.key)f.textContent='Add your API key in Settings to begin.';
+  else f.textContent=(PRESETS.find(function(p){return p.id===S.settings.prov})||{label:''}).label+' · '+S.settings.model+(S.settings.gh?' · GitHub connected':'');
+}
+function setBusy(b){var s=$('#sendBtn');s.textContent=b?'Stop':'Send';s.classList.toggle('gold',true)}
+
+/* ---------- events ---------- */
+function autoSize(){var t=$('#input');t.style.height='auto';t.style.height=Math.min(t.scrollHeight,window.innerHeight*0.4)+'px'}
+function send(){
+  if(run){run.ctrl.abort();return}
+  var t=$('#input'),text=t.value.trim();if(!text)return;
+  if(!S.settings.key){openSettings();return}
+  if(!S.settings.url||!S.settings.model){openSettings();return}
+  var c=chat()||newChat();
+  t.value='';autoSize();
+  agent(c,text);
+}
+function download(name,blob){
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},2000);
+}
+function slug(s){return (s||'robinai').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40)||'robinai'}
+
+function openSettings(){
+  var d=$('#setDlg'),s=S.settings,sel=$('#sProv');
+  sel.innerHTML='';PRESETS.forEach(function(p){var o=document.createElement('option');o.value=p.id;o.textContent=p.label;sel.appendChild(o)});
+  sel.value=s.prov;$('#sUrl').value=s.url;$('#sModel').value=s.model;$('#sKey').value=s.key;$('#sGh').value=s.gh;
+  $('#sSteps').value=s.steps;$('#sTokens').value=s.tokens;$('#sSys').value=s.system;
+  if(!d.open)d.showModal();
+}
+function init(){
+  load();
+  try{var th=localStorage.getItem('robinai.theme');if(th)document.documentElement.setAttribute('data-theme',th)}catch(e){}
+  if(!chat()){if(S.chats.length)S.active=S.chats[0].id}
+  renderAll();
+
+  $('#input').addEventListener('input',autoSize);
+  $('#input').addEventListener('keydown',function(e){
+    if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing&&!window.matchMedia('(pointer:coarse)').matches){e.preventDefault();send()}
+  });
+  $('#sendBtn').onclick=send;
+  $('#newChat').onclick=function(){if(run)return;newChat();openFile=null;renderAll();$('#side').classList.remove('open');$('#input').focus()};
+  $('#menuBtn').onclick=function(){$('#side').classList.toggle('open')};
+  $('#settingsBtn').onclick=openSettings;
+  function flipTheme(){
+    var cur=document.documentElement.getAttribute('data-theme');
+    var dark=cur?cur==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var nx=dark?'light':'dark';document.documentElement.setAttribute('data-theme',nx);
+    document.documentElement.style.colorScheme=nx;
+    try{localStorage.setItem('robinai.theme',nx)}catch(e){}
+  }
+  $('#themeBtn').onclick=flipTheme;$('#sTheme').onclick=flipTheme;
+  function pane(p){$('#app').dataset.pane=p;$('#tabChat').setAttribute('aria-pressed',p==='chat');$('#tabFiles').setAttribute('aria-pressed',p==='files')}
+  $('#tabChat').onclick=function(){pane('chat')};$('#tabFiles').onclick=function(){pane('files')};
+
+  $('#sProv').onchange=function(){
+    var p=PRESETS.find(function(x){return x.id===$('#sProv').value});
+    $('#sUrl').value=p.url;$('#sModel').value=p.model;
+  };
+  $('#setForm').addEventListener('submit',function(e){
+    if(e.submitter&&e.submitter.value==='ok'){
+      var s=S.settings;
+      s.prov=$('#sProv').value;s.url=$('#sUrl').value.trim();s.model=$('#sModel').value.trim();s.key=$('#sKey').value.trim();s.gh=$('#sGh').value.trim();
+      s.steps=$('#sSteps').value.trim()||'200';s.tokens=$('#sTokens').value.trim()||'16000';s.system=$('#sSys').value.trim()||SYSTEM_DEFAULT;
+      loginCache=null;save();updateFoot();
+    }
+  });
+
+  $('#zipBtn').onclick=function(){var c=chat();if(!c)return;download(slug(c.title)+'.zip',makeZip(c.files))};
+  $('#newFileBtn').onclick=function(){if(!chat())newChat();$('#nfPath').value='';$('#fileDlg').showModal();$('#nfPath').focus()};
+  $('#fileDlg form').addEventListener('submit',function(e){
+    if(e.submitter&&e.submitter.value==='ok'){
+      try{var p=normPath($('#nfPath').value);var c=chat();if(!(p in c.files))c.files[p]='';openFile=p;previewing=false;save();renderFiles()}catch(x){}
+    }
+  });
+  $('#vSave').onclick=function(){var c=chat();if(!c||!openFile)return;c.files[openFile]=$('#vtext').value;$('#vtext').dataset.len=String($('#vtext').value.length);save();renderFiles()};
+  $('#vDel').onclick=function(){
+    var b=$('#vDel');
+    if(b.dataset.sure!=='1'){b.dataset.sure='1';b.textContent='Sure?';setTimeout(function(){b.dataset.sure='';b.textContent='Delete'},2500);return}
+    var c=chat();delete c.files[openFile];openFile=null;b.dataset.sure='';b.textContent='Delete';save();renderFiles();
+  };
+  $('#vCopy').onclick=function(){
+    var t=$('#vtext');
+    (navigator.clipboard?navigator.clipboard.writeText(t.value):Promise.reject()).catch(function(){t.select();document.execCommand&&document.execCommand('copy')});
+  };
+  $('#vDl').onclick=function(){if(!openFile)return;download(openFile.split('/').pop(),new Blob([$('#vtext').value],{type:'text/plain'}))};
+  $('#vPreview').onclick=function(){previewing=!previewing;renderFiles()};
+
+  $('#pushBtn').onclick=function(){
+    var c=chat();if(!c)return;
+    $('#pRepo').value=c.repo||slug(c.title);$('#pOut').textContent='';
+    if(!S.settings.gh)$('#pOut').textContent='Add a GitHub token in Settings first.';
+    $('#pushDlg').showModal();
+  };
+  $('#pGo').onclick=async function(){
+    var c=chat(),out=$('#pOut'),b=$('#pGo');if(!c)return;
+    if(!S.settings.gh){out.textContent='Add a GitHub token in Settings first.';return}
+    b.disabled=true;out.textContent='Pushing...';
+    try{
+      var r=await ghPush(c,{repo:$('#pRepo').value,branch:$('#pBranch').value,message:$('#pMsg').value,private:$('#pPrivate').checked?'true':'false'});
+      out.innerHTML='Pushed '+r.files+' files. <a href="'+esc(r.url)+'" target="_blank" rel="noopener noreferrer">Open repository</a> · <a href="'+esc(r.commit)+'" target="_blank" rel="noopener noreferrer">Commit</a>';
+    }catch(e){out.textContent=String(e.message||e)}
+    b.disabled=false;
+  };
+
+  $('#thread').addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('[data-copy]');
+    if(!b)return;
+    var code=b.closest('.code').querySelector('code').textContent;
+    (navigator.clipboard?navigator.clipboard.writeText(code):Promise.reject()).then(function(){b.textContent='Copied';setTimeout(function(){b.textContent='Copy'},1200)},function(){
+      var r=document.createRange();r.selectNodeContents(b.closest('.code').querySelector('code'));var s=getSelection();s.removeAllRanges();s.addRange(r);
+    });
+  });
+  if(!S.settings.key)setTimeout(function(){if(!S.chats.length)openSettings()},400);
+}
+init();
+</script>
+</body>
+</html>
