@@ -1,0 +1,9 @@
+id = "waypoints"
+name = "Waypoints"
+version = "0.1.0"
+description = "Xaero-style waypoints: save places with a name, colour and dimension, see them in the world with name and distance, a compass strip, death points, Nether/Overworld conversion, teleport and share. /wp or /waypoint opens the menu."
+authors = ["Robin"]
+api = "0.1"
+side = "client"
+capabilities = ["game-read", "chat", "storage", "command", "ui", "render"]
+experimental = ["render", "ui"]

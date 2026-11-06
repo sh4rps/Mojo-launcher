@@ -1,0 +1,28 @@
+name: Build Waypoints (.hmod)
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Horizon SDK and tool
+        run: |
+          git clone https://github.com/Vasysik/horizon-android horizon-src
+          cd horizon-src && git checkout 150a414
+          cargo build --release -p cargo-horizon-mod
+      - name: Build mod
+        working-directory: waypoints
+        run: |
+          rustup target add wasm32-unknown-unknown
+          ../horizon-src/target/release/cargo-horizon-mod build --release || ../horizon-src/target/release/cargo-horizon-mod build
+          ls -la target/horizon-mod
+          ../horizon-src/target/release/cargo-horizon-mod check target/horizon-mod/waypoints.hmod
+      - name: Release
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          cp waypoints/target/horizon-mod/waypoints.hmod Waypoints.hmod
+          gh release delete waypoints -y --cleanup-tag || true
+          gh release create waypoints Waypoints.hmod --title "Waypoints (.hmod)" --notes "Replay Lite for Horizon Android 0.7.x. Put the .hmod in Horizon Android/horizon-mods and turn it on in Options > Mods."
