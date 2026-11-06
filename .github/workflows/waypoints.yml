@@ -25,4 +25,4 @@ jobs:
         run: |
           cp waypoints/target/horizon-mod/waypoints.hmod Waypoints.hmod
           gh release delete waypoints -y --cleanup-tag || true
-          gh release create waypoints Waypoints.hmod --title "Waypoints (.hmod)" --notes "Replay Lite for Horizon Android 0.7.x. Put the .hmod in Horizon Android/horizon-mods and turn it on in Options > Mods."
+          gh release create waypoints Waypoints.hmod --title "Waypoints (.hmod)" --notes "Waypoints mod (Xaero-style) for Horizon Android 0.7.x. Put the .hmod in Horizon Android/horizon-mods and turn it on in Options > Mods."

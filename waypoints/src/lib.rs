@@ -273,7 +273,7 @@ impl Mod for State {
             "tp" | "go" => { let i = idx(self, &name)?; Ok(Some(self.teleport(i)?)) }
             "hide" | "show" | "toggle" => { let i = idx(self, &name)?; self.wps[i].on = !self.wps[i].on; self.save(); Ok(Some(format!("\"{}\" {}", self.wps[i].name, if self.wps[i].on { "shown" } else { "hidden" }))) }
             "color" | "colour" => {
-                let (n, c) = rest.split_last().ok_or("/wp color <name> <0-15>")?;
+                let (c, n) = rest.split_last().ok_or("/wp color <name> <0-15>")?;
                 let c: usize = c.parse().map_err(|_| "Colour is a number 0-15")?;
                 let _ = n; // name is everything before the number
                 let nm = rest[..rest.len() - 1].join(" ");
