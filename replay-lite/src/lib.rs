@@ -241,7 +241,11 @@ impl Mod for Replay {
                 Ok(None)
             }
             "play" => { let r = self.start_play(&rest); self.say(r); Ok(None) }
-            "pause" => { if let Some(p) = &mut self.play { p.paused = !p.paused; self.refresh(); Ok(Some(if p.paused { "Paused".into() } else { "Resumed".into() })) } else { Err("Not playing".into()) } }
+            "pause" => {
+                let now = match &mut self.play { Some(p) => { p.paused = !p.paused; p.paused } None => return Err("Not playing".into()) };
+                self.refresh();
+                Ok(Some(if now { "Paused".into() } else { "Resumed".into() }))
+            }
             "speed" => { self.speed = (self.speed + 1) % SPEEDS.len(); self.refresh(); Ok(Some(format!("Speed {}x", SPEEDS[self.speed]))) }
             "delete" => { let r = self.delete(&rest); self.say(r); Ok(None) }
             "list" => Ok(Some(if self.names.is_empty() { "No recordings".into() } else { self.names.join(", ") })),
