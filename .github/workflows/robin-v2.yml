@@ -19,7 +19,7 @@ jobs:
       - name: Patch and build
         run: |
           java -jar apktool.jar d -f -o fcl fcl.apk
-          python3 -I v2/apply_fcl.py "$PWD/fcl" "$PWD/v2/mojo_default.json" "$PWD/v2/logo.png"
+          python3 v2/apply_fcl.py "$PWD/fcl" "$PWD/v2/mojo_default.json" "$PWD/v2/logo.png"
           java -jar apktool.jar b -f -o unsigned.apk fcl
           java -jar signer.jar -a unsigned.apk --ks v2/robin.jks --ksAlias mojo --ksPass mojogames --ksKeyPass mojogames -o out
           mv out/unsigned-aligned-signed.apk RobinLauncherV2.apk
