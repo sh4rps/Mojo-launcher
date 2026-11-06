@@ -1,0 +1,8 @@
+[{
+  "modid": "robinv1",
+  "name": "RobinV1",
+  "description": "ROBIN V1 PvP utility client",
+  "version": "${version}",
+  "mcversion": "1.8.9",
+  "authorList": ["Robin"]
+}]

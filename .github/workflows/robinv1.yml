@@ -1,0 +1,26 @@
+name: Build RobinV1 client
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '8' }
+      - name: Build
+        working-directory: RobinV1-Client
+        run: chmod +x gradlew && ./gradlew build --no-daemon --stacktrace
+      - name: Collect jar
+        run: |
+          ls -la RobinV1-Client/build/libs
+          cp "$(ls RobinV1-Client/build/libs/RobinV1-*.jar | grep -v -- '-dev\|-sources' | head -1)" RobinV1.jar
+      - uses: actions/upload-artifact@v4
+        with: { name: RobinV1, path: RobinV1.jar }
+      - name: Release
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          gh release delete robinv1-client -y --cleanup-tag || true
+          gh release create robinv1-client RobinV1.jar --title "RobinV1 Client (1.8.9 Forge)" --notes "Build of RobinV1 for Minecraft 1.8.9 Forge. Put in .minecraft/mods."
