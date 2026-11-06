@@ -1,0 +1,8 @@
+id = "replay_lite"
+name = "Replay Lite"
+version = "0.1.0"
+description = "Records your own path (position, view and time) and plays it back by teleporting you along it. /replay opens the menu. Needs cheats (single player or your own world)."
+authors = ["Robin"]
+api = "0.1"
+side = "client"
+capabilities = ["game-read", "hud", "chat", "storage", "command", "ui"]
