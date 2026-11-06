@@ -6,3 +6,4 @@ authors = ["Robin"]
 api = "0.1"
 side = "client"
 capabilities = ["game-read", "hud", "chat", "storage", "command", "ui"]
+experimental = ["ui"]
