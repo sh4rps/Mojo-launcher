@@ -1,0 +1,23 @@
+name: Build System App Disabler
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.9' }
+      - name: Build
+        working-directory: sysdis-shizuku
+        run: gradle --no-daemon assembleRelease
+      - name: Release
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          cp sysdis-shizuku/app/build/outputs/apk/release/app-release.apk SystemAppDisabler.apk
+          gh release delete system-app-disabler -y --cleanup-tag || true
+          gh release create system-app-disabler SystemAppDisabler.apk --title "System App Disabler" --notes "System App Disabler with Shizuku one-tap disable."
