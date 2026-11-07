@@ -27,6 +27,7 @@ public final class Hz {
     }
 
     public static void init(Application app) {
+        try { app.getExternalFilesDir(null); } catch (Throwable t) { } // makes sure Android/data/<pkg>/files exists
         app.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
             public void onActivityCreated(Activity a, Bundle b) { request(a); watch(a); }
             public void onActivityStarted(Activity a) { request(a); }

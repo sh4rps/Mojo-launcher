@@ -117,7 +117,9 @@ def arrays(body):
 def rename(plain, fname):
     base = os.path.basename(fname)
     if "http" in plain or "ZalithVersion" in plain: return None
-    if plain in ("/games/ZalithLauncher", "games/ZalithLauncher"): return plain.replace("ZalithLauncher", "FSRLauncher")
+    # game data lives in Android/data (app-specific storage): no storage permission needed, no crash
+    if plain == "/games/ZalithLauncher": return "/Android/data/" + NEW_PKG + "/files"
+    if plain == "games/ZalithLauncher": return "Android/data/" + NEW_PKG + "/files"
     if plain == "ZalithLauncher" and base.startswith("InfoDistributor"): return "FSRLauncher"
     if "Zalith Launcher" in plain: return plain.replace("Zalith Launcher", "FSR Launcher")
     return None
