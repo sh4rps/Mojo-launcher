@@ -1,0 +1,50 @@
+name: Build FSR Launcher
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - name: Tools
+        run: |
+          pip install pillow
+          curl -L -o apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v2.10.0/apktool_2.10.0.jar
+          curl -L -o signer.jar https://github.com/patrickfav/uber-apk-signer/releases/download/v1.3.0/uber-apk-signer-1.3.0.jar
+          curl -L -o zalith.apk https://github.com/ZalithLauncher/ZalithLauncher/releases/download/141400/ZalithLauncher-1.4.1.4-arm64-v8a.apk
+          ls -la zalith.apk
+      - name: Pull MobileGlues + LTW libs from Rust Launcher build
+        run: |
+          mkdir -p libs assets_x
+          unzip -o -j RustLauncher.apk lib/arm64-v8a/libltw.so lib/arm64-v8a/libmobileglues.so -d libs
+          unzip -o -j RustLauncher.apk assets/licenses/mobileglues-lgplv2.1-license.txt -d assets_x
+          ls -la libs assets_x
+      - name: Compile Hz helper
+        run: |
+          SDK=${ANDROID_HOME:-/usr/local/lib/android/sdk}
+          BT=$(ls -d $SDK/build-tools/* | sort -V | tail -1)
+          PL=$(ls -d $SDK/platforms/android-* | sort -V | tail -1)
+          mkdir -p hz/cls
+          javac --release 8 -cp $PL/android.jar -d hz/cls fsr-launcher/java/fsr/Hz.java
+          $BT/d8 --min-api 21 --output hz hz/cls/fsr/*.class
+          mv hz/classes.dex hz/classes4.dex
+          ls -la hz
+      - name: Patch and build
+        run: |
+          java -jar apktool.jar d -f -o zl zalith.apk
+          python3 fsr-launcher/patch.py "$PWD/zl" "$PWD/libs" "$PWD/assets_x"
+          java -jar apktool.jar b -f -o unsigned.apk zl
+          cp hz/classes4.dex classes4.dex
+          zip -q unsigned.apk classes4.dex
+          java -jar signer.jar -a unsigned.apk --ks v2/robin.jks --ksAlias mojo --ksPass mojogames --ksKeyPass mojogames -o out
+          mv out/unsigned-aligned-signed.apk FSRLauncher.apk
+          ls -la FSRLauncher.apk; sha256sum FSRLauncher.apk
+      - name: Release
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          gh release delete fsr-launcher -y --cleanup-tag || true
+          gh release create fsr-launcher FSRLauncher.apk --title "FSR Launcher" --notes "FSR Launcher, a modified Zalith Launcher 1.4.1.4 (GPL-3.0, credit MovTery and contributors). Adds MobileGlues + LTW renderers, refresh-rate unlock, electric theme. Game files: /sdcard/games/FSRLauncher. Uninstall nothing needed: separate app id com.fsrlauncher.app."
