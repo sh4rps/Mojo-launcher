@@ -1,0 +1,45 @@
+name: Build RS Launcher
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - uses: gradle/actions/setup-gradle@v5
+      - uses: dtolnay/rust-toolchain@stable
+        with: { targets: "aarch64-linux-android" }
+      - name: cargo-ndk
+        run: |
+          curl -sL "https://github.com/bbqsrc/cargo-ndk/releases/download/v4.1.2/cargo-ndk-x86_64-unknown-linux-gnu-v4.1.2.tgz" | tar xz -C "$HOME/.cargo/bin" --strip-components=1
+          chmod +x "$HOME/.cargo/bin"/cargo-ndk*
+      - name: NDK
+        run: |
+          ndk=$(ls -d "$ANDROID_HOME"/ndk/* 2>/dev/null | sort -V | tail -1)
+          if [ -z "$ndk" ] || [ ! -f "$ndk/source.properties" ]; then sdkmanager --install "ndk;27.0.12077973"; ndk=$(ls -d "$ANDROID_HOME"/ndk/* | sort -V | tail -1); fi
+          echo "ANDROID_NDK_HOME=$ndk" >> "$GITHUB_ENV"
+      - name: Get Zalith Launcher 2 source (2.8.2, GPL-3.0)
+        run: git clone --depth 1 --branch 2.8.2 --recurse-submodules https://github.com/ZalithLauncher/ZalithLauncher2 zl2
+      - name: Apply RS Launcher patch
+        run: |
+          pip install pillow
+          python3 rs-launcher/patch.py "$PWD/zl2"
+      - name: Build
+        working-directory: zl2
+        env:
+          RS_KEYSTORE: ${{ github.workspace }}/v2/robin.jks
+        run: |
+          chmod +x gradlew
+          ./gradlew ZalithLauncher:assembleRelease -Darch=arm64 --no-daemon
+          find . -name "*.apk" -path "*release*" | head
+      - name: Release
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          APK=$(find zl2 -name "*arm64*.apk" -path "*release*" | head -1)
+          cp "$APK" RSLauncher.apk; ls -la RSLauncher.apk; sha256sum RSLauncher.apk
+          gh release delete rs-launcher -y --cleanup-tag || true
+          gh release create rs-launcher RSLauncher.apk --title "RS Launcher" --notes "RS Launcher, a modified build of Zalith Launcher 2 (GPL-3.0, by MovTery and contributors). Source of the changes: rs-launcher/ in this repository; upstream: https://github.com/ZalithLauncher/ZalithLauncher2 (tag 2.8.2)."
