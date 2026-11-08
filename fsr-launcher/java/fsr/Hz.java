@@ -27,6 +27,9 @@ public final class Hz {
     }
 
     public static void init(Application app) {
+        try { // always use the dark (electric) theme
+            Class.forName("androidx.appcompat.app.AppCompatDelegate").getMethod("setDefaultNightMode", int.class).invoke(null, 2);
+        } catch (Throwable t) { }
         try { app.getExternalFilesDir(null); } catch (Throwable t) { } // makes sure Android/data/<pkg>/files exists
         app.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
             public void onActivityCreated(Activity a, Bundle b) { request(a); watch(a); }

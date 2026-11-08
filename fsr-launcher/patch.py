@@ -53,12 +53,7 @@ for f in ("res/values/colors.xml", "res/values-night/colors.xml"):
     for k, v in PALETTE.items():
         c = re.sub(r'(<color name="%s">)[^<]*(</color>)' % re.escape(k), r"\g<1>%s\g<2>" % v, c)
     wr(f, c)
-st = rd("res/values/styles.xml")
-st = st.replace('parent="@style/Theme.AppCompat.DayNight.NoActionBar"', 'parent="@style/Theme.AppCompat.NoActionBar"')
-wr("res/values/styles.xml", st)
-if os.path.exists(os.path.join(D, "res/values-night/styles.xml")):
-    t = rd("res/values-night/styles.xml").replace("Theme.AppCompat.DayNight", "Theme.AppCompat")
-    wr("res/values-night/styles.xml", t)
+# (theme parents are left untouched; dark mode is forced at runtime by fsr.Hz.init)
 
 # ---------- 3. hide About ----------
 lay = rd("res/layout/fragment_launcher.xml")
