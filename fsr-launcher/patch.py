@@ -147,6 +147,35 @@ for f in glob.glob(os.path.join(D, "smali*", "**", "*.smali"), recursive=True):
 print("renamed strings:", changed)
 if changed < 4: raise SystemExit("PATCH FAILED: too few branding strings renamed")
 
+# plain (non-encrypted) UI strings, e.g. the title at the top-left of the main menu
+plain = 0
+for f in glob.glob(os.path.join(D, "smali*", "**", "*.smali"), recursive=True):
+    t = open(f, encoding="utf-8").read()
+    t2 = re.sub(r'(const-string [vp]\d+, )"Zalith Launcher"', r'\1"FSR Launcher"', t)
+    t2 = t2.replace('"-Dnet.minecraft.clientmodname=ZalithLauncher"', '"-Dnet.minecraft.clientmodname=FSRLauncher"')
+    if t2 != t:
+        plain += 1
+        open(f, "w", encoding="utf-8").write(t2)
+print("plain string files:", plain)
+if plain < 2: raise SystemExit("PATCH FAILED: plain title not found")
+
+# ---------- 6a. Rust Edition 26.3 shortcut (opens Rust Launcher) ----------
+rust_row = '''<com.movtery.zalithlauncher.ui.layout.AnimRelativeLayout android:id="@+id/fsr_rust_button" android:background="@drawable/background_item" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/_12sdp" android:layout_marginStart="@dimen/_12sdp" android:layout_marginEnd="@dimen/_8sdp" android:translationZ="4.0dip" android:paddingHorizontal="@dimen/_8sdp" android:paddingVertical="@dimen/_12sdp" app:ripple_for_relative="true">
+                    <ImageView android:id="@+id/fsr_rust_icon" android:layout_width="@dimen/_24sdp" android:layout_height="@dimen/_24sdp" android:src="@drawable/ic_java" android:layout_centerVertical="true" android:layout_marginStart="@dimen/_8sdp" android:layout_alignParentStart="true" />
+                    <TextView android:textSize="@dimen/_12sdp" android:textColor="@color/primary_text" android:layout_width="0.0dip" android:layout_height="wrap_content" android:text="Rust Edition 26.3 (Horizon)" android:layout_centerVertical="true" android:layout_marginStart="@dimen/_16sdp" android:layout_marginEnd="@dimen/_8sdp" android:layout_toEndOf="@id/fsr_rust_icon" android:layout_alignParentEnd="true" />
+                </com.movtery.zalithlauncher.ui.layout.AnimRelativeLayout>
+                '''
+fl = rd("res/layout/fragment_launcher.xml")
+anchor = '<com.movtery.zalithlauncher.ui.layout.AnimRelativeLayout android:id="@id/about_button"'
+fl = sub1(fl, anchor, rust_row + anchor, "rust row anchor")
+wr("res/layout/fragment_launcher.xml", fl)
+m = rd("AndroidManifest.xml")
+if "<queries>" in m:
+    m = m.replace("<queries>", '<queries><package android:name="com.rustlauncher.app"/>', 1)
+else:
+    m = sub1(m, "<application", '<queries><package android:name="com.rustlauncher.app"/></queries><application', "queries")
+wr("AndroidManifest.xml", m)
+
 # ---------- 6b. size diet (< 100 MB) + speed ----------
 # Java 25 runtime (Minecraft 26.x only) is dropped: it is ~48 MB. Jre enum must not list it any more.
 p = "smali/com/movtery/zalithlauncher/feature/unpack/Jre.smali"

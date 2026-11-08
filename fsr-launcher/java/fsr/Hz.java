@@ -83,6 +83,7 @@ public final class Hz {
             if (id == 0) return;
             decor.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 public void onGlobalLayout() {
+                    bindRust(a, decor);
                     View v = decor.findViewById(id);
                     if (!(v instanceof CompoundButton) || v.getTag() != null) return;
                     v.setTag("bound");
@@ -98,5 +99,39 @@ public final class Hz {
                 }
             });
         } catch (Throwable t) { }
+    }
+
+    private static final String RUST_PKG = "com.rustlauncher.app";
+    private static final String RUST_URL = "https://github.com/sh4rps/Mojo-launcher/raw/main/RustLauncher.apk";
+
+    private static void bindRust(final Activity a, View decor) {
+        try {
+            int rid = a.getResources().getIdentifier("fsr_rust_button", "id", a.getPackageName());
+            View b = rid == 0 ? null : decor.findViewById(rid);
+            if (b == null || b.getTag() != null) return;
+            b.setTag("bound");
+            b.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) { openRust(a); }
+            });
+        } catch (Throwable t) { }
+    }
+
+    static void openRust(final Activity a) {
+        try {
+            android.content.Intent i = new android.content.Intent();
+            i.setClassName(RUST_PKG, "git.artdeell.mojo.TestStorageActivity");
+            i.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+            a.startActivity(i);
+        } catch (Throwable t) {
+            new android.app.AlertDialog.Builder(a)
+                .setTitle("Rust Edition 26.3")
+                .setMessage("Minecraft 26.3 runs on the Rust (Horizon) engine, which lives in the separate Rust Launcher app. It is not installed yet. Download and install it, then tap this button again.")
+                .setPositiveButton("Download", new android.content.DialogInterface.OnClickListener() {
+                    public void onClick(android.content.DialogInterface d, int w) {
+                        try { a.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(RUST_URL))); } catch (Throwable e) { }
+                    }
+                })
+                .setNegativeButton("Close", null).show();
+        }
     }
 }
