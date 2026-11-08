@@ -79,12 +79,12 @@ shutil.copytree(os.path.join(HERE, "smali"), dst, dirs_exist_ok=True)
 
 p = "smali/com/movtery/zalithlauncher/renderer/Renderers.smali"
 r = rd(p)
+# 5 renderers: GL4ES, Zink, LTW (replaces VirGL), Freedreno, MobileGlues (replaces Panfrost) -> frees ~9 MB of Mesa libs
+R = "com/movtery/zalithlauncher/renderer/renderers/"
 r = sub1(r, "    const/4 p1, 0x5\n\n    new-array p1, p1, [Lcom/movtery/zalithlauncher/renderer/RendererInterface;",
-         "    const/4 p1, 0x7\n\n    new-array p1, p1, [Lcom/movtery/zalithlauncher/renderer/RendererInterface;", "renderer array size")
-tail = "    const/4 v1, 0x4\n\n    aput-object v0, p1, v1\n"
-add = ("    new-instance v0, Lcom/fsr/FsrLtwRenderer;\n\n    invoke-direct {v0}, Lcom/fsr/FsrLtwRenderer;-><init>()V\n\n    const/4 v1, 0x5\n\n    aput-object v0, p1, v1\n\n"
-       "    new-instance v0, Lcom/fsr/FsrMobileGluesRenderer;\n\n    invoke-direct {v0}, Lcom/fsr/FsrMobileGluesRenderer;-><init>()V\n\n    const/4 v1, 0x6\n\n    aput-object v0, p1, v1\n")
-r = sub1(r, tail, tail + "\n" + add, "renderer registration")
+         "    const/4 p1, 0x5\n\n    new-array p1, p1, [Lcom/movtery/zalithlauncher/renderer/RendererInterface;", "renderer array size")
+assert r.count("L" + R + "VirGLRenderer;") == 2 and r.count("L" + R + "PanfrostRenderer;") == 2
+r = r.replace("L" + R + "VirGLRenderer;", "Lcom/fsr/FsrLtwRenderer;").replace("L" + R + "PanfrostRenderer;", "Lcom/fsr/FsrMobileGluesRenderer;")
 wr(p, r)
 
 p = "smali_classes2/net/kdt/pojavlaunch/PojavApplication.smali"
@@ -147,8 +147,48 @@ for f in glob.glob(os.path.join(D, "smali*", "**", "*.smali"), recursive=True):
 print("renamed strings:", changed)
 if changed < 4: raise SystemExit("PATCH FAILED: too few branding strings renamed")
 
+# ---------- 6b. size diet (< 100 MB) + speed ----------
+# Java 25 runtime (Minecraft 26.x only) is dropped: it is ~48 MB. Jre enum must not list it any more.
+p = "smali/com/movtery/zalithlauncher/feature/unpack/Jre.smali"
+j = rd(p)
+j = sub1(j, "    sget-object v3, Lcom/movtery/zalithlauncher/feature/unpack/Jre;->JRE_25:Lcom/movtery/zalithlauncher/feature/unpack/Jre;\n\n    filled-new-array {v0, v1, v2, v3}, [Lcom/movtery/zalithlauncher/feature/unpack/Jre;",
+         "    filled-new-array {v0, v1, v2}, [Lcom/movtery/zalithlauncher/feature/unpack/Jre;", "Jre values")
+wr(p, j)
+shutil.rmtree(os.path.join(D, "assets", "components", "jre-25"), ignore_errors=True)
+
+# lib/ct.sym (javac symbol table, ~10 MB, never used at runtime) is removed from the bundled runtimes
+import lzma, tarfile
+def strip_runtime(path, drop):
+    tmp = path + ".new"
+    n_drop = 0
+    with lzma.open(path, "rb") as xf, tarfile.open(fileobj=xf, mode="r|") as tin, \
+         lzma.open(tmp, "wb", format=lzma.FORMAT_XZ, check=lzma.CHECK_CRC32, preset=9) as xo, \
+         tarfile.open(fileobj=xo, mode="w|", format=tarfile.GNU_FORMAT) as tout:
+        for mem in tin:
+            if mem.name.lstrip("./") in drop:
+                n_drop += 1
+                continue
+            if mem.isreg():
+                tout.addfile(mem, tin.extractfile(mem))
+            else:
+                tout.addfile(mem)
+    print(path, os.path.getsize(path) // 1024, "KB ->", os.path.getsize(tmp) // 1024, "KB (dropped %d)" % n_drop)
+    os.replace(tmp, path)
+for jre in ("jre-17", "jre-21"):
+    strip_runtime(os.path.join(D, "assets", "components", jre, "universal.tar.xz"), {"lib/ct.sym"})
+
+# animations off by default = snappier launcher UI
+p = "smali/com/movtery/zalithlauncher/setting/AllSettings.smali"
+a = rd(p)
+a = sub1(a, "    invoke-direct {v0, v2, v6}, Lcom/movtery/zalithlauncher/setting/unit/BooleanSettingUnit;-><init>(Ljava/lang/String;Z)V\n\n    sput-object v0, Lcom/movtery/zalithlauncher/setting/AllSettings;->animation:",
+         "    const/4 v3, 0x0\n\n    invoke-direct {v0, v2, v3}, Lcom/movtery/zalithlauncher/setting/unit/BooleanSettingUnit;-><init>(Ljava/lang/String;Z)V\n\n    sput-object v0, Lcom/movtery/zalithlauncher/setting/AllSettings;->animation:", "animation default")
+wr(p, a)
+
 # ---------- 7. native libs, licenses ----------
 libd = os.path.join(D, "lib", "arm64-v8a")
+for n in ("libOSMesa_2121.so", "libOSMesa_2300d.so", "libvirgl_test_server.so"):
+    try: os.remove(os.path.join(libd, n))
+    except FileNotFoundError: raise SystemExit("PATCH FAILED: missing " + n)
 for n in ("libltw.so", "libmobileglues.so"):
     shutil.copy(os.path.join(LIBS, n), os.path.join(libd, n))
 ad = os.path.join(D, "assets", "licenses")
