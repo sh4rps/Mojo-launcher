@@ -1,0 +1,17 @@
+name: Release RustLauncher Starling AllJava
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  rel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Join and release
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          cat parts-alljava/p.* > RustLauncherStarling-AllJava.apk
+          sha256sum -c <(sed 's/ .*/  RustLauncherStarling-AllJava.apk/' parts-alljava/SHA256)
+          gh release delete alljava -y --cleanup-tag || true
+          gh release create alljava RustLauncherStarling-AllJava.apk --title "RustLauncher Starling AllJava" --notes "Horizon 0.7.8 (Rust) + Java Edition launcher with Java 8/17/21 bundled."
