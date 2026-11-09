@@ -1,0 +1,28 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'com.rusic.app'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'com.rusic.app'
+        minSdk 26
+        targetSdk 33
+        versionCode 1
+        versionName '1.0'
+    }
+    signingConfigs {
+        rel {
+            storeFile file('../../v2/robin.jks')
+            storePassword 'mojogames'
+            keyAlias 'mojo'
+            keyPassword 'mojogames'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+            signingConfig signingConfigs.rel
+        }
+    }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_1_8; targetCompatibility JavaVersion.VERSION_1_8 }
+}
