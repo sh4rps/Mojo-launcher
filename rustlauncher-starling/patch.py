@@ -18,3 +18,10 @@ s = s.replace('<activity android:label="@string/app_short_name" android:name="gi
 assert 'com.robin.launcher.Chooser' in s
 open(p, 'w').write(s)
 print('patched')
+
+# --- all Java runtimes (done by hand on the decoded tree; see java/rl/Jres.java) ---
+# 1. assets/components/jre-17 and jre-21 (universal.tar.xz + bin-arm64.tar.xz + version) copied from the RustBridge APK;
+#    jre/bin-{arm,x86,x86_64}.tar.xz dropped (arm64 only).
+# 2. javac --release 8 java/rl/Jres.java -> dx -> classes4.dex, zipped into the built APK.
+# 3. smali: AsyncAssetManager.unpackRuntime calls rl.Jres.ensureAsync(am) first;
+#    NewJREUtil.installNewJreIfNeeded calls rl.Jres.ensure(am) first (blocking).
