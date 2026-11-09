@@ -1,0 +1,24 @@
+name: Build RobinUI
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.9' }
+      - name: Build
+        working-directory: robinui
+        run: gradle --no-daemon assembleRelease
+      - name: Release
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          cp robinui/app/build/outputs/apk/release/app-release.apk RobinUI.apk
+          ls -la RobinUI.apk
+          gh release delete robinui -y --cleanup-tag || true
+          gh release create robinui RobinUI.apk --title "RobinUI" --notes "RobinUI launcher: ColorOS-style home, always-on dynamic island, control center with adaptive 120 Hz toggle."

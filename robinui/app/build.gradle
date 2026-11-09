@@ -1,0 +1,29 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'com.robin.ui'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'com.robin.ui'
+        minSdk 29
+        targetSdk 33
+        versionCode 1
+        versionName '1.0'
+    }
+    signingConfigs {
+        rel {
+            storeFile file('../../v2/robin.jks')
+            storePassword 'mojogames'
+            keyAlias 'mojo'
+            keyPassword 'mojogames'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources false
+            signingConfig signingConfigs.rel
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_1_8; targetCompatibility JavaVersion.VERSION_1_8 }
+}
