@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "rustlod",
+  "version": "${version}",
+  "name": "Rust LOD",
+  "description": "Far terrain (fake LOD chunks) beyond your render distance. Client-only, works on any server.",
+  "authors": ["Robin"],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": { "client": ["com.robin.rustlod.RustLod"] },
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.4",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
