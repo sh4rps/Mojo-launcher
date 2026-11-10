@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "rustmod",
+  "version": "${version}",
+  "name": "Rust Mod",
+  "description": "Max-performance mode: fast graphics preset, adaptive render distance, entity and particle culling.",
+  "authors": ["Robin"],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": { "client": ["com.robin.rustmod.RustMod"] },
+  "mixins": [{ "config": "rustmod.mixins.json", "environment": "client" }],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.4",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}

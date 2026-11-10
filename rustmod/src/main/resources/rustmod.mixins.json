@@ -1,0 +1,7 @@
+{
+  "required": true,
+  "package": "com.robin.rustmod.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["EntityRenderDispatcherMixin", "ParticleManagerMixin"],
+  "injectors": { "defaultRequire": 1 }
+}
