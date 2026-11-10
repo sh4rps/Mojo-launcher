@@ -3,11 +3,14 @@
   "id": "rustlod",
   "version": "${version}",
   "name": "Rust LOD",
-  "description": "Far terrain (fake LOD chunks) beyond your render distance. Client-only, works on any server.",
+  "description": "Fake far terrain (LOD) beyond render distance. Works client-only on any server; with the mod on the server it also streams terrain you have never visited.",
   "authors": ["Robin"],
   "license": "MIT",
-  "environment": "client",
-  "entrypoints": { "client": ["com.robin.rustlod.RustLod"] },
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.robin.rustlod.RustLod"],
+    "client": ["com.robin.rustlod.client.RustLodClient"]
+  },
   "depends": {
     "fabricloader": ">=0.16.0",
     "minecraft": "~1.21.4",

@@ -21,4 +21,4 @@ jobs:
           ls -la rustlod/build/libs
           cp rustlod/build/libs/rustlod-1.0.0.jar rustlod-1.21.4.jar
           gh release delete rustlod -y --cleanup-tag || true
-          gh release create rustlod rustlod-1.21.4.jar --title "Rust LOD (Fabric 1.21.4)" --notes "Far terrain (fake LOD chunks) for Minecraft 1.21.4, client-only. Needs Fabric API."
+          gh release create rustlod rustlod-1.21.4.jar --title "Rust LOD (Fabric 1.21.4)" --notes "Far terrain (LOD) Fabric mod for Minecraft 1.21.4. Client-only works on any server; with the mod on the server it also streams unexplored terrain. Needs Fabric API."
