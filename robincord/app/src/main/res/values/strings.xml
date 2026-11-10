@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="a11y_desc">Lets Robincord keep recording your microphone while a call (Discord, WhatsApp, phone) is active. Robincord does not read your screen or any text.</string>
+</resources>

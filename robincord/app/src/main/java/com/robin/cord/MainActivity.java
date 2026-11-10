@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
     static final int RED = 0xFFE53935, BG = 0xFF0D0D10, CARD = 0xFF17171C, DIM = 0xFF9A9AA3;
 
     private SharedPreferences sp;
-    private TextView timer, status, sdState, listTitle;
+    private TextView timer, status, sdState, listTitle, a11yState;
     private Button rec, pause;
     private LinearLayout list;
     private final Handler h = new Handler(Looper.getMainLooper());
@@ -99,6 +99,28 @@ public class MainActivity extends Activity {
         spinner(v, "Start delay", new String[]{"None", "3 seconds", "5 seconds", "10 seconds"}, "cd", 1);
         root.addView(v);
 
+        // ---- call fix
+        LinearLayout k = section("Call recording fix (do this once)");
+        k.addView(tv("During a Discord / phone call Android silences the microphone for normal apps. Turn Robincord ON in "
+                + "Accessibility and Android lets it keep recording the mic. Robincord never reads your screen.\n\n"
+                + "If the switch is greyed out: Settings > Apps > Robincord > top-right menu (3 dots) > Allow restricted settings, then try again.",
+                12, DIM, false));
+        a11yState = tv("", 13, Color.WHITE, true);
+        a11yState.setPadding(0, dp(8), 0, 0);
+        k.addView(a11yState);
+        Button ab = btn("Open Accessibility settings", RED);
+        ab.setOnClickListener(new View.OnClickListener() { public void onClick(View v) {
+            try { startActivity(new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS)); } catch (Throwable t) {
+                Toast.makeText(MainActivity.this, "Open Settings > Accessibility manually", Toast.LENGTH_LONG).show(); }
+        } });
+        k.addView(ab, lp(-1, 44, 0, 8, 0, 0));
+        Button ai = btn("App info (Allow restricted settings)", 0xFF2A2A31);
+        ai.setOnClickListener(new View.OnClickListener() { public void onClick(View v) {
+            startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName())));
+        } });
+        k.addView(ai, lp(-1, 44, 0, 8, 0, 0));
+        root.addView(k);
+
         // ---- audio
         LinearLayout a = section("Sound");
         spinner(a, "Internal sound", Cfg.INTERNAL, "internal", 1);
@@ -145,6 +167,7 @@ public class MainActivity extends Activity {
         h.post(tick);
         buildList();
         updateSd();
+        updateA11y();
     }
 
     @Override protected void onPause() {
@@ -226,6 +249,17 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void updateA11y() {
+        boolean on = false;
+        try {
+            String e = android.provider.Settings.Secure.getString(getContentResolver(),
+                    android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            on = e != null && e.contains(getPackageName() + "/");
+        } catch (Throwable ignore) { }
+        a11yState.setText(on ? "Status: ON - mic will keep working during calls" : "Status: OFF - mic may be silent during calls");
+        a11yState.setTextColor(on ? 0xFF66BB6A : 0xFFFFB74D);
+    }
+
     private void updateSd() {
         boolean has = false;
         try {
@@ -254,12 +288,24 @@ public class MainActivity extends Activity {
         setBg(rec, st == RecService.IDLE ? RED : 0xFF8E1C1A);
         pause.setVisibility(st == RecService.REC || st == RecService.PAUSED ? View.VISIBLE : View.GONE);
         pause.setText(st == RecService.PAUSED ? "▶  RESUME" : "❚❚  PAUSE");
-        status.setText(st == RecService.IDLE ? "Ready" : st == RecService.COUNTDOWN ? "Starting..."
-                : st == RecService.REC ? "Recording" : "Paused");
+        String stt = st == RecService.IDLE ? "Ready" : st == RecService.COUNTDOWN ? "Starting..."
+                : st == RecService.REC ? "Recording" : "Paused";
+        if (st == RecService.REC || st == RecService.PAUSED) {
+            stt += "\nMic " + bar(Recorder.micLevel) + "    Game/Internal " + bar(Recorder.gameLevel);
+            if (Recorder.micMsg.length() > 0) stt += "\n" + Recorder.micMsg;
+        }
+        status.setText(stt);
         if (st == RecService.IDLE && list != null && lastState != RecService.IDLE) buildList();
         lastState = st;
     }
     private int lastState = RecService.IDLE;
+
+    private static String bar(int lvl) {
+        int n = lvl <= 0 ? 0 : Math.min(8, 1 + (int) (Math.log10(lvl / 64.0 + 1) * 3.3));
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < 8; i++) b.append(i < n ? '▮' : '▯');
+        return b.toString();
+    }
 
     // ------------------------------------------------------------ recordings list
     private void buildList() {

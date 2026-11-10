@@ -13,7 +13,7 @@ final class Cfg {
     static final String[] CODEC = {"H.264 (AVC)", "H.265 (HEVC)"};
     static final String[] ORIENT = {"Landscape", "Portrait", "Auto (as screen is now)"};
     static final String[] INTERNAL = {"Off", "Internal sound (media + game)", "Game sound only"};
-    static final String[] MICSRC = {"Mic (default)", "Unprocessed (best for loudspeaker pickup)", "Camcorder", "Voice call (try if mic is muted in Discord)"};
+    static final String[] MICSRC = {"Mic (default)", "Unprocessed (best for loudspeaker pickup)", "Camcorder", "Voice call (try if mic is muted in Discord)", "Voice recognition (best during calls)"};
     static final String[] STORE = {"Internal storage (Movies/Robincord)", "SD card / external memory"};
 
     int res, fps, br, codec, orient, internal, micSrc, store, countdown;

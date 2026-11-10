@@ -55,6 +55,12 @@ final class Recorder {
     private final Object ml = new Object();
     private final ArrayList<Pend> pend = new ArrayList<>();
 
+    /** Live meters for the UI: peak level 0..32767 (decaying) and a status line. */
+    static volatile int micLevel, gameLevel;
+    static volatile String micMsg = "";
+    private int micSrcNow = -1;
+    private int micAttempt = 0;
+
     String summary = "";
     final ArrayList<String> warnings = new ArrayList<>();
 
@@ -185,22 +191,55 @@ final class Recorder {
         return soft;
     }
 
+    private static final int[] SRC = {MediaRecorder.AudioSource.MIC, MediaRecorder.AudioSource.UNPROCESSED,
+            MediaRecorder.AudioSource.CAMCORDER, MediaRecorder.AudioSource.VOICE_COMMUNICATION,
+            MediaRecorder.AudioSource.VOICE_RECOGNITION};
+
+    /** Selected source first, then the ones that usually survive a call. */
+    private int[] micOrder() {
+        int[] pref = {SRC[Math.min(cfg.micSrc, SRC.length - 1)], MediaRecorder.AudioSource.VOICE_RECOGNITION,
+                MediaRecorder.AudioSource.VOICE_COMMUNICATION, MediaRecorder.AudioSource.MIC,
+                MediaRecorder.AudioSource.CAMCORDER, MediaRecorder.AudioSource.UNPROCESSED};
+        java.util.LinkedHashSet<Integer> set = new java.util.LinkedHashSet<>();
+        for (int p : pref) set.add(p);
+        int[] o = new int[set.size()];
+        int i = 0;
+        for (int v : set) o[i++] = v;
+        return o;
+    }
+
+    private AudioRecord openMic(int src) {
+        try {
+            int minMono = AudioRecord.getMinBufferSize(SR, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+            AudioRecord r = new AudioRecord(src, SR, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT,
+                    Math.max(minMono * 4, SR / 2));
+            if (r.getState() == AudioRecord.STATE_INITIALIZED) return r;
+            r.release();
+        } catch (Throwable t) { Log.w(TAG, "mic src " + src, t); }
+        return null;
+    }
+
+    private static String srcName(int s) {
+        switch (s) {
+            case MediaRecorder.AudioSource.MIC: return "Mic";
+            case MediaRecorder.AudioSource.UNPROCESSED: return "Unprocessed";
+            case MediaRecorder.AudioSource.CAMCORDER: return "Camcorder";
+            case MediaRecorder.AudioSource.VOICE_COMMUNICATION: return "Voice call";
+            case MediaRecorder.AudioSource.VOICE_RECOGNITION: return "Voice recognition";
+        }
+        return "src" + s;
+    }
+
     private void setupAudio() {
         boolean wantMic = cfg.mic, wantInt = cfg.internal != 0;
         if (!wantMic && !wantInt) { hasAudio = false; return; }
-        int minMono = AudioRecord.getMinBufferSize(SR, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
         int minStereo = AudioRecord.getMinBufferSize(SR, AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT);
+        micLevel = 0; gameLevel = 0; micMsg = "";
         if (wantMic) {
-            int[] srcs = {MediaRecorder.AudioSource.MIC, MediaRecorder.AudioSource.UNPROCESSED,
-                    MediaRecorder.AudioSource.CAMCORDER, MediaRecorder.AudioSource.VOICE_COMMUNICATION};
-            int[] tryOrder = {srcs[cfg.micSrc], MediaRecorder.AudioSource.MIC};
-            for (int s : tryOrder) {
-                try {
-                    AudioRecord r = new AudioRecord(s, SR, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT,
-                            Math.max(minMono * 4, SR / 2));
-                    if (r.getState() == AudioRecord.STATE_INITIALIZED) { micRec = r; break; }
-                    r.release();
-                } catch (Throwable t) { Log.w(TAG, "mic src " + s, t); }
+            int[] order = micOrder();
+            for (int k = 0; k < order.length && micRec == null; k++) {
+                micRec = openMic(order[k]);
+                if (micRec != null) { micSrcNow = order[k]; micAttempt = k; }
             }
             if (micRec == null) warnings.add("Microphone could not be opened");
         }
@@ -357,13 +396,25 @@ final class Recorder {
         long t0 = startUs * 1000L, pausedNs = 0, pauseFrom = 0;
         long frames = 0;
         boolean wasPaused = false;
+        long lastMicSound = System.nanoTime();
         MediaCodec.BufferInfo bi = new MediaCodec.BufferInfo();
         try {
             while (!stopping) {
                 try { Thread.sleep(8); } catch (InterruptedException ignore) { }
-                pull(micRec, micQ, rd);
-                pull(gameRec, gameQ, rd);
+                int mp = pull(micRec, micQ, rd);
+                int gp = pull(gameRec, gameQ, rd);
+                micLevel = Math.max((int) (micLevel * 0.9f), mp);
+                gameLevel = Math.max((int) (gameLevel * 0.9f), gp);
                 long now = System.nanoTime();
+                if (micRec != null) {
+                    if (mp > 0) {
+                        lastMicSound = now;
+                        if (micMsg.length() > 0 && now - lastMicSound < 1_000_000_000L) micMsg = "";
+                    } else if (!paused && now - lastMicSound > 3_000_000_000L) {
+                        switchMic();
+                        lastMicSound = now;
+                    }
+                }
                 if (paused) {
                     if (!wasPaused) { wasPaused = true; pauseFrom = now; }
                     micQ.clear(); gameQ.clear();
@@ -402,13 +453,34 @@ final class Recorder {
 
     private static int clip(float v) { return v > 32767 ? 32767 : (v < -32768 ? -32768 : (int) v); }
 
-    private void pull(AudioRecord r, Fifo q, short[] buf) {
-        if (r == null) return;
+    /** @return the peak absolute sample read this call (0 if none / digital silence). */
+    private int pull(AudioRecord r, Fifo q, short[] buf) {
+        if (r == null) return 0;
+        int peak = 0;
         for (int k = 0; k < 6; k++) {
             int n = r.read(buf, 0, buf.length, AudioRecord.READ_NON_BLOCKING);
             if (n <= 0) break;
+            for (int i = 0; i < n; i++) { int v = buf[i] < 0 ? -buf[i] : buf[i]; if (v > peak) peak = v; }
             q.push(buf, n);
         }
+        return peak;
+    }
+
+    /** Called when the mic only delivers digital zeros (Android silences it during calls): try the next source. */
+    private void switchMic() {
+        int[] order = micOrder();
+        if (micAttempt + 1 >= order.length) { micMsg = "Mic is silent (Android blocks it). Enable Robincord in Accessibility."; return; }
+        try { micRec.stop(); micRec.release(); } catch (Throwable ignore) { }
+        micRec = null;
+        for (int k = micAttempt + 1; k < order.length && micRec == null; k++) {
+            micAttempt = k;
+            AudioRecord r = openMic(order[k]);
+            if (r != null) {
+                try { r.startRecording(); micRec = r; micSrcNow = order[k]; } catch (Throwable t) { r.release(); }
+            }
+        }
+        micMsg = micRec != null ? "Mic silent - trying source: " + srcName(micSrcNow)
+                : "Mic is silent (Android blocks it). Enable Robincord in Accessibility.";
     }
 
     private void queueAudio(byte[] pcm, int len, long pts, MediaCodec.BufferInfo bi) {
