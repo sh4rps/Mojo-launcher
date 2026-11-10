@@ -37,8 +37,8 @@ public final class LodRenderer {
         float ang = w.getSkyAngle(td);
         float f = MathHelper.clamp(MathHelper.cos(ang * (float) (Math.PI * 2)) * 2.0F + 0.5F, 0.0F, 1.0F);
         float bright = 0.18f + 0.82f * f;
-        Vec3d sky = w.getSkyColor(cam, td);
-        float sr = (float) sky.x, sg = (float) sky.y, sb = (float) sky.z;
+        int sky = w.getSkyColor(cam, td);
+        float sr = ((sky >> 16) & 255) / 255f, sg = ((sky >> 8) & 255) / 255f, sb = (sky & 255) / 255f;
 
         int rd = mc.options.getClampedViewDistance();
         double near = rd * 16.0;
