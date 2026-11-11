@@ -1,0 +1,24 @@
+name: Build Infuse Keys (1.21.4 port)
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.11.1' }
+      - name: Build
+        working-directory: infusekeys
+        run: gradle --no-daemon build
+      - name: Release
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          ls -la infusekeys/build/libs
+          cp infusekeys/build/libs/infusekeys-1.5.0-1.21.4.jar infusekeys-1.5.0-1.21.4.jar
+          gh release delete infusekeys -y --cleanup-tag || true
+          gh release create infusekeys infusekeys-1.5.0-1.21.4.jar --title "Infuse Keys 1.5.0 (Fabric 1.21.4 port)" --notes "Port of Infuse Keys 1.5.0 from 1.21.11 to Fabric 1.21.4. Ability keys + Infuse resource pack. The 1.21.11-only entity shader is left out."

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "infusekeys",
+  "version": "1.5.0",
+  "name": "Infuse Keys",
+  "description": "Infuse SMP client mod (1.21.4 port): built-in Infuse resource pack (icons/textures) + 269 custom RPG item models + rebindable ability keys (Options > Controls > Key Binds).",
+  "authors": ["Infuse SMP"],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "dev.infusekeys.InfuseKeysClient",
+      "dev.infusekeys.InfuseHello"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.4",
+    "java": ">=21",
+    "fabric-api": "*"
+  },
+  "icon": "assets/infusekeys/icon.png"
+}
