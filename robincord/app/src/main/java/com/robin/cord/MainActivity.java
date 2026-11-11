@@ -185,6 +185,8 @@ public class MainActivity extends Activity {
             pickTree();
             return;
         }
+        if (c.mic && !a11yOn())
+            Toast.makeText(this, "Accessibility is OFF - the mic may be silent during calls. Turn Robincord ON (Call recording fix).", Toast.LENGTH_LONG).show();
         java.util.ArrayList<String> need = new java.util.ArrayList<>();
         if (c.audio() && checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
             need.add(Manifest.permission.RECORD_AUDIO);
@@ -203,6 +205,27 @@ public class MainActivity extends Activity {
         startActivityForResult(m.createScreenCaptureIntent(), RC_PROJ);
     }
 
+    /** Only leave the app once the service has really started recording/counting (mic must start while we are visible). */
+    private void goBackWhenRunning(final int tries) {
+        h.postDelayed(new Runnable() {
+            public void run() {
+                if (RecService.state != RecService.IDLE) {
+                    h.postDelayed(new Runnable() { public void run() { moveTaskToBack(true); } }, 400);
+                } else if (tries > 0) {
+                    goBackWhenRunning(tries - 1);
+                }
+            }
+        }, 150);
+    }
+
+    private boolean a11yOn() {
+        try {
+            String e = android.provider.Settings.Secure.getString(getContentResolver(),
+                    android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            return e != null && e.contains(getPackageName() + "/");
+        } catch (Throwable t) { return false; }
+    }
+
     private void onPauseBtn() {
         if (RecService.state == RecService.REC) svc(RecService.A_PAUSE);
         else if (RecService.state == RecService.PAUSED) svc(RecService.A_RESUME);
@@ -218,7 +241,7 @@ public class MainActivity extends Activity {
                 Intent i = new Intent(this, RecService.class).setAction(RecService.A_START)
                         .putExtra("code", res).putExtra("data", d);
                 startForegroundService(i);
-                moveTaskToBack(true);
+                goBackWhenRunning(40);
             } else {
                 Toast.makeText(this, "Screen capture permission denied", Toast.LENGTH_SHORT).show();
             }
@@ -310,6 +333,12 @@ public class MainActivity extends Activity {
     // ------------------------------------------------------------ recordings list
     private void buildList() {
         list.removeAllViews();
+        String li = sp.getString("lastinfo", null);
+        if (li != null) {
+            TextView t = tv("Last recording: " + li, 12, DIM, false);
+            t.setPadding(0, 0, 0, dp(8));
+            list.addView(t);
+        }
         JSONArray a = Cfg.recent(this);
         if (a.length() == 0) {
             list.addView(tv("Nothing recorded yet.", 13, DIM, false));

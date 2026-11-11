@@ -60,6 +60,12 @@ final class Recorder {
     static volatile String micMsg = "";
     private int micSrcNow = -1;
     private int micAttempt = 0;
+    private boolean everSound;          // once the mic has produced real sound we never switch source again
+    private int switches;
+    private long micLoops, micActive;
+    private int gamePeakMax;
+    private boolean micWanted, gameWanted;
+    volatile String report = "";
 
     String summary = "";
     final ArrayList<String> warnings = new ArrayList<>();
@@ -235,6 +241,7 @@ final class Recorder {
         if (!wantMic && !wantInt) { hasAudio = false; return; }
         int minStereo = AudioRecord.getMinBufferSize(SR, AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT);
         micLevel = 0; gameLevel = 0; micMsg = "";
+        micWanted = wantMic; gameWanted = wantInt;
         if (wantMic) {
             int[] order = micOrder();
             for (int k = 0; k < order.length && micRec == null; k++) {
@@ -406,11 +413,14 @@ final class Recorder {
                 micLevel = Math.max((int) (micLevel * 0.9f), mp);
                 gameLevel = Math.max((int) (gameLevel * 0.9f), gp);
                 long now = System.nanoTime();
-                if (micRec != null) {
+                if (gp > gamePeakMax) gamePeakMax = gp;
+                if (micRec != null && !paused) {
+                    micLoops++;
                     if (mp > 0) {
+                        micActive++;
                         lastMicSound = now;
-                        if (micMsg.length() > 0 && now - lastMicSound < 1_000_000_000L) micMsg = "";
-                    } else if (!paused && now - lastMicSound > 3_000_000_000L) {
+                        if (!everSound) { everSound = true; micMsg = ""; }
+                    } else if (!everSound && now - lastMicSound > 3_000_000_000L) {
                         switchMic();
                         lastMicSound = now;
                     }
@@ -469,7 +479,12 @@ final class Recorder {
     /** Called when the mic only delivers digital zeros (Android silences it during calls): try the next source. */
     private void switchMic() {
         int[] order = micOrder();
-        if (micAttempt + 1 >= order.length) { micMsg = "Mic is silent (Android blocks it). Enable Robincord in Accessibility."; return; }
+        if (micAttempt + 1 >= order.length) {
+            micMsg = "Mic is silent (Android blocks it). Enable Robincord in Accessibility.";
+            micAttempt = -1; // try the whole list again in 3 s (the call may connect later)
+            return;
+        }
+        switches++;
         try { micRec.stop(); micRec.release(); } catch (Throwable ignore) { }
         micRec = null;
         for (int k = micAttempt + 1; k < order.length && micRec == null; k++) {
@@ -544,6 +559,10 @@ final class Recorder {
 
     /** Stops everything and returns the finished output (or null if nothing usable was recorded). */
     Out stop() {
+        report = "Mic " + (!micWanted ? "off" : micSrcNow < 0 ? "could not open"
+                : srcName(micSrcNow) + ", " + (micLoops > 0 ? (100 * micActive / micLoops) : 0) + "% active"
+                + (everSound ? "" : " (SILENT)")) + "  |  Internal "
+                + (!gameWanted ? "off" : (gamePeakMax > 0 ? "ok" : "no sound")) + "  |  source switches: " + switches;
         if (paused) resume();
         stopping = true;
         try { if (vd != null) vd.release(); } catch (Throwable ignore) { }

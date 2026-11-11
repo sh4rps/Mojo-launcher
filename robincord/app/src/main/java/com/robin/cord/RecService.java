@@ -88,17 +88,26 @@ public class RecService extends Service {
             busy = false; finishService(); return;
         }
         int cd = cfg.countdown;
-        if (cd > 0) { setState(COUNTDOWN); countdown(cd); } else begin();
+        begin(cd);
     }
 
     private void countdown(final int n) {
-        if (state != COUNTDOWN) return;
-        if (n <= 0) { begin(); return; }
+        if (state != COUNTDOWN || rec == null) return;
+        if (n <= 0) { rec.resume(); enterRec(); return; }
         notify1(note("Recording starts in " + n + "...", false, false));
         main.postDelayed(new Runnable() { public void run() { countdown(n - 1); } }, 1000);
     }
 
-    private void begin() {
+    private void enterRec() {
+        recStart = SystemClock.elapsedRealtime();
+        pausedMs = 0;
+        setState(REC);
+        notify1(note(rec.summary, true, false));
+        for (String w : rec.warnings) toast(w);
+    }
+
+    /** The recorder (and its microphone) starts immediately, while the app is still on screen; the countdown only gates the output. */
+    private void begin(final int cd) {
         new Thread(new Runnable() {
             public void run() {
                 final Recorder r = new Recorder(RecService.this, cfg, mp);
@@ -114,11 +123,13 @@ public class RecService extends Service {
                 main.post(new Runnable() { public void run() {
                     if (!busy) { new Thread(new Runnable() { public void run() { r.stop(); } }).start(); return; }
                     rec = r;
-                    recStart = SystemClock.elapsedRealtime();
-                    pausedMs = 0;
-                    setState(REC);
-                    notify1(note(r.summary, true, false));
-                    for (String w : r.warnings) toast(w);
+                    if (cd > 0) {
+                        r.pause();
+                        setState(COUNTDOWN);
+                        countdown(cd);
+                    } else {
+                        enterRec();
+                    }
                 } });
             }
         }, "rc-start").start();
@@ -142,13 +153,14 @@ public class RecService extends Service {
 
     private void stopRec() {
         if (state == IDLE && !busy) { finishService(); return; }
-        if (state == COUNTDOWN || rec == null) { finishService(); return; }
+        if (rec == null) { finishService(); return; }
         final Recorder r = rec;
         rec = null;
         notify1(note("Saving...", false, false));
         new Thread(new Runnable() {
             public void run() {
                 final Out o = r.stop();
+                Cfg.sp(RecService.this).edit().putString("lastinfo", r.report + "  |  Accessibility " + (a11yOn() ? "ON" : "OFF")).apply();
                 main.post(new Runnable() { public void run() {
                     if (o != null) {
                         Cfg.addRecent(RecService.this, o.uri.toString(), o.name, o.size);
@@ -185,6 +197,14 @@ public class RecService extends Service {
         if (rec != null) { try { rec.stop(); } catch (Throwable ignore) { } rec = null; }
         state = IDLE;
         super.onDestroy();
+    }
+
+    private boolean a11yOn() {
+        try {
+            String e = android.provider.Settings.Secure.getString(getContentResolver(),
+                    android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+            return e != null && e.contains(getPackageName() + "/");
+        } catch (Throwable t) { return false; }
     }
 
     private void toast(String s) { Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show(); }
