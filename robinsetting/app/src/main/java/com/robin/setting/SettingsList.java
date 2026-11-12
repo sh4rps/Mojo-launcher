@@ -1,0 +1,58 @@
+package com.robin.setting;
+
+import android.provider.Settings;
+
+/** Every system settings page we can open: {title, keywords, intent action}. */
+final class SettingsList {
+    static final String[][] ALL = {
+        {"Wi-Fi", "wifi wireless internet network", Settings.ACTION_WIFI_SETTINGS},
+        {"Mobile network / SIM", "sim data roaming network 5g mobile", Settings.ACTION_NETWORK_OPERATOR_SETTINGS},
+        {"Data usage", "data usage mobile cellular limit", Settings.ACTION_DATA_USAGE_SETTINGS},
+        {"Airplane mode", "flight airplane radio", Settings.ACTION_AIRPLANE_MODE_SETTINGS},
+        {"Hotspot & tethering", "hotspot tether share internet", "android.settings.TETHER_SETTINGS"},
+        {"VPN", "vpn private network", Settings.ACTION_VPN_SETTINGS},
+        {"Bluetooth", "bluetooth pair device", Settings.ACTION_BLUETOOTH_SETTINGS},
+        {"NFC", "nfc tap pay", Settings.ACTION_NFC_SETTINGS},
+        {"Cast / screen mirroring", "cast mirror screen share", Settings.ACTION_CAST_SETTINGS},
+        {"Connected devices", "connected devices usb", "android.settings.CONNECTED_DEVICE_SETTINGS"},
+        {"Display", "display screen brightness dark mode theme refresh rate hz", Settings.ACTION_DISPLAY_SETTINGS},
+        {"Night light / Eye care", "night light eye comfort blue", "android.settings.NIGHT_DISPLAY_SETTINGS"},
+        {"Screen saver", "screensaver daydream", Settings.ACTION_DREAM_SETTINGS},
+        {"Wallpaper & style", "wallpaper style", "android.settings.WALLPAPER_SETTINGS"},
+        {"Sound & vibration", "sound volume ringtone vibration silent", Settings.ACTION_SOUND_SETTINGS},
+        {"Do not disturb", "dnd do not disturb priority", "android.settings.ZEN_MODE_SETTINGS"},
+        {"Notifications", "notification alerts", Settings.ACTION_APP_NOTIFICATION_SETTINGS},
+        {"Battery", "battery power saver usage", Intent_BATTERY()},
+        {"Battery optimization", "battery optimization doze unrestricted", Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS},
+        {"Storage", "storage space memory cleanup", Settings.ACTION_INTERNAL_STORAGE_SETTINGS},
+        {"Memory card", "sd memory card external", Settings.ACTION_MEMORY_CARD_SETTINGS},
+        {"Apps", "apps application manage uninstall", Settings.ACTION_APPLICATION_SETTINGS},
+        {"All apps", "all apps list", Settings.ACTION_MANAGE_ALL_APPLICATIONS_SETTINGS},
+        {"Default apps", "default apps browser launcher sms", Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS},
+        {"Special app access", "special access overlay write settings usage", "android.settings.MANAGE_ALL_APPLICATIONS_SETTINGS"},
+        {"Display over other apps", "overlay draw over apps floating", Settings.ACTION_MANAGE_OVERLAY_PERMISSION},
+        {"Modify system settings", "write settings modify system", Settings.ACTION_MANAGE_WRITE_SETTINGS},
+        {"All files access", "all files storage manage external", "android.settings.MANAGE_ALL_FILES_ACCESS_PERMISSION"},
+        {"Usage access", "usage access stats", Settings.ACTION_USAGE_ACCESS_SETTINGS},
+        {"Install unknown apps", "install unknown apps sources apk", Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES},
+        {"Accessibility", "accessibility service talkback", Settings.ACTION_ACCESSIBILITY_SETTINGS},
+        {"Location", "location gps", Settings.ACTION_LOCATION_SOURCE_SETTINGS},
+        {"Privacy", "privacy permissions dashboard", Settings.ACTION_PRIVACY_SETTINGS},
+        {"Security", "security lock screen fingerprint face", Settings.ACTION_SECURITY_SETTINGS},
+        {"Biometrics", "fingerprint face unlock biometrics", "android.settings.BIOMETRIC_ENROLL"},
+        {"Accounts & sync", "accounts google sync", Settings.ACTION_SYNC_SETTINGS},
+        {"Add account", "add account", Settings.ACTION_ADD_ACCOUNT},
+        {"Date & time", "date time timezone clock", Settings.ACTION_DATE_SETTINGS},
+        {"Language & input", "language keyboard input", Settings.ACTION_LOCALE_SETTINGS},
+        {"Keyboard", "keyboard ime input method", Settings.ACTION_INPUT_METHOD_SETTINGS},
+        {"Physical keyboard / mouse", "physical keyboard mouse pointer speed", Settings.ACTION_HARD_KEYBOARD_SETTINGS},
+        {"Text-to-speech", "tts speech voice", "com.android.settings.TTS_SETTINGS"},
+        {"Developer options", "developer options debug usb adb", Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS},
+        {"About phone", "about phone device info version build", Settings.ACTION_DEVICE_INFO_SETTINGS},
+        {"System update", "update ota software", "android.settings.SYSTEM_UPDATE_SETTINGS"},
+        {"Print", "print printer", Settings.ACTION_PRINT_SETTINGS},
+        {"Users", "users guest profiles", "android.settings.USER_SETTINGS"},
+        {"Android Settings (full)", "settings main all", Settings.ACTION_SETTINGS},
+    };
+    private static String Intent_BATTERY() { return Settings.ACTION_BATTERY_SAVER_SETTINGS; }
+}

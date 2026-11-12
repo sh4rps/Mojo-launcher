@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="svc_desc">Switches the screen refresh rate per app (60/90/120/144 Hz) when you open an app you configured. Only reads which app is in front; nothing else.</string>
+    <style name="Robin" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:statusBarColor">#0d0e13</item>
+        <item name="android:navigationBarColor">#0d0e13</item>
+        <item name="android:colorAccent">#9a86ff</item>
+    </style>
+</resources>
