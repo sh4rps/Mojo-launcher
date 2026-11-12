@@ -1,0 +1,17 @@
+name: Release FeatherAndroid
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  rel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Join and release
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          cat parts-feather/p.* > FeatherAndroid.apk
+          echo "$(cat parts-feather/SHA256)  FeatherAndroid.apk" | sha256sum -c
+          gh release delete featherandroid -y --cleanup-tag || true
+          gh release create featherandroid FeatherAndroid.apk --title "FeatherAndroid" --notes "Java Edition launcher: all versions, all loaders, GL4ES/Holy/OpenLTW/MobileGlues/Zink/Freedreno renderers, Java 8/17/21, Horizon-Android style purple pixel UI."
