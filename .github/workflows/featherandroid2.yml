@@ -1,0 +1,17 @@
+name: Release FeatherAndroid 2
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  rel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Join and release
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          cat parts-feather2/p.* > FeatherAndroid2.apk
+          echo "$(cat parts-feather2/SHA256)  FeatherAndroid2.apk" | sha256sum -c
+          gh release delete featherandroid2 -y --cleanup-tag || true
+          gh release create featherandroid2 FeatherAndroid2.apk --title "FeatherAndroid 2.0" --notes "FeatherAndroid 2.0: Skins & Capes manager with 3D preview, games/FeatherAndroid folder, lighter build."
