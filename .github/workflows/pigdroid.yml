@@ -1,0 +1,17 @@
+name: Release Pigdroid Launcher
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  rel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Join and release
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          cat parts-pigdroid/p.* > PigdroidLauncher.apk
+          echo "$(cat parts-pigdroid/SHA256)  PigdroidLauncher.apk" | sha256sum -c
+          gh release delete pigdroid -y --cleanup-tag || true
+          gh release create pigdroid PigdroidLauncher.apk --title "Pigdroid Launcher" --notes "Pigdroid Launcher: Java Edition launcher with Skins and Capes (3D preview), games/PigdroidLauncher folder."
