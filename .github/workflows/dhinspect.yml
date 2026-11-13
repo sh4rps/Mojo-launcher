@@ -1,0 +1,28 @@
+name: DH inspect
+on: workflow_dispatch
+jobs:
+  i:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch jar
+        run: |
+          curl -sS "https://api.modrinth.com/v2/project/distanthorizons/version?game_versions=%5B%221.21.11%22%5D" -o v.json
+          python3 - <<'PY'
+          import json
+          for v in json.load(open('v.json'))[:6]:
+              print(v['version_number'], v['game_versions'], v['loaders'], [(f['filename'], f['size']) for f in v['files']])
+          PY
+          python3 - <<'PY'
+          import json,urllib.request
+          for v in json.load(open('v.json')):
+              if v['version_number'].startswith('3.3.3') and '1.21.11' in v['game_versions']:
+                  f=[x for x in v['files'] if x['primary']][0]
+                  urllib.request.urlretrieve(f['url'],'dh.jar'); print('got',f['filename']); break
+          PY
+      - name: Inspect
+        run: |
+          ls -la dh.jar
+          unzip -l dh.jar | awk '{print $4}' | grep -v '/$' | awk -F/ '{ if (NF>6) print $1"/"$2"/"$3"/"$4"/"$5"/"$6; else print $0 }' | sort | uniq -c | sort -rn | head -80
+          unzip -l dh.jar | tail -1
+          unzip -p dh.jar fabric.mod.json | head -120
+          unzip -l dh.jar | awk '{print $4}' | grep -i "mixins.json\|refmap\|\.toml\|META-INF/services\|accesswidener"
