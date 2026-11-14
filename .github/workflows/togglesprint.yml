@@ -1,0 +1,25 @@
+name: Build Toggle Sprint (Forge 1.8.9)
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '8' }
+      - name: Gradle 2.14.1
+        run: |
+          curl -sSL -o g.zip https://services.gradle.org/distributions/gradle-2.14.1-bin.zip
+          unzip -q g.zip
+      - name: Build
+        working-directory: togglesprint
+        run: ../gradle-2.14.1/bin/gradle --no-daemon setupCIWorkspace build 2>&1 | tail -60
+      - name: Release
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          ls togglesprint/build/libs
+          gh release delete togglesprint -y --cleanup-tag || true
+          gh release create togglesprint togglesprint/build/libs/ToggleSprint-1.8.9-1.0.jar --title "Toggle Sprint 1.8.9 (Forge)" --notes "Press O to toggle auto-sprint. Forge 1.8.9."
