@@ -142,6 +142,8 @@ for dens, sz in (('mdpi', 48), ('hdpi', 72), ('xhdpi', 96), ('xxhdpi', 144), ('x
 HERE = os.path.dirname(os.path.abspath(__file__))
 if not NOSKINS:
     pass
+import subprocess
+subprocess.check_call(['python3', f'{HERE}/gen_layout.py'])
 shutil.copy(f'{HERE}/res/fragment_launcher_land.xml', f'{R}/layout-land/fragment_launcher.xml')
 if NOSKINS:
     rw(f'{R}/layout-land/fragment_launcher.xml', lambda s: s.replace('android:tag="robin_skins"', ''))
@@ -153,4 +155,25 @@ open(f'{R}/drawable/send_play.xml', 'w').write(shape('<shape xmlns:android="http
 open(f'{R}/drawable/send_pill.xml', 'w').write(shape('<selector xmlns:android="http://schemas.android.com/apk/res/android"><item android:state_pressed="true"><shape><solid android:color="#ff2a1f4d"/><corners android:radius="12dp"/></shape></item><item><shape><solid android:color="#00000000"/><corners android:radius="12dp"/></shape></item></selector>'))
 rw(f'{R}/layout-land/fragment_launcher.xml', lambda s: s.replace('android:text="@string/main_play" android:textAllCaps="true" android:textSize="20sp"', 'android:text="@string/main_play" android:background="@drawable/send_play" android:textColor="#ffffffff" android:textAllCaps="true" android:textSize="20sp"'))
 rw(f'{R}/values/styles.xml', lambda s: s.replace('</resources>', '    <style name="SendMenuButton" parent="@style/LauncherMenuButton">\n        <item name="android:layout_height">48dp</item>\n        <item name="android:background">@drawable/send_pill</item>\n        <item name="android:textColor">@color/primary_text</item>\n        <item name="android:textSize">12sp</item>\n        <item name="android:layout_marginBottom">4dp</item>\n    </style>\n</resources>'))
+
+# ---------- icons + extra drawables for the new home ----------
+ICONS = {
+ 'home': ('', 'M12,3 L2,12 H5 V21 H10 V15 H14 V21 H19 V12 H22 Z'),
+ 'versions': ('', 'M12,2 L2,7 L12,12 L22,7 Z M2,11 L12,16 L22,11 L20.6,10.3 L12,14.6 L3.4,10.3 Z M2,15 L12,20 L22,15 L20.6,14.3 L12,18.6 L3.4,14.3 Z'),
+ 'mods': ('evenOdd', 'M12,2 L21,7 V17 L12,22 L3,17 V7 Z M12,5 L6,8.2 L12,11.4 L18,8.2 Z'),
+ 'packs': ('evenOdd', 'M3,4 H21 V20 H3 Z M5,18 H19 L14,11 L11,15 L9,13 Z'),
+ 'shaders': ('', 'M12,2 L14.5,9.5 L22,12 L14.5,14.5 L12,22 L9.5,14.5 L2,12 L9.5,9.5 Z'),
+ 'gear': ('', 'M3,6 H10 V8 H3 Z M14,6 H21 V8 H14 Z M10,4 H14 V10 H10 Z M3,16 H6 V18 H3 Z M10,16 H21 V18 H10 Z M6,14 H10 V20 H6 Z'),
+ 'info': ('evenOdd', 'M12,2 A10,10 0 1,0 12,22 A10,10 0 1,0 12,2 Z M11,10 H13 V17 H11 Z M11,7 H13 V9 H11 Z'),
+ 'plus': ('', 'M11,4 H13 V11 H20 V13 H13 V20 H11 V13 H4 V11 H11 Z'),
+ 'pencil': ('', 'M3,17.25 V21 H6.75 L17.8,9.94 L14.06,6.2 Z M20.7,7.04 L18.37,4.71 L16.96,6.12 L19.29,8.45 Z'),
+}
+for n, (ft, path) in ICONS.items():
+    vb = '0 0 24 24' if n != 'gear' else '0 -1 24 26'
+    open(f'{R}/drawable/send_i_{n}.xml', 'w').write(shape(f'<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24"><path android:fillColor="#ffe9e4ff" {"android:fillType=" + chr(34) + ft + chr(34) if ft else ""} android:pathData="{path}"/></vector>'))
+open(f'{R}/drawable/send_nav_on.xml', 'w').write(shape('<shape xmlns:android="http://schemas.android.com/apk/res/android"><gradient android:angle="270" android:startColor="#ff7c3aed" android:endColor="#ff5b21b6"/><corners android:radius="12dp"/></shape>'))
+open(f'{R}/drawable/send_chip.xml', 'w').write(shape('<shape xmlns:android="http://schemas.android.com/apk/res/android"><solid android:color="#ff3b1f86"/><corners android:radius="9dp"/></shape>'))
+open(f'{R}/drawable/send_btn2.xml', 'w').write(shape('<shape xmlns:android="http://schemas.android.com/apk/res/android"><solid android:color="#ff2a1f4d"/><corners android:radius="10dp"/><stroke android:width="1.5dp" android:color="#ff8b5cf6"/></shape>'))
+# tag the settings gear in the activity so the new sidebar can click it
+rw(f'{R}/layout/activity_mojo_ui.xml', lambda s: s.replace('android:id="@id/setting_button"', 'android:id="@id/setting_button" android:tag="send_settings"', 1))
 print('send tree ready')

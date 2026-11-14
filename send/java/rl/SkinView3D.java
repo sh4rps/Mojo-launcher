@@ -140,7 +140,7 @@ public class SkinView3D extends View {
     private void build() {
         faces.clear();
         if (skin == null) return;
-        if (autoSpin && !drag && System.currentTimeMillis() - lastTouch > 2500) yaw += 0.9f;
+        if (autoSpin && !drag && System.currentTimeMillis() - lastTouch > 2500) yaw += 1.8f;
         float t = (System.currentTimeMillis() % 100000) / 1000f;
         float sw = (float) Math.sin(t * 2.2) * 14;
         float aw = slim ? 3 : 4;
@@ -166,7 +166,17 @@ public class SkinView3D extends View {
         });
     }
 
+    @Override protected void onAttachedToWindow() { super.onAttachedToWindow(); invalidate(); }
+    @Override protected void onWindowVisibilityChanged(int v) { super.onWindowVisibilityChanged(v); if (v == View.VISIBLE) invalidate(); }
+    @Override protected void onVisibilityChanged(View w, int v) { super.onVisibilityChanged(w, v); if (v == View.VISIBLE) invalidate(); }
+
     @Override protected void onDraw(Canvas c) {
+        try { draw3d(c); } catch (Throwable t) { }
+        // ~30 fps, and nothing at all while the view is hidden / the game is running on top
+        if (isShown() && getWindowVisibility() == View.VISIBLE) postInvalidateDelayed(33);
+    }
+
+    private void draw3d(Canvas c) {
         beforeModel(c);
         build();
         float s = Math.min(getHeight() / 38f, getWidth() / 24f) * scaleMul;
@@ -184,6 +194,5 @@ public class SkinView3D extends View {
             c.drawBitmap(f.bmp, mx, paint);
         }
         afterModel(c);
-        postInvalidateOnAnimation();
     }
 }

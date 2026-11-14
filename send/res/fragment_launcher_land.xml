@@ -3,83 +3,149 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@id/fragment_menu_main"
-    android:background="@drawable/send_bg"
+    android:background="#ff0e0b1f"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
-    <androidx.constraintlayout.widget.Guideline android:id="@+id/send_g_side" android:orientation="vertical" android:layout_width="0dp" android:layout_height="0dp" app:layout_constraintGuide_percent="0.21" />
-    <androidx.constraintlayout.widget.Guideline android:id="@+id/send_g_stage" android:orientation="vertical" android:layout_width="0dp" android:layout_height="0dp" app:layout_constraintGuide_percent="0.62" />
+    <rl.ForestView android:layout_width="0dp" android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent" />
 
-    <!-- left sidebar: every Mojo action keeps its original id -->
-    <ScrollView
-        android:id="@+id/send_sidebar"
-        android:background="@drawable/send_side_bg"
-        android:layout_width="0dp" android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/send_g_side"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+    <androidx.constraintlayout.widget.Guideline android:id="@+id/send_g_stage" android:orientation="vertical" android:layout_width="0dp" android:layout_height="0dp" app:layout_constraintGuide_percent="0.60" />
+
+    <!-- sidebar -->
+    <ScrollView android:id="@+id/send_sidebar" android:background="@drawable/send_side_bg" android:scrollbars="none"
+        android:layout_width="80dp" android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent">
         <LinearLayout android:orientation="vertical" android:padding="6dp" android:layout_width="fill_parent" android:layout_height="wrap_content">
-            <com.kdt.mcgui.LauncherMenuButton android:id="@id/news_button" android:visibility="gone" android:layout_width="fill_parent" android:text="@string/mcl_tab_wiki" android:drawableStart="@drawable/ic_px_book" style="@style/SendMenuButton" />
-            <View android:id="@id/social_divider" android:visibility="gone" android:layout_width="1dp" android:layout_height="1dp" />
-            <com.kdt.mcgui.LauncherMenuButton android:id="@id/social_media_button" android:visibility="gone" android:layout_width="fill_parent" android:text="@string/mcl_button_social_media" android:drawableStart="@drawable/ic_social_media" style="@style/SendMenuButton" />
-            <com.kdt.mcgui.LauncherMenuButton android:id="@+id/robin_content_btn" android:tag="robin_content" android:layout_width="fill_parent" android:text="@string/robin_content_title" android:drawableStart="@drawable/ic_px_file_dl" style="@style/SendMenuButton" />
-            <com.kdt.mcgui.LauncherMenuButton android:id="@id/custom_control_button" android:layout_width="fill_parent" android:text="@string/mcl_option_customcontrol" android:drawableStart="@drawable/ic_px_gamepad" style="@style/SendMenuButton" />
-            <com.kdt.mcgui.LauncherMenuButton android:id="@id/install_jar_button" android:layout_width="fill_parent" android:text="@string/main_install_jar_file" android:drawableStart="@drawable/ic_px_java_run" style="@style/SendMenuButton" />
-            <com.kdt.mcgui.LauncherMenuButton android:id="@id/open_files_button" android:layout_width="fill_parent" android:text="@string/mcl_button_open_directory" android:drawableStart="@drawable/ic_px_folder" style="@style/SendMenuButton" />
-            <com.kdt.mcgui.LauncherMenuButton android:id="@id/share_logs_button" android:layout_width="fill_parent" android:text="@string/main_share_logs" android:drawableStart="@drawable/ic_px_sharelog" style="@style/SendMenuButton" />
+            <LinearLayout android:tag="h_home" android:orientation="vertical" android:gravity="center" android:clickable="true" android:focusable="true" android:background="@drawable/send_nav_on" android:layout_width="fill_parent" android:layout_height="54dp" android:layout_marginBottom="3dp">
+                <ImageView android:src="@drawable/send_i_home" android:layout_width="22dp" android:layout_height="22dp" />
+                <TextView android:text="Home" android:textColor="#fff5f3ff" android:textSize="10sp" android:maxLines="1" android:layout_marginTop="2dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+            <LinearLayout android:tag="h_versions" android:orientation="vertical" android:gravity="center" android:clickable="true" android:focusable="true" android:background="@drawable/send_pill" android:layout_width="fill_parent" android:layout_height="54dp" android:layout_marginBottom="3dp">
+                <ImageView android:src="@drawable/send_i_versions" android:layout_width="22dp" android:layout_height="22dp" />
+                <TextView android:text="Versions" android:textColor="#fff5f3ff" android:textSize="10sp" android:maxLines="1" android:layout_marginTop="2dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+            <LinearLayout android:tag="h_mods" android:orientation="vertical" android:gravity="center" android:clickable="true" android:focusable="true" android:background="@drawable/send_pill" android:layout_width="fill_parent" android:layout_height="54dp" android:layout_marginBottom="3dp">
+                <ImageView android:src="@drawable/send_i_mods" android:layout_width="22dp" android:layout_height="22dp" />
+                <TextView android:text="Mods" android:textColor="#fff5f3ff" android:textSize="10sp" android:maxLines="1" android:layout_marginTop="2dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+            <LinearLayout android:tag="h_packs" android:orientation="vertical" android:gravity="center" android:clickable="true" android:focusable="true" android:background="@drawable/send_pill" android:layout_width="fill_parent" android:layout_height="54dp" android:layout_marginBottom="3dp">
+                <ImageView android:src="@drawable/send_i_packs" android:layout_width="22dp" android:layout_height="22dp" />
+                <TextView android:text="Textures" android:textColor="#fff5f3ff" android:textSize="10sp" android:maxLines="1" android:layout_marginTop="2dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+            <LinearLayout android:tag="h_shaders" android:orientation="vertical" android:gravity="center" android:clickable="true" android:focusable="true" android:background="@drawable/send_pill" android:layout_width="fill_parent" android:layout_height="54dp" android:layout_marginBottom="3dp">
+                <ImageView android:src="@drawable/send_i_shaders" android:layout_width="22dp" android:layout_height="22dp" />
+                <TextView android:text="Shaders" android:textColor="#fff5f3ff" android:textSize="10sp" android:maxLines="1" android:layout_marginTop="2dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+            <LinearLayout android:tag="h_settings" android:orientation="vertical" android:gravity="center" android:clickable="true" android:focusable="true" android:background="@drawable/send_pill" android:layout_width="fill_parent" android:layout_height="54dp" android:layout_marginBottom="3dp">
+                <ImageView android:src="@drawable/send_i_gear" android:layout_width="22dp" android:layout_height="22dp" />
+                <TextView android:text="Settings" android:textColor="#fff5f3ff" android:textSize="10sp" android:maxLines="1" android:layout_marginTop="2dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+            <LinearLayout android:tag="h_about" android:orientation="vertical" android:gravity="center" android:clickable="true" android:focusable="true" android:background="@drawable/send_pill" android:layout_width="fill_parent" android:layout_height="54dp" android:layout_marginBottom="3dp">
+                <ImageView android:src="@drawable/send_i_info" android:layout_width="22dp" android:layout_height="22dp" />
+                <TextView android:text="About" android:textColor="#fff5f3ff" android:textSize="10sp" android:maxLines="1" android:layout_marginTop="2dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+            <TextView android:id="@+id/send_online" android:tag="h_online" android:text="●  Online" android:textColor="#ff4ade80" android:textSize="11sp" android:textStyle="bold" android:gravity="center" android:background="@drawable/send_card" android:layout_marginTop="6dp" android:layout_width="fill_parent" android:layout_height="30dp" />
         </LinearLayout>
     </ScrollView>
 
-    <!-- centre: 3D skin stage -->
-    <rl.HomeStage
-        android:id="@+id/send_stage"
-        android:layout_width="0dp" android:layout_height="0dp"
-        app:layout_constraintStart_toEndOf="@id/send_g_side"
-        app:layout_constraintEnd_toStartOf="@id/send_g_stage"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+    <!-- original Mojo buttons: kept (hidden) so every existing action still works; the new UI clicks them -->
+    <LinearLayout android:id="@+id/send_hidden" android:visibility="gone" android:orientation="vertical" android:layout_width="1dp" android:layout_height="1dp"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent">
+            <com.kdt.mcgui.LauncherMenuButton android:id="@id/news_button" android:tag="h_o_news" android:text="@string/mcl_tab_wiki" android:drawableStart="@drawable/ic_px_book" android:layout_width="fill_parent" style="@style/LauncherMenuButton.Universal" />
+            <View android:id="@id/social_divider" android:layout_width="1dp" android:layout_height="1dp" />
+            <com.kdt.mcgui.LauncherMenuButton android:id="@id/social_media_button" android:tag="h_o_social" android:text="@string/mcl_button_social_media" android:drawableStart="@drawable/ic_social_media" android:layout_width="fill_parent" style="@style/LauncherMenuButton.Universal" />
+            <com.kdt.mcgui.LauncherMenuButton android:tag="robin_content" android:text="@string/robin_content_title" android:drawableStart="@drawable/ic_px_file_dl" android:layout_width="fill_parent" style="@style/LauncherMenuButton.Universal" />
+            <com.kdt.mcgui.LauncherMenuButton android:id="@id/custom_control_button" android:tag="h_o_controls" android:text="@string/mcl_option_customcontrol" android:drawableStart="@drawable/ic_px_gamepad" android:layout_width="fill_parent" style="@style/LauncherMenuButton.Universal" />
+            <com.kdt.mcgui.LauncherMenuButton android:id="@id/install_jar_button" android:tag="h_o_jar" android:text="@string/main_install_jar_file" android:drawableStart="@drawable/ic_px_java_run" android:layout_width="fill_parent" style="@style/LauncherMenuButton.Universal" />
+            <com.kdt.mcgui.LauncherMenuButton android:id="@id/open_files_button" android:tag="h_o_files" android:text="@string/mcl_button_open_directory" android:drawableStart="@drawable/ic_px_folder" android:layout_width="fill_parent" style="@style/LauncherMenuButton.Universal" />
+            <com.kdt.mcgui.LauncherMenuButton android:id="@id/share_logs_button" android:tag="h_o_logs" android:text="@string/main_share_logs" android:drawableStart="@drawable/ic_px_sharelog" android:layout_width="fill_parent" style="@style/LauncherMenuButton.Universal" />
+    </LinearLayout>
 
-    <!-- right column -->
-    <LinearLayout
-        android:id="@+id/send_right"
-        android:orientation="vertical"
-        android:layout_width="0dp" android:layout_height="0dp"
-        android:layout_marginStart="4dp" android:layout_marginEnd="12dp" android:layout_marginBottom="12dp"
-        android:gravity="bottom"
-        app:layout_constraintStart_toEndOf="@id/send_g_stage"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+    <!-- bottom strip: installed versions + quick actions -->
+    <LinearLayout android:id="@+id/send_bottom" android:orientation="horizontal"
+        android:layout_width="0dp" android:layout_height="84dp" android:layout_marginStart="10dp" android:layout_marginEnd="10dp" android:layout_marginBottom="8dp"
+        app:layout_constraintStart_toEndOf="@id/send_sidebar" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintBottom_toBottomOf="parent">
+        <LinearLayout android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1.15" android:layout_height="fill_parent">
+            <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="3dp">
+                <TextView android:text="Installed Versions" android:textColor="#fff5f3ff" android:textStyle="bold" android:textSize="12sp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" />
+                <TextView android:tag="h_viewall" android:text="View All  ›" android:textColor="#ffa78bfa" android:textSize="11sp" android:clickable="true" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/send_vers" android:tag="h_vers" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="0dp" android:layout_weight="1" />
+        </LinearLayout>
+        <LinearLayout android:orientation="horizontal" android:layout_width="0dp" android:layout_weight="1.35" android:layout_height="fill_parent" android:layout_marginStart="8dp">
+            <LinearLayout android:tag="h_q_mods" android:orientation="horizontal" android:gravity="center_vertical" android:clickable="true" android:focusable="true" android:background="@drawable/send_card" android:padding="8dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="fill_parent" android:layout_marginStart="6dp">
+                <ImageView android:src="@drawable/send_i_plus" android:background="@drawable/send_chip" android:padding="7dp" android:layout_width="34dp" android:layout_height="34dp" />
+                <LinearLayout android:orientation="vertical" android:layout_marginStart="8dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content">
+                    <TextView android:text="Add Mods" android:textColor="#fff5f3ff" android:textStyle="bold" android:textSize="12sp" android:maxLines="1" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Browse &amp; install" android:textColor="#ffc4b5fd" android:textSize="10sp" android:maxLines="1" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout android:tag="h_q_packs" android:orientation="horizontal" android:gravity="center_vertical" android:clickable="true" android:focusable="true" android:background="@drawable/send_card" android:padding="8dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="fill_parent" android:layout_marginStart="6dp">
+                <ImageView android:src="@drawable/send_i_packs" android:background="@drawable/send_chip" android:padding="7dp" android:layout_width="34dp" android:layout_height="34dp" />
+                <LinearLayout android:orientation="vertical" android:layout_marginStart="8dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content">
+                    <TextView android:text="Texture Packs" android:textColor="#fff5f3ff" android:textStyle="bold" android:textSize="12sp" android:maxLines="1" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Find &amp; apply" android:textColor="#ffc4b5fd" android:textSize="10sp" android:maxLines="1" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout android:tag="h_q_shaders" android:orientation="horizontal" android:gravity="center_vertical" android:clickable="true" android:focusable="true" android:background="@drawable/send_card" android:padding="8dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="fill_parent" android:layout_marginStart="6dp">
+                <ImageView android:src="@drawable/send_i_shaders" android:background="@drawable/send_chip" android:padding="7dp" android:layout_width="34dp" android:layout_height="34dp" />
+                <LinearLayout android:orientation="vertical" android:layout_marginStart="8dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content">
+                    <TextView android:text="Shaders" android:textColor="#fff5f3ff" android:textStyle="bold" android:textSize="12sp" android:maxLines="1" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Better visuals" android:textColor="#ffc4b5fd" android:textSize="10sp" android:maxLines="1" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
 
-        <TextView android:id="@+id/send_skin_btn" android:tag="robin_skins"
-            android:text="@string/robin_skins_title"
-            android:textColor="@color/primary_text" android:textStyle="bold" android:textSize="15sp"
-            android:gravity="center" android:background="@drawable/send_card"
-            android:clickable="true" android:focusable="true"
-            android:layout_width="fill_parent" android:layout_height="46dp" android:layout_marginBottom="10dp" />
+    <!-- 3D stage -->
+    <rl.HomeStage android:id="@+id/send_stage" android:layout_width="0dp" android:layout_height="0dp"
+        app:layout_constraintStart_toEndOf="@id/send_sidebar" app:layout_constraintEnd_toStartOf="@id/send_g_stage"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toTopOf="@id/send_bottom" />
+
+    <!-- right column: profile, version, play -->
+    <LinearLayout android:id="@+id/send_right" android:orientation="vertical" android:gravity="center_vertical"
+        android:layout_width="0dp" android:layout_height="0dp" android:layout_marginStart="2dp" android:layout_marginEnd="12dp" android:layout_marginBottom="8dp"
+        app:layout_constraintStart_toEndOf="@id/send_g_stage" app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toTopOf="@id/send_bottom">
 
         <LinearLayout android:orientation="vertical" android:background="@drawable/send_card" android:padding="10dp"
-            android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="10dp">
-            <TextView android:text="Game Version" android:textColor="@color/secondary_text" android:textSize="12sp" android:textStyle="bold"
-                android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="6dp" />
+            android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp">
+            <TextView android:text="Player Profile" android:textColor="#ffc4b5fd" android:textSize="11sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            <LinearLayout android:orientation="horizontal" android:gravity="center_vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp">
+                <ImageView android:tag="h_avatar" android:background="@drawable/send_chip" android:padding="2dp" android:layout_width="44dp" android:layout_height="44dp" />
+                <LinearLayout android:orientation="vertical" android:layout_marginStart="10dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content">
+                    <TextView android:tag="h_name" android:text="Player" android:textColor="#ffffffff" android:textStyle="bold" android:textSize="15sp" android:maxLines="1" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:tag="h_sub" android:text="Default Skin" android:textColor="#ffc4b5fd" android:textSize="11sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+                <ImageView android:tag="h_pencil" android:src="@drawable/send_i_pencil" android:padding="9dp" android:clickable="true" android:background="@drawable/send_pill" android:layout_width="38dp" android:layout_height="38dp" />
+            </LinearLayout>
+            <TextView android:id="@+id/send_skin_btn" android:tag="robin_skins" android:text="Change Skin" android:textColor="#ffffffff" android:textStyle="bold" android:textSize="13sp"
+                android:gravity="center" android:background="@drawable/send_btn2" android:clickable="true" android:focusable="true"
+                android:layout_width="fill_parent" android:layout_height="38dp" android:layout_marginTop="8dp" />
+        </LinearLayout>
+
+        <LinearLayout android:orientation="vertical" android:background="@drawable/send_card" android:padding="8dp"
+            android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp">
+            <TextView android:text="Game Version" android:textColor="#ffc4b5fd" android:textSize="11sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" />
             <LinearLayout android:orientation="horizontal" android:gravity="center_vertical" android:layout_width="fill_parent" android:layout_height="wrap_content">
-                <com.kdt.mcgui.mcVersionSpinner android:id="@id/mc_version_spinner" android:background="@android:color/transparent"
-                    android:layout_width="0dp" android:layout_weight="1" android:layout_height="@dimen/_36sdp"
+                <com.kdt.mcgui.mcVersionSpinner android:id="@id/mc_version_spinner" android:tag="h_spinner" android:background="@android:color/transparent"
+                    android:layout_width="0dp" android:layout_weight="1" android:layout_height="@dimen/_30sdp"
                     android:drawableEnd="@drawable/spinner_arrow"
                     app:drawableEndPadding="@dimen/_1sdp" app:drawableEndSize="@dimen/_12sdp"
-                    app:drawableStartIntegerScaling="true" app:drawableStartSize="@dimen/_36sdp" />
+                    app:drawableStartIntegerScaling="true" app:drawableStartSize="@dimen/_30sdp" />
                 <ImageButton android:id="@id/edit_profile_button" android:background="?android:selectableItemBackground"
-                    android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_px_edit" />
+                    android:layout_width="36dp" android:layout_height="36dp" android:src="@drawable/ic_px_edit" />
             </LinearLayout>
         </LinearLayout>
 
-        <com.kdt.mcgui.MineButton android:id="@id/play_button"
-            android:text="@string/main_play" android:textAllCaps="true" android:textSize="20sp"
-            android:layout_width="fill_parent" android:layout_height="64dp" />
+        <com.kdt.mcgui.MineButton android:id="@id/play_button" android:text="@string/main_play" android:background="@drawable/send_play"
+            android:textColor="#ffffffff" android:textAllCaps="true" android:textSize="20sp"
+            android:layout_width="fill_parent" android:layout_height="52dp" />
+        <TextView android:text="Start Minecraft" android:textColor="#ffc4b5fd" android:textSize="10sp" android:gravity="center" android:layout_marginTop="2dp" android:layout_width="fill_parent" android:layout_height="wrap_content" />
     </LinearLayout>
 
-    <!-- kept for the original code, not shown -->
     <View android:id="@id/_background_display_view" android:visibility="gone" android:layout_width="1dp" android:layout_height="1dp" app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent" />
     <androidx.constraintlayout.widget.Guideline android:id="@id/center_guideline" android:orientation="vertical" android:layout_width="0dp" android:layout_height="0dp" app:layout_constraintGuide_percent="0.5" />
 </androidx.constraintlayout.widget.ConstraintLayout>

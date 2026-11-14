@@ -38,6 +38,7 @@ public class Skins extends Activity {
 
     /** Called from the launcher main menu (smali). */
     public static void hook(View root) {
+        try { Home.wire(root); } catch (Throwable t) { }
         try {
             View b = root.findViewWithTag("robin_skins");
             if (b == null) return;

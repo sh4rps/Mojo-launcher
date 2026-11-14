@@ -31,9 +31,11 @@ public class HomeStage extends SkinView3D {
     public HomeStage(Context c, AttributeSet a) { super(c, a); init(); }
 
     private void init() {
-        scaleMul = 0.78f; cyFrac = 0.46f;
-        setSkin(defaultSkin(), false);
-        skins.add(defaultSkin());
+        scaleMul = 0.8f; cyFrac = 0.5f;
+        Bitmap d = defaultSkin();
+        setSkin(d, false);
+        skins.add(d);
+        Home.avatar(d);
     }
 
     private float dp(float v) { return v * getResources().getDisplayMetrics().density; }
@@ -46,26 +48,34 @@ public class HomeStage extends SkinView3D {
     }
 
     private void loadAccountSkin() {
-        try {
-            Class<?> c = Class.forName("git.artdeell.mojo.authenticator.accounts.Accounts");
-            Object a = c.getMethod("getCurrent").invoke(null);
-            if (a == null) return;
-            boolean ms = a.getClass().getField("isMicrosoft").getBoolean(a);
-            String name = (String) a.getClass().getField("username").get(a);
-            if (!ms || name == null) return;
-            File cache = new File(getContext().getCacheDir(), "home_skin_" + name + ".png");
-            Bitmap b = cache.exists() ? BitmapFactory.decodeFile(cache.getAbsolutePath()) : null;
-            boolean slim = false;
-            if (b == null) {
-                String[] r = Mojang.playerSkin(name);
-                b = Mojang.bitmap(r[0]); slim = "slim".equals(r[1]);
-                java.io.FileOutputStream o = new java.io.FileOutputStream(cache);
-                b.compress(Bitmap.CompressFormat.PNG, 100, o); o.close();
-            }
-            final Bitmap fb = b; final boolean fs = slim;
-            post(new Runnable() { public void run() { skins.set(0, fb); idx = 0; setSkin(fb, fs); } });
-        } catch (Throwable t) { }
+        for (int tries = 0; tries < 6; tries++) {
+            try {
+                Class<?> c = Class.forName("git.artdeell.mojo.authenticator.accounts.Accounts");
+                Object a = c.getMethod("getCurrent").invoke(null);
+                if (a == null) { Thread.sleep(2000); continue; }
+                boolean ms = a.getClass().getField("isMicrosoft").getBoolean(a);
+                final String name = (String) a.getClass().getField("username").get(a);
+                if (name == null) return;
+                post(new Runnable() { public void run() { Home.who(name, null); } });
+                if (!ms) return;
+                File cache = new File(getContext().getCacheDir(), "home_skin_" + name + ".png");
+                Bitmap b = cache.exists() ? BitmapFactory.decodeFile(cache.getAbsolutePath()) : null;
+                boolean slim = false;
+                if (b == null) {
+                    String[] r = Mojang.playerSkin(name);
+                    b = Mojang.bitmap(r[0]); slim = "slim".equals(r[1]);
+                    java.io.FileOutputStream o = new java.io.FileOutputStream(cache);
+                    b.compress(Bitmap.CompressFormat.PNG, 100, o); o.close();
+                }
+                final Bitmap fb = b; final boolean fs = slim;
+                post(new Runnable() { public void run() { skins.set(0, fb); idx = 0; accountSkin = true; setSkin(fb, fs); Home.who(null, label()); Home.avatar(fb); } });
+                return;
+            } catch (Throwable t) { return; }
+        }
     }
+
+    private boolean accountSkin;
+    private String label() { return idx == 0 ? (accountSkin ? "Current Skin" : "Default Skin") : "Saved Skin " + idx; }
 
     private void loadLibrary() {
         try {
@@ -75,7 +85,7 @@ public class HomeStage extends SkinView3D {
             if (fs == null) return;
             for (File f : fs) {
                 Bitmap b = f.getName().endsWith(".png") ? BitmapFactory.decodeFile(f.getAbsolutePath()) : null;
-                if (b != null && b.getWidth() == 64) skins.add(b);
+                if (b != null && b.getWidth() == 64 && skins.size() < 12) skins.add(b);
             }
         } catch (Throwable t) { }
     }
@@ -99,35 +109,44 @@ public class HomeStage extends SkinView3D {
         return b;
     }
 
+    private RadialGradient glow;
+    private final Paint gp = new Paint();
+
+    @Override protected void onSizeChanged(int w, int hh, int ow, int oh) {
+        super.onSizeChanged(w, hh, ow, oh);
+        glow = new RadialGradient(w / 2f, hh * 0.5f, Math.max(1f, Math.min(w, hh) * 0.62f), 0x668b5cf6, 0x008b5cf6, Shader.TileMode.CLAMP);
+        gp.setShader(glow);
+    }
+
     @Override protected void beforeModel(Canvas c) {
         int w = getWidth(), h = getHeight();
-        // soft glow behind the character
-        p.setShader(new RadialGradient(w / 2f, h * 0.45f, Math.min(w, h) * 0.6f, 0x558b5cf6, 0x008b5cf6, Shader.TileMode.CLAMP));
-        c.drawRect(0, 0, w, h, p);
+        if (glow != null) c.drawRect(0, 0, w, h, gp);
+        // podium (two stacked discs with a glowing rim)
+        float cx = w / 2f, cy = h * 0.86f, rw = Math.min(w * 0.40f, h * 0.5f), rh = rw * 0.24f;
         p.setShader(null);
-        // podium
-        float cx = w / 2f, cy = h * 0.82f, rw = Math.min(w * 0.42f, h * 0.55f), rh = rw * 0.22f;
-        p.setStyle(Paint.Style.FILL); p.setColor(0xff1d1236);
-        r.set(cx - rw, cy - rh + dp(14), cx + rw, cy + rh + dp(14)); c.drawOval(r, p);
+        p.setStyle(Paint.Style.FILL); p.setColor(0xff150b30);
+        r.set(cx - rw, cy - rh + dp(12), cx + rw, cy + rh + dp(12)); c.drawOval(r, p);
         p.setColor(0xff2c1a58);
         r.set(cx - rw, cy - rh, cx + rw, cy + rh); c.drawOval(r, p);
-        p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(dp(2)); p.setColor(0xffa78bfa);
-        r.set(cx - rw * 0.9f, cy - rh * 0.9f, cx + rw * 0.9f, cy + rh * 0.9f); c.drawOval(r, p);
+        p.setStyle(Paint.Style.STROKE); p.setStrokeWidth(dp(2.5f)); p.setColor(0xffa78bfa);
+        r.set(cx - rw * 0.92f, cy - rh * 0.92f, cx + rw * 0.92f, cy + rh * 0.92f); c.drawOval(r, p);
+        p.setStrokeWidth(dp(1)); p.setColor(0x88c4b5fd);
+        r.set(cx - rw * 0.7f, cy - rh * 0.7f, cx + rw * 0.7f, cy + rh * 0.7f); c.drawOval(r, p);
         p.setStyle(Paint.Style.FILL);
     }
 
     @Override protected void afterModel(Canvas c) {
         int w = getWidth(), h = getHeight();
         p.setTypeface(Typeface.DEFAULT_BOLD);
-        p.setColor(Color.WHITE); p.setTextSize(dp(26));
-        c.drawText("Send Launcher", dp(14), dp(34), p);
+        p.setColor(Color.WHITE); p.setTextSize(dp(24));
+        c.drawText("Send Launcher", dp(16), dp(30), p);
         p.setTypeface(Typeface.DEFAULT); p.setColor(0xffc4b5fd); p.setTextSize(dp(13));
-        c.drawText("Minecraft Java Edition", dp(14), dp(54), p);
+        c.drawText("Minecraft Java Edition", dp(16), dp(48), p);
         // arrows + rotate pill
         float bs = dp(40);
-        left.set(dp(8), h * 0.45f - bs / 2, dp(8) + bs, h * 0.45f + bs / 2);
-        right.set(w - dp(8) - bs, h * 0.45f - bs / 2, w - dp(8), h * 0.45f + bs / 2);
-        rot.set(w / 2f - dp(52), h - dp(40), w / 2f + dp(52), h - dp(10));
+        left.set(dp(8), h * 0.5f - bs / 2, dp(8) + bs, h * 0.5f + bs / 2);
+        right.set(w - dp(8) - bs, h * 0.5f - bs / 2, w - dp(8), h * 0.5f + bs / 2);
+        rot.set(w / 2f - dp(52), h - dp(34), w / 2f + dp(52), h - dp(6));
         pill(c, left, "‹", 22); pill(c, right, "›", 22); pill(c, rot, "↻  Rotate", 13);
     }
 
@@ -148,7 +167,7 @@ public class HomeStage extends SkinView3D {
             if (rot.contains(x, y)) turn(90);
             else if ((left.contains(x, y) || right.contains(x, y)) && skins.size() > 1) {
                 idx = (idx + (left.contains(x, y) ? skins.size() - 1 : 1)) % skins.size();
-                setSkin(skins.get(idx), slim());
+                setSkin(skins.get(idx), slim()); Home.who(null, label()); Home.avatar(skins.get(idx));
             }
         }
         return res;
