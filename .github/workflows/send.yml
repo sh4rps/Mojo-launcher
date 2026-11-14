@@ -8,10 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Join and release
+      - name: Release
         env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
         run: |
-          cat parts-send/p.* > SendLauncher-V1.0.apk
-          echo "$(cat parts-send/SHA256)  SendLauncher-V1.0.apk" | sha256sum -c
+          (cd dist-send && sha256sum -c SHA256SUMS)
           gh release delete send-v1.0 -y --cleanup-tag || true
-          gh release create send-v1.0 SendLauncher-V1.0.apk --title "Send Launcher V1.0" --notes "Send Launcher V1.0 - Java Edition launcher fork: landscape UI, games/SendLauncher folder, Skins and Capes, tuned defaults for low-end phones."
+          gh release create send-v1.0 dist-send/SendLauncher-V1.0.apk dist-send/SendLauncher-V1.0-noskins.apk dist-send/SHA256SUMS --title "Send Launcher V1.0" --notes "Send Launcher V1.0 (slim, ~40 MB). Java 8 bundled; Java 17/21 download on first use. Main APK has Skins and Capes; -noskins is the same without it."

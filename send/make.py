@@ -8,6 +8,7 @@ d = sys.argv[1]; R = f'{d}/res'
 def rw(p, f):
     s = open(p, encoding='utf-8').read(); n = f(s); open(p, 'w', encoding='utf-8').write(n)
 PKG = 'com.send.launcher'
+NOSKINS = os.environ.get('NOSKINS') == '1'
 NAME = 'Send Launcher'
 
 # ---------- manifest ----------
@@ -23,7 +24,7 @@ def man(s):
     # landscape launcher
     for cls in ('git.artdeell.mojo.LauncherActivity', 'com.robin.launcher.ContentActivity', 'git.artdeell.mojo.TestStorageActivity', 'git.artdeell.mojo.MissingStorageActivity'):
         s = re.sub(r'(<activity )((?:(?!>).)*?android:name="%s")' % re.escape(cls), r'\1android:screenOrientation="sensorLandscape" \2', s, 1)
-    s = s.replace('</application>', '<activity android:name="rl.Skins" android:screenOrientation="sensorLandscape" android:theme="@android:style/Theme.Material.NoActionBar" android:exported="false" android:configChanges="orientation|screenSize|keyboardHidden"/></application>', 1)
+    if not NOSKINS: s = s.replace('</application>', '<activity android:name="rl.Skins" android:screenOrientation="sensorLandscape" android:theme="@android:style/Theme.Material.NoActionBar" android:exported="false" android:configChanges="orientation|screenSize|keyboardHidden"/></application>', 1)
     return s
 rw(f'{d}/AndroidManifest.xml', man)
 rw(f'{d}/smali/git/artdeell/mojo/BuildConfig.smali', lambda s: s.replace('com.rustlauncher.app', PKG))
@@ -65,11 +66,11 @@ for lay in ('layout', 'layout-land'):
                'android:drawableStart="@drawable/ic_px_edit" app:layout_constraintTop_toBottomOf="@id/robin_content_btn" style="@style/LauncherMenuButton.Universal" />\n')
         i = s.index('        </androidx.constraintlayout.widget.ConstraintLayout>\n    </ScrollView>')
         return s[:i] + btn + s[i:]
-    rw(p, skins)
+    if not NOSKINS: rw(p, skins)
 
 # smali: Skins hook, no Horizon routing, folders, user agents
 Rb = f'{d}/smali/com/robin/launcher/Robin.smali'
-rw(Rb, lambda s: s.replace('.method public static hook(Landroid/view/View;)V\n    .locals 2\n', '.method public static hook(Landroid/view/View;)V\n    .locals 2\n\n    invoke-static {p0}, Lrl/Skins;->hook(Landroid/view/View;)V\n', 1))
+if not NOSKINS: rw(Rb, lambda s: s.replace('.method public static hook(Landroid/view/View;)V\n    .locals 2\n', '.method public static hook(Landroid/view/View;)V\n    .locals 2\n\n    invoke-static {p0}, Lrl/Skins;->hook(Landroid/view/View;)V\n', 1))
 rw(Rb, lambda s: s.replace('.method public static onPlay(Landroid/view/View;)Z\n    .locals 7\n', '.method public static onPlay(Landroid/view/View;)Z\n    .locals 7\n\n    const/4 v0, 0x0\n\n    return v0\n', 1))
 for root, _, fs in os.walk(d):
     if '/smali' not in root + '/': continue
@@ -82,6 +83,13 @@ for root, _, fs in os.walk(d):
                      ('const-string v0, "RustLauncher"', 'const-string v0, "SendLauncher"'), ('"Rust Launcher"', '"Send Launcher"')):
             n = n.replace(a, b)
         if n != s: open(p, 'w', encoding='utf-8').write(n)
+
+# ---------- slim: Java 8 stays bundled, Java 17/21 are downloaded on first use (like the original Mojo) ----------
+for jr in ('jre-17', 'jre-21'):
+    shutil.rmtree(f'{d}/assets/components/{jr}', ignore_errors=True)
+for rel, call in (('smali/git/artdeell/mojo/tasks/AsyncAssetManager.smali', '    invoke-static {p0}, Lrl/Jres;->ensureAsync(Landroid/content/res/AssetManager;)V\n'),
+                  ('smali/git/artdeell/mojo/NewJREUtil.smali', '    invoke-static {p0}, Lrl/Jres;->ensure(Landroid/content/res/AssetManager;)V\n')):
+    rw(f'{d}/{rel}', lambda t, c=call: t.replace(c, ''))
 
 # ---------- palette: night teal ----------
 pal = {'background_app': '#ff0b1416', 'background_bottom_bar': '#ff122124', 'background_overlay': '#ff1b3236',
