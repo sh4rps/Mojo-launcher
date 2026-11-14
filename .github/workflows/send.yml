@@ -13,4 +13,4 @@ jobs:
         run: |
           (cd dist-send && sha256sum -c SHA256SUMS)
           gh release delete send-v1.0 -y --cleanup-tag || true
-          gh release create send-v1.0 dist-send/SendLauncher-V1.0.apk dist-send/SendLauncher-V1.0-noskins.apk dist-send/SHA256SUMS --title "Send Launcher V1.0" --notes "Send Launcher V1.0 (slim, ~40 MB). Java 8 bundled; Java 17/21 download on first use. Main APK has Skins and Capes; -noskins is the same without it."
+          gh release create send-v1.0 dist-send/SendLauncher-V1.0.apk dist-send/SHA256SUMS --title "Send Launcher V1.0" --notes "Send Launcher V1.0 (slim, ~40 MB) with the new home screen: 3D skin stage, Skins and Capes, purple theme. Java 8 bundled; Java 17/21 download on first use."

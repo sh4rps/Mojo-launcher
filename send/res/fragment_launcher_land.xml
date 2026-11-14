@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@id/fragment_menu_main"
+    android:background="@drawable/send_bg"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <androidx.constraintlayout.widget.Guideline android:id="@+id/send_g_side" android:orientation="vertical" android:layout_width="0dp" android:layout_height="0dp" app:layout_constraintGuide_percent="0.21" />
+    <androidx.constraintlayout.widget.Guideline android:id="@+id/send_g_stage" android:orientation="vertical" android:layout_width="0dp" android:layout_height="0dp" app:layout_constraintGuide_percent="0.62" />
+
+    <!-- left sidebar: every Mojo action keeps its original id -->
+    <ScrollView
+        android:id="@+id/send_sidebar"
+        android:background="@drawable/send_side_bg"
+        android:layout_width="0dp" android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/send_g_side"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+        <LinearLayout android:orientation="vertical" android:padding="6dp" android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <com.kdt.mcgui.LauncherMenuButton android:id="@id/news_button" android:visibility="gone" android:layout_width="fill_parent" android:text="@string/mcl_tab_wiki" android:drawableStart="@drawable/ic_px_book" style="@style/SendMenuButton" />
+            <View android:id="@id/social_divider" android:visibility="gone" android:layout_width="1dp" android:layout_height="1dp" />
+            <com.kdt.mcgui.LauncherMenuButton android:id="@id/social_media_button" android:visibility="gone" android:layout_width="fill_parent" android:text="@string/mcl_button_social_media" android:drawableStart="@drawable/ic_social_media" style="@style/SendMenuButton" />
+            <com.kdt.mcgui.LauncherMenuButton android:id="@+id/robin_content_btn" android:tag="robin_content" android:layout_width="fill_parent" android:text="@string/robin_content_title" android:drawableStart="@drawable/ic_px_file_dl" style="@style/SendMenuButton" />
+            <com.kdt.mcgui.LauncherMenuButton android:id="@id/custom_control_button" android:layout_width="fill_parent" android:text="@string/mcl_option_customcontrol" android:drawableStart="@drawable/ic_px_gamepad" style="@style/SendMenuButton" />
+            <com.kdt.mcgui.LauncherMenuButton android:id="@id/install_jar_button" android:layout_width="fill_parent" android:text="@string/main_install_jar_file" android:drawableStart="@drawable/ic_px_java_run" style="@style/SendMenuButton" />
+            <com.kdt.mcgui.LauncherMenuButton android:id="@id/open_files_button" android:layout_width="fill_parent" android:text="@string/mcl_button_open_directory" android:drawableStart="@drawable/ic_px_folder" style="@style/SendMenuButton" />
+            <com.kdt.mcgui.LauncherMenuButton android:id="@id/share_logs_button" android:layout_width="fill_parent" android:text="@string/main_share_logs" android:drawableStart="@drawable/ic_px_sharelog" style="@style/SendMenuButton" />
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- centre: 3D skin stage -->
+    <rl.HomeStage
+        android:id="@+id/send_stage"
+        android:layout_width="0dp" android:layout_height="0dp"
+        app:layout_constraintStart_toEndOf="@id/send_g_side"
+        app:layout_constraintEnd_toStartOf="@id/send_g_stage"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- right column -->
+    <LinearLayout
+        android:id="@+id/send_right"
+        android:orientation="vertical"
+        android:layout_width="0dp" android:layout_height="0dp"
+        android:layout_marginStart="4dp" android:layout_marginEnd="12dp" android:layout_marginBottom="12dp"
+        android:gravity="bottom"
+        app:layout_constraintStart_toEndOf="@id/send_g_stage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView android:id="@+id/send_skin_btn" android:tag="robin_skins"
+            android:text="@string/robin_skins_title"
+            android:textColor="@color/primary_text" android:textStyle="bold" android:textSize="15sp"
+            android:gravity="center" android:background="@drawable/send_card"
+            android:clickable="true" android:focusable="true"
+            android:layout_width="fill_parent" android:layout_height="46dp" android:layout_marginBottom="10dp" />
+
+        <LinearLayout android:orientation="vertical" android:background="@drawable/send_card" android:padding="10dp"
+            android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="10dp">
+            <TextView android:text="Game Version" android:textColor="@color/secondary_text" android:textSize="12sp" android:textStyle="bold"
+                android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="6dp" />
+            <LinearLayout android:orientation="horizontal" android:gravity="center_vertical" android:layout_width="fill_parent" android:layout_height="wrap_content">
+                <com.kdt.mcgui.mcVersionSpinner android:id="@id/mc_version_spinner" android:background="@android:color/transparent"
+                    android:layout_width="0dp" android:layout_weight="1" android:layout_height="@dimen/_36sdp"
+                    android:drawableEnd="@drawable/spinner_arrow"
+                    app:drawableEndPadding="@dimen/_1sdp" app:drawableEndSize="@dimen/_12sdp"
+                    app:drawableStartIntegerScaling="true" app:drawableStartSize="@dimen/_36sdp" />
+                <ImageButton android:id="@id/edit_profile_button" android:background="?android:selectableItemBackground"
+                    android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/ic_px_edit" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <com.kdt.mcgui.MineButton android:id="@id/play_button"
+            android:text="@string/main_play" android:textAllCaps="true" android:textSize="20sp"
+            android:layout_width="fill_parent" android:layout_height="64dp" />
+    </LinearLayout>
+
+    <!-- kept for the original code, not shown -->
+    <View android:id="@id/_background_display_view" android:visibility="gone" android:layout_width="1dp" android:layout_height="1dp" app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent" />
+    <androidx.constraintlayout.widget.Guideline android:id="@id/center_guideline" android:orientation="vertical" android:layout_width="0dp" android:layout_height="0dp" app:layout_constraintGuide_percent="0.5" />
+</androidx.constraintlayout.widget.ConstraintLayout>

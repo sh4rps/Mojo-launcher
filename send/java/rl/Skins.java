@@ -33,8 +33,8 @@ import java.lang.reflect.Method;
 
 /** Send Launcher skin + cape manager. Entry point: Skins.hook(view) wires the "robin_skins" menu button. */
 public class Skins extends Activity {
-    static final int BG = 0xff0b1416, CARD = 0xff122124, EDGE = 0xff25454a, ACC = 0xff2ee6c5, ACC_D = 0xff169b86,
-            TXT = 0xffeafffb, SUB = 0xffa6cfc8, OK = 0xff45c27a, BAD = 0xfff07a68;
+    static final int BG = 0xff0e0b1f, CARD = 0xff1b1436, EDGE = 0xff3b2a73, ACC = 0xff8b5cf6, ACC_D = 0xff6d28d9,
+            TXT = 0xfff5f3ff, SUB = 0xffc4b5fd, OK = 0xff45c27a, BAD = 0xfff07a68;
 
     /** Called from the launcher main menu (smali). */
     public static void hook(View root) {
@@ -71,7 +71,7 @@ public class Skins extends Activity {
         TextView t = new TextView(this);
         t.setText(s); t.setTextSize(14); t.setGravity(Gravity.CENTER); t.setTypeface(Typeface.DEFAULT_BOLD);
         t.setTextColor(primary ? Color.WHITE : SUB);
-        t.setBackground(box(primary ? ACC_D : EDGE, primary ? ACC : 0xff3d6a70, 8));
+        t.setBackground(box(primary ? ACC_D : EDGE, primary ? ACC : 0xff5b4a99, 8));
         t.setPadding(dp(10), dp(10), dp(10), dp(10));
         return t;
     }
@@ -211,7 +211,7 @@ public class Skins extends Activity {
     private Bitmap defaultSkin() {
         // plain grey placeholder so the preview works before anything is loaded
         Bitmap b = Bitmap.createBitmap(64, 64, Bitmap.Config.ARGB_8888);
-        b.eraseColor(0xff2ee6c5);
+        b.eraseColor(0xff8b5cf6);
         return b;
     }
 

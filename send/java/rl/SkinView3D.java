@@ -30,10 +30,19 @@ public class SkinView3D extends View {
         Bitmap bmp; float[] p = new float[3], u = new float[3], v = new float[3]; float depth;
     }
 
+    protected float scaleMul = 1f, cyFrac = 0.5f;
+    protected boolean autoSpin = true;
+
     public SkinView3D(Context c) {
         super(c);
         paint.setFilterBitmap(false); paint.setAntiAlias(false);
     }
+
+    public SkinView3D(Context c, android.util.AttributeSet a) { this(c); }
+
+    protected void beforeModel(Canvas c) { }
+    protected void afterModel(Canvas c) { }
+    public void turn(float deg) { yaw += deg; lastTouch = System.currentTimeMillis(); invalidate(); }
 
     public void setSkin(Bitmap b, boolean slim) { this.skin = b == null ? null : normalize(b); this.slim = slim; cache.clear(); invalidate(); }
     public void setCape(Bitmap b) { this.cape = b; cache.clear(); invalidate(); }
@@ -131,7 +140,7 @@ public class SkinView3D extends View {
     private void build() {
         faces.clear();
         if (skin == null) return;
-        if (!drag && System.currentTimeMillis() - lastTouch > 2500) yaw += 0.9f;
+        if (autoSpin && !drag && System.currentTimeMillis() - lastTouch > 2500) yaw += 0.9f;
         float t = (System.currentTimeMillis() % 100000) / 1000f;
         float sw = (float) Math.sin(t * 2.2) * 14;
         float aw = slim ? 3 : 4;
@@ -158,9 +167,10 @@ public class SkinView3D extends View {
     }
 
     @Override protected void onDraw(Canvas c) {
+        beforeModel(c);
         build();
-        float s = Math.min(getHeight() / 38f, getWidth() / 24f);
-        float ox = getWidth() / 2f, oy = getHeight() / 2f;
+        float s = Math.min(getHeight() / 38f, getWidth() / 24f) * scaleMul;
+        float ox = getWidth() / 2f, oy = getHeight() * cyFrac;
         for (Face f : faces) {
             // outward normal = V x U ; draw only faces looking at the viewer (+z)
             float nz = f.v[0] * f.u[1] - f.v[1] * f.u[0];
@@ -173,6 +183,7 @@ public class SkinView3D extends View {
             mx.setPolyToPoly(src, 0, dst, 0, 3);
             c.drawBitmap(f.bmp, mx, paint);
         }
+        afterModel(c);
         postInvalidateOnAnimation();
     }
 }

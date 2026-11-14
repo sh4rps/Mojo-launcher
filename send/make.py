@@ -57,7 +57,7 @@ def hide(s):
         s = re.sub(r'(<[\w.]+ android:id="@id/%s")' % vid, r'\1 android:visibility="gone"', s)
     s = s.replace('android:visibility="gone" android:visibility="gone"', 'android:visibility="gone"')
     return s
-for lay in ('layout', 'layout-land'):
+for lay in ('layout',):
     p = f'{R}/{lay}/fragment_launcher.xml'
     rw(p, hide)
     def skins(s):
@@ -92,10 +92,10 @@ for rel, call in (('smali/git/artdeell/mojo/tasks/AsyncAssetManager.smali', '   
     rw(f'{d}/{rel}', lambda t, c=call: t.replace(c, ''))
 
 # ---------- palette: night teal ----------
-pal = {'background_app': '#ff0b1416', 'background_bottom_bar': '#ff122124', 'background_overlay': '#ff1b3236',
-       'background_status_bar': '#ff0b1416', 'ic_launcher_background': '#ff0b1416', 'minebutton_color': '#ff2ee6c5',
-       'minebutton_secondary': '#ff1b3236', 'preference_fallback_accent_color': '#ff2ee6c5',
-       'primary_text': '#ffeafffb', 'secondary_text': '#ffa6cfc8'}
+pal = {'background_app': '#ff0e0b1f', 'background_bottom_bar': '#ff151029', 'background_overlay': '#ff2a1f4d',
+       'background_status_bar': '#ff0e0b1f', 'ic_launcher_background': '#ff0e0b1f', 'minebutton_color': '#ff8b5cf6',
+       'minebutton_secondary': '#ff2a1f4d', 'preference_fallback_accent_color': '#ff8b5cf6',
+       'primary_text': '#fff5f3ff', 'secondary_text': '#ffc4b5fd'}
 def colors(s):
     for k, v in pal.items(): s = re.sub(rf'(<color name="{k}">)[^<]*', rf'\1{v}', s)
     return s
@@ -105,9 +105,9 @@ def rr(fill, stroke):
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
     <solid android:color="{fill}"/><corners android:radius="10dp"/><stroke android:width="2dp" android:color="{stroke}"/>
 </shape>'''
-open(f'{R}/drawable/button_flat.xml', 'w').write(rr('#ff1b3236', '#ff25454a'))
-open(f'{R}/drawable/button_flat_toggle_off.xml', 'w').write(rr('#ff1b3236', '#ff25454a'))
-open(f'{R}/drawable/button_flat_toggle_on.xml', 'w').write(rr('#ff169b86', '#ff2ee6c5'))
+open(f'{R}/drawable/button_flat.xml', 'w').write(rr('#ff2a1f4d', '#ff3b2a73'))
+open(f'{R}/drawable/button_flat_toggle_off.xml', 'w').write(rr('#ff2a1f4d', '#ff3b2a73'))
+open(f'{R}/drawable/button_flat_toggle_on.xml', 'w').write(rr('#ff6d28d9', '#ff8b5cf6'))
 
 # ---------- speed defaults for weak phones ----------
 rw(f'{R}/xml/pref_video.xml', lambda s: re.sub(r'(android:key="sustainedPerformance"[^>]*android:defaultValue=")false', r'\1true', s))
@@ -121,20 +121,36 @@ y = open(f'{d}/apktool.yml').read()
 y = re.sub(r"versionCode: '?\d+'?", "versionCode: '1'", y); y = re.sub(r"versionName: .*", "versionName: V1.0", y)
 open(f'{d}/apktool.yml', 'w').write(y)
 
-# ---------- icon: pixel paper plane ----------
-PL = ["..............", "..........PP..", "........PPPP..", "......PPPPPP..", "....PPPPPPPP..", "..PPPPPPPPPP..", "PPPPPPPPPPP...", "..DDPPPPPP....",
-      "....DDPPP.....", "......DPP.....", "......DDP.....", ".......DD.....", "..............", ".............."]
-COL = {'P': '#2ee6c5', 'D': '#169b86'}
+# ---------- icon: purple isometric cube ----------
 def glyph(size, pad, bg):
     im = Image.new('RGBA', (size, size), bg); dr = ImageDraw.Draw(im)
-    cell = (size - 2 * pad) // 14; ox = (size - cell * 14) // 2
-    for y, row in enumerate(PL):
-        for x, c in enumerate(row):
-            if c in COL: dr.rectangle([ox + x * cell, ox + y * cell, ox + (x + 1) * cell - 1, ox + (y + 1) * cell - 1], fill=COL[c])
+    s = size - 2 * pad; ox = pad; oy = pad
+    def P(x, y): return (ox + x * s, oy + y * s)
+    top = [P(.5, .06), P(.92, .28), P(.5, .5), P(.08, .28)]
+    left = [P(.08, .28), P(.5, .5), P(.5, .94), P(.08, .72)]
+    right = [P(.92, .28), P(.5, .5), P(.5, .94), P(.92, .72)]
+    dr.polygon(top, fill='#c4b5fd'); dr.polygon(left, fill='#7c3aed'); dr.polygon(right, fill='#5b21b6')
+    for poly in (top, left, right): dr.line(poly + [poly[0]], fill='#ede9fe', width=max(1, size // 48))
     return im
 for dens, sz in (('mdpi', 48), ('hdpi', 72), ('xhdpi', 96), ('xxhdpi', 144), ('xxxhdpi', 192)):
-    full = glyph(sz, sz // 8, '#ff0b1416'); fg = glyph(sz * 108 // 48, sz * 108 // 48 * 3 // 10, (0, 0, 0, 0))
+    full = glyph(sz, sz // 6, '#ff0e0b1f'); fg = glyph(sz * 108 // 48, sz * 108 // 48 * 3 // 10, (0, 0, 0, 0))
     for n, im in (('ic_launcher', full), ('ic_launcher_round', full), ('ic_launcher_foreground', fg)):
         p = f'{R}/mipmap-{dens}/{n}.webp'
         if os.path.exists(p): im.save(p, 'WEBP', lossless=True)
+
+# ---------- new home layout (landscape) ----------
+HERE = os.path.dirname(os.path.abspath(__file__))
+if not NOSKINS:
+    pass
+shutil.copy(f'{HERE}/res/fragment_launcher_land.xml', f'{R}/layout-land/fragment_launcher.xml')
+if NOSKINS:
+    rw(f'{R}/layout-land/fragment_launcher.xml', lambda s: s.replace('android:tag="robin_skins"', ''))
+def shape(body): return '<?xml version="1.0" encoding="utf-8"?>\n' + body
+open(f'{R}/drawable/send_bg.xml', 'w').write(shape('<shape xmlns:android="http://schemas.android.com/apk/res/android"><gradient android:angle="270" android:startColor="#ff1d1140" android:endColor="#ff0b0818"/></shape>'))
+open(f'{R}/drawable/send_side_bg.xml', 'w').write(shape('<shape xmlns:android="http://schemas.android.com/apk/res/android"><solid android:color="#ee120d26"/></shape>'))
+open(f'{R}/drawable/send_card.xml', 'w').write(shape('<shape xmlns:android="http://schemas.android.com/apk/res/android"><solid android:color="#ee1b1436"/><corners android:radius="14dp"/><stroke android:width="1.5dp" android:color="#ff3b2a73"/></shape>'))
+open(f'{R}/drawable/send_play.xml', 'w').write(shape('<shape xmlns:android="http://schemas.android.com/apk/res/android"><gradient android:angle="0" android:startColor="#ff6d28d9" android:endColor="#ffa855f7"/><corners android:radius="16dp"/><stroke android:width="2dp" android:color="#ffc4b5fd"/></shape>'))
+open(f'{R}/drawable/send_pill.xml', 'w').write(shape('<selector xmlns:android="http://schemas.android.com/apk/res/android"><item android:state_pressed="true"><shape><solid android:color="#ff2a1f4d"/><corners android:radius="12dp"/></shape></item><item><shape><solid android:color="#00000000"/><corners android:radius="12dp"/></shape></item></selector>'))
+rw(f'{R}/layout-land/fragment_launcher.xml', lambda s: s.replace('android:text="@string/main_play" android:textAllCaps="true" android:textSize="20sp"', 'android:text="@string/main_play" android:background="@drawable/send_play" android:textColor="#ffffffff" android:textAllCaps="true" android:textSize="20sp"'))
+rw(f'{R}/values/styles.xml', lambda s: s.replace('</resources>', '    <style name="SendMenuButton" parent="@style/LauncherMenuButton">\n        <item name="android:layout_height">48dp</item>\n        <item name="android:background">@drawable/send_pill</item>\n        <item name="android:textColor">@color/primary_text</item>\n        <item name="android:textSize">12sp</item>\n        <item name="android:layout_marginBottom">4dp</item>\n    </style>\n</resources>'))
 print('send tree ready')
