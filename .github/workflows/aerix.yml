@@ -1,0 +1,16 @@
+name: Release Aerix edit
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  rel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Release
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        run: |
+          (cd dist-aerix && sha256sum -c SHA256SUMS)
+          gh release delete aerix-edit-2.3.2 -y --cleanup-tag || true
+          gh release create aerix-edit-2.3.2 dist-aerix/Aerix-Launcher-2.3.2-edit-arm64-v8a.apk dist-aerix/SHA256SUMS --title "Aerix Launcher 2.3.2 (edit)" --notes "Aerix Launcher 2.3.2 arm64-v8a, edited: in-game FPS/Hz readout (top-left) removed, Contributors section removed from the Info page. Signed with a different key than the original, so uninstall the original Aerix first (back up worlds)."
