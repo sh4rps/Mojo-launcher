@@ -1,23 +1,24 @@
-# generates res/fragment_launcher_land.xml (Send Launcher home, modelled on the reference mockup)
+# generates res/fragment_launcher_land.xml (home) + res/activity_mojo_ui_land.xml (top bar) for Send Launcher, modelled on the reference mockup
 import os
 HERE = os.path.dirname(os.path.abspath(__file__))
-W = 'android:layout_width="%s" android:layout_height="%s"'
+NS = 'xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"'
 
 def nav(tag, icon, label, on=False):
     bg = 'send_nav_on' if on else 'send_pill'
-    return f'''            <LinearLayout android:tag="{tag}" android:orientation="vertical" android:gravity="center" android:clickable="true" android:focusable="true" android:background="@drawable/{bg}" android:layout_width="fill_parent" android:layout_height="54dp" android:layout_marginBottom="3dp">
-                <ImageView android:src="@drawable/{icon}" android:layout_width="22dp" android:layout_height="22dp" />
-                <TextView android:text="{label}" android:textColor="#fff5f3ff" android:textSize="10sp" android:maxLines="1" android:layout_marginTop="2dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+    return f'''            <LinearLayout android:tag="{tag}" android:orientation="vertical" android:gravity="center" android:clickable="true" android:focusable="true" android:background="@drawable/{bg}" android:layout_width="fill_parent" android:layout_height="40dp" android:layout_marginBottom="2dp">
+                <ImageView android:src="@drawable/{icon}" android:layout_width="18dp" android:layout_height="18dp" />
+                <TextView android:text="{label}" android:textColor="#fff5f3ff" android:textSize="9sp" android:maxLines="1" android:layout_marginTop="0dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
             </LinearLayout>
 '''
 
 def quick(tag, icon, title, sub):
-    return f'''            <LinearLayout android:tag="{tag}" android:orientation="horizontal" android:gravity="center_vertical" android:clickable="true" android:focusable="true" android:background="@drawable/send_card" android:padding="8dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="fill_parent" android:layout_marginStart="6dp">
-                <ImageView android:src="@drawable/{icon}" android:background="@drawable/send_chip" android:padding="7dp" android:layout_width="34dp" android:layout_height="34dp" />
-                <LinearLayout android:orientation="vertical" android:layout_marginStart="8dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content">
-                    <TextView android:text="{title}" android:textColor="#fff5f3ff" android:textStyle="bold" android:textSize="12sp" android:maxLines="1" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                    <TextView android:text="{sub}" android:textColor="#ffc4b5fd" android:textSize="10sp" android:maxLines="1" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+    return f'''            <LinearLayout android:tag="{tag}" android:orientation="horizontal" android:gravity="center_vertical" android:clickable="true" android:focusable="true" android:background="@drawable/send_card" android:paddingStart="7dp" android:paddingEnd="5dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="fill_parent" android:layout_marginStart="5dp">
+                <ImageView android:src="@drawable/{icon}" android:layout_width="22dp" android:layout_height="22dp" />
+                <LinearLayout android:orientation="vertical" android:layout_marginStart="6dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content">
+                    <TextView android:text="{title}" android:textColor="#fff5f3ff" android:textStyle="bold" android:textSize="10sp" android:maxLines="1" android:ellipsize="end" android:layout_width="fill_parent" android:layout_height="wrap_content" />
+                    <TextView android:text="{sub}" android:textColor="#ffc4b5fd" android:textSize="8.5sp" android:maxLines="1" android:ellipsize="end" android:layout_width="fill_parent" android:layout_height="wrap_content" />
                 </LinearLayout>
+                <ImageView android:src="@drawable/send_i_chev_p" android:layout_width="10dp" android:layout_height="10dp" android:layout_marginStart="2dp" />
             </LinearLayout>
 '''
 
@@ -25,10 +26,8 @@ def hidden(tag, cid, text, icon):
     idattr = f'android:id="@id/{cid}" ' if cid else ''
     return f'            <com.kdt.mcgui.LauncherMenuButton {idattr}android:tag="{tag}" android:text="{text}" android:drawableStart="@drawable/{icon}" android:layout_width="fill_parent" style="@style/LauncherMenuButton.Universal" />\n'
 
-x = '''<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+frag = f'''<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout {NS}
     android:id="@id/fragment_menu_main"
     android:background="#ff0e0b1f"
     android:layout_width="fill_parent"
@@ -38,15 +37,31 @@ x = '''<?xml version="1.0" encoding="utf-8"?>
         app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent" />
 
-    <androidx.constraintlayout.widget.Guideline android:id="@+id/send_g_stage" android:orientation="vertical" android:layout_width="0dp" android:layout_height="0dp" app:layout_constraintGuide_percent="0.60" />
+    <androidx.constraintlayout.widget.Guideline android:id="@+id/send_g_stage" android:orientation="vertical" android:layout_width="0dp" android:layout_height="0dp" app:layout_constraintGuide_percent="0.64" />
+
+    <!-- 3D stage (behind everything else on the home) -->
+    <rl.HomeStage android:id="@+id/send_stage" android:layout_width="0dp" android:layout_height="0dp"
+        app:layout_constraintStart_toEndOf="@id/send_sidebar" app:layout_constraintEnd_toStartOf="@id/send_g_stage"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toTopOf="@id/send_bottom" />
+
+    <!-- title -->
+    <LinearLayout android:id="@+id/send_title" android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginStart="14dp" android:layout_marginTop="4dp"
+        app:layout_constraintStart_toEndOf="@id/send_sidebar" app:layout_constraintTop_toTopOf="parent">
+        <TextView android:text="Send Launcher" android:textColor="#ffffffff" android:textStyle="bold" android:textSize="23sp" android:shadowColor="#aa000000" android:shadowDx="1" android:shadowDy="2" android:shadowRadius="4" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        <TextView android:text="Minecraft Java Edition" android:textColor="#ffc4b5fd" android:textSize="12.5sp" android:shadowColor="#aa000000" android:shadowDx="1" android:shadowDy="1" android:shadowRadius="3" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+    </LinearLayout>
 
     <!-- sidebar -->
-    <ScrollView android:id="@+id/send_sidebar" android:background="@drawable/send_side_bg" android:scrollbars="none"
-        android:layout_width="80dp" android:layout_height="0dp"
+    <ScrollView android:id="@+id/send_sidebar" android:background="@drawable/send_side_bg" android:scrollbars="none" android:overScrollMode="never"
+        android:layout_width="84dp" android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent">
-        <LinearLayout android:orientation="vertical" android:padding="6dp" android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <LinearLayout android:orientation="vertical" android:paddingStart="6dp" android:paddingEnd="6dp" android:paddingTop="4dp" android:paddingBottom="4dp" android:layout_width="fill_parent" android:layout_height="wrap_content">
+            <ImageView android:src="@drawable/send_logo" android:layout_width="38dp" android:layout_height="38dp" android:layout_gravity="center_horizontal" android:layout_marginTop="0dp" android:layout_marginBottom="4dp" />
 ''' + nav('h_home', 'send_i_home', 'Home', True) + nav('h_versions', 'send_i_versions', 'Versions') + nav('h_mods', 'send_i_mods', 'Mods') \
-  + nav('h_packs', 'send_i_packs', 'Textures') + nav('h_shaders', 'send_i_shaders', 'Shaders') + nav('h_settings', 'send_i_gear', 'Settings') + nav('h_about', 'send_i_info', 'About') + '''            <TextView android:id="@+id/send_online" android:tag="h_online" android:text="●  Online" android:textColor="#ff4ade80" android:textSize="11sp" android:textStyle="bold" android:gravity="center" android:background="@drawable/send_card" android:layout_marginTop="6dp" android:layout_width="fill_parent" android:layout_height="30dp" />
+  + nav('h_packs', 'send_i_packs', 'Textures') + nav('h_shaders', 'send_i_shaders', 'Shaders') + nav('h_settings', 'send_i_gear', 'Settings') \
+  + '''            <View android:background="#ff2a1f4d" android:layout_width="fill_parent" android:layout_height="1dp" android:layout_marginTop="3dp" android:layout_marginBottom="3dp" />
+''' + nav('h_about', 'send_i_info', 'About') + '''            <TextView android:id="@+id/send_online" android:tag="h_online" android:text="●  Online" android:textColor="#ff4ade80" android:textSize="10.5sp" android:textStyle="bold" android:gravity="center" android:background="@drawable/send_card" android:layout_marginTop="4dp" android:layout_width="fill_parent" android:layout_height="26dp" />
         </LinearLayout>
     </ScrollView>
 
@@ -64,69 +79,100 @@ x = '''<?xml version="1.0" encoding="utf-8"?>
 
     <!-- bottom strip: installed versions + quick actions -->
     <LinearLayout android:id="@+id/send_bottom" android:orientation="horizontal"
-        android:layout_width="0dp" android:layout_height="84dp" android:layout_marginStart="10dp" android:layout_marginEnd="10dp" android:layout_marginBottom="8dp"
+        android:layout_width="0dp" android:layout_height="92dp" android:layout_marginStart="10dp" android:layout_marginEnd="12dp" android:layout_marginBottom="6dp"
         app:layout_constraintStart_toEndOf="@id/send_sidebar" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintBottom_toBottomOf="parent">
-        <LinearLayout android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1.15" android:layout_height="fill_parent">
-            <LinearLayout android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="3dp">
-                <TextView android:text="Installed Versions" android:textColor="#fff5f3ff" android:textStyle="bold" android:textSize="12sp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" />
+        <LinearLayout android:orientation="vertical" android:background="@drawable/send_card" android:padding="6dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="fill_parent">
+            <LinearLayout android:orientation="horizontal" android:gravity="center_vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="3dp">
+                <ImageView android:src="@drawable/send_logo" android:layout_width="14dp" android:layout_height="15dp" />
+                <TextView android:text="Installed Versions" android:textColor="#fff5f3ff" android:textStyle="bold" android:textSize="12.5sp" android:layout_marginStart="6dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" />
                 <TextView android:tag="h_viewall" android:text="View All  ›" android:textColor="#ffa78bfa" android:textSize="11sp" android:clickable="true" android:layout_width="wrap_content" android:layout_height="wrap_content" />
             </LinearLayout>
             <LinearLayout android:id="@+id/send_vers" android:tag="h_vers" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="0dp" android:layout_weight="1" />
         </LinearLayout>
-        <LinearLayout android:orientation="horizontal" android:layout_width="0dp" android:layout_weight="1.35" android:layout_height="fill_parent" android:layout_marginStart="8dp">
-''' + quick('h_q_mods', 'send_i_plus', 'Add Mods', 'Browse &amp; install') + quick('h_q_packs', 'send_i_packs', 'Texture Packs', 'Find &amp; apply') + quick('h_q_shaders', 'send_i_shaders', 'Shaders', 'Better visuals') + '''        </LinearLayout>
+        <LinearLayout android:orientation="horizontal" android:layout_width="0dp" android:layout_weight="1.45" android:layout_height="fill_parent" android:layout_marginStart="1dp">
+''' + quick('h_q_mods', 'send_i_mods_p', 'Add Mods', 'Enhance your game') + quick('h_q_packs', 'send_i_brush', 'Texture Packs', 'Change look &amp; feel') + quick('h_q_shaders', 'send_i_sun_p', 'Enable Shaders', 'Make it beautiful') + '''        </LinearLayout>
     </LinearLayout>
 
-    <!-- 3D stage -->
-    <rl.HomeStage android:id="@+id/send_stage" android:layout_width="0dp" android:layout_height="0dp"
-        app:layout_constraintStart_toEndOf="@id/send_sidebar" app:layout_constraintEnd_toStartOf="@id/send_g_stage"
-        app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toTopOf="@id/send_bottom" />
-
     <!-- right column: profile, version, play -->
-    <LinearLayout android:id="@+id/send_right" android:orientation="vertical" android:gravity="center_vertical"
-        android:layout_width="0dp" android:layout_height="0dp" android:layout_marginStart="2dp" android:layout_marginEnd="12dp" android:layout_marginBottom="8dp"
+    <ScrollView android:id="@+id/send_right" android:fillViewport="true" android:scrollbars="none" android:overScrollMode="never"
+        android:layout_width="0dp" android:layout_height="0dp" android:layout_marginStart="2dp" android:layout_marginEnd="12dp" android:layout_marginTop="38dp" android:layout_marginBottom="6dp"
         app:layout_constraintStart_toEndOf="@id/send_g_stage" app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toTopOf="@id/send_bottom">
-
-        <LinearLayout android:orientation="vertical" android:background="@drawable/send_card" android:padding="10dp"
-            android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp">
-            <TextView android:text="Player Profile" android:textColor="#ffc4b5fd" android:textSize="11sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-            <LinearLayout android:orientation="horizontal" android:gravity="center_vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp">
-                <ImageView android:tag="h_avatar" android:background="@drawable/send_chip" android:padding="2dp" android:layout_width="44dp" android:layout_height="44dp" />
-                <LinearLayout android:orientation="vertical" android:layout_marginStart="10dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content">
-                    <TextView android:tag="h_name" android:text="Player" android:textColor="#ffffffff" android:textStyle="bold" android:textSize="15sp" android:maxLines="1" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                    <TextView android:tag="h_sub" android:text="Default Skin" android:textColor="#ffc4b5fd" android:textSize="11sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-                </LinearLayout>
-                <ImageView android:tag="h_pencil" android:src="@drawable/send_i_pencil" android:padding="9dp" android:clickable="true" android:background="@drawable/send_pill" android:layout_width="38dp" android:layout_height="38dp" />
-            </LinearLayout>
-            <TextView android:id="@+id/send_skin_btn" android:tag="robin_skins" android:text="Change Skin" android:textColor="#ffffffff" android:textStyle="bold" android:textSize="13sp"
-                android:gravity="center" android:background="@drawable/send_btn2" android:clickable="true" android:focusable="true"
-                android:layout_width="fill_parent" android:layout_height="38dp" android:layout_marginTop="8dp" />
-        </LinearLayout>
+      <LinearLayout android:orientation="vertical" android:gravity="center_vertical" android:layout_width="fill_parent" android:layout_height="fill_parent">
 
         <LinearLayout android:orientation="vertical" android:background="@drawable/send_card" android:padding="8dp"
-            android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp">
-            <TextView android:text="Game Version" android:textColor="#ffc4b5fd" android:textSize="11sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content" />
-            <LinearLayout android:orientation="horizontal" android:gravity="center_vertical" android:layout_width="fill_parent" android:layout_height="wrap_content">
+            android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="6dp">
+            <LinearLayout android:orientation="horizontal" android:gravity="center_vertical" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <ImageView android:src="@drawable/send_i_crown" android:layout_width="14dp" android:layout_height="14dp" />
+                <TextView android:text="Player Profile" android:textColor="#ffc4b5fd" android:textSize="12.5sp" android:textStyle="bold" android:layout_marginStart="6dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+            <LinearLayout android:orientation="horizontal" android:gravity="center_vertical" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp">
+                <ImageView android:tag="h_avatar" android:background="@drawable/send_chip" android:padding="2dp" android:layout_width="38dp" android:layout_height="38dp" />
+                <LinearLayout android:orientation="vertical" android:layout_marginStart="10dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content">
+                    <TextView android:tag="h_name" android:text="Player" android:textColor="#ffffffff" android:textStyle="bold" android:textSize="16sp" android:maxLines="1" android:ellipsize="end" android:layout_width="fill_parent" android:layout_height="wrap_content" />
+                    <TextView android:tag="h_sub" android:text="Default Skin" android:textColor="#ffc4b5fd" android:textSize="11.5sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+                <ImageView android:tag="h_pencil" android:src="@drawable/send_i_pencil" android:padding="9dp" android:clickable="true" android:background="@drawable/send_pill" android:layout_width="34dp" android:layout_height="34dp" />
+            </LinearLayout>
+            <LinearLayout android:id="@+id/send_skin_btn" android:tag="robin_skins" android:orientation="horizontal" android:gravity="center" android:background="@drawable/send_btn2" android:clickable="true" android:focusable="true"
+                android:layout_width="fill_parent" android:layout_height="30dp" android:layout_marginTop="5dp">
+                <ImageView android:src="@drawable/send_i_shirt" android:layout_width="16dp" android:layout_height="16dp" />
+                <TextView android:text="Change Skin" android:textColor="#ffffffff" android:textStyle="bold" android:textSize="13sp" android:layout_marginStart="7dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout android:orientation="vertical" android:background="@drawable/send_card" android:padding="7dp"
+            android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_marginBottom="6dp">
+            <LinearLayout android:orientation="horizontal" android:gravity="center_vertical" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <ImageView android:src="@drawable/send_grass" android:layout_width="16dp" android:layout_height="16dp" />
+                <TextView android:text="Game Version" android:textColor="#fff5f3ff" android:textSize="12.5sp" android:textStyle="bold" android:layout_marginStart="7dp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+            <LinearLayout android:orientation="horizontal" android:gravity="center_vertical" android:background="@drawable/send_inner" android:paddingStart="4dp" android:paddingEnd="2dp"
+                android:layout_width="fill_parent" android:layout_height="36dp" android:layout_marginTop="4dp">
                 <com.kdt.mcgui.mcVersionSpinner android:id="@id/mc_version_spinner" android:tag="h_spinner" android:background="@android:color/transparent"
-                    android:layout_width="0dp" android:layout_weight="1" android:layout_height="@dimen/_30sdp"
+                    android:layout_width="0dp" android:layout_weight="1" android:layout_height="fill_parent"
                     android:drawableEnd="@drawable/spinner_arrow"
-                    app:drawableEndPadding="@dimen/_1sdp" app:drawableEndSize="@dimen/_12sdp"
-                    app:drawableStartIntegerScaling="true" app:drawableStartSize="@dimen/_30sdp" />
+                    app:drawableEndPadding="@dimen/_1sdp" app:drawableEndSize="14dp"
+                    app:drawableStartIntegerScaling="true" app:drawableStartSize="28dp" />
                 <ImageButton android:id="@id/edit_profile_button" android:background="?android:selectableItemBackground"
                     android:layout_width="36dp" android:layout_height="36dp" android:src="@drawable/ic_px_edit" />
             </LinearLayout>
         </LinearLayout>
 
-        <com.kdt.mcgui.MineButton android:id="@id/play_button" android:text="@string/main_play" android:background="@drawable/send_play"
-            android:textColor="#ffffffff" android:textAllCaps="true" android:textSize="20sp"
-            android:layout_width="fill_parent" android:layout_height="52dp" />
-        <TextView android:text="Start Minecraft" android:textColor="#ffc4b5fd" android:textSize="10sp" android:gravity="center" android:layout_marginTop="2dp" android:layout_width="fill_parent" android:layout_height="wrap_content" />
-    </LinearLayout>
+        <FrameLayout android:layout_width="fill_parent" android:layout_height="48dp">
+            <com.kdt.mcgui.MineButton android:id="@id/play_button" android:text="" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+            <LinearLayout android:orientation="horizontal" android:gravity="center" android:clickable="false" android:focusable="false" android:layout_width="fill_parent" android:layout_height="fill_parent">
+                <ImageView android:src="@drawable/send_i_play" android:layout_width="26dp" android:layout_height="26dp" />
+                <LinearLayout android:orientation="vertical" android:layout_marginStart="12dp" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                    <TextView android:text="Play" android:textColor="#ffffffff" android:textStyle="bold" android:textSize="20sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                    <TextView android:text="Start Minecraft" android:textColor="#ffe9e4ff" android:textSize="11sp" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+      </LinearLayout>
+    </ScrollView>
 
     <View android:id="@id/_background_display_view" android:visibility="gone" android:layout_width="1dp" android:layout_height="1dp" app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent" />
     <androidx.constraintlayout.widget.Guideline android:id="@id/center_guideline" android:orientation="vertical" android:layout_width="0dp" android:layout_height="0dp" app:layout_constraintGuide_percent="0.5" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 '''
-open(f'{HERE}/res/fragment_launcher_land.xml', 'w').write(x)
+open(f'{HERE}/res/fragment_launcher_land.xml', 'w').write(frag)
+
+# activity (top bar floats over the home): account switcher + settings gear + minimise + close
+act = f'''<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  {NS}>
+    <androidx.fragment.app.FragmentContainerView android:name="git.artdeell.mojo.fragments.MainMenuFragment" android:id="@id/container_fragment" android:layout_width="fill_parent" android:layout_height="0.0dip" app:layout_constraintBottom_toTopOf="@id/progress_layout" app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout android:id="@+id/send_topbar" android:orientation="horizontal" android:gravity="center_vertical" android:layout_width="wrap_content" android:layout_height="36dp" android:layout_marginTop="2dp" android:layout_marginEnd="6dp"
+        app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent">
+        <com.kdt.mcgui.AccountSpinner android:id="@id/account_spinner" android:layout_width="190dp" android:layout_height="32dp" android:dropDownWidth="260dp" android:dropDownVerticalOffset="34dp" />
+        <ImageButton android:id="@id/setting_button" android:tag="send_settings" android:background="?selectableItemBackground" android:padding="8dp" android:layout_width="36dp" android:layout_height="36dp" android:src="@drawable/send_i_gear" android:scaleType="fitCenter" android:layout_marginStart="6dp" />
+        <View android:background="#55c4b5fd" android:layout_width="1dp" android:layout_height="22dp" android:layout_marginStart="2dp" android:layout_marginEnd="2dp" />
+        <ImageButton android:tag="send_min" android:background="?selectableItemBackground" android:padding="10dp" android:layout_width="36dp" android:layout_height="36dp" android:src="@drawable/send_i_min" android:scaleType="fitCenter" />
+        <ImageButton android:tag="send_close" android:background="?selectableItemBackground" android:padding="10dp" android:layout_width="36dp" android:layout_height="36dp" android:src="@drawable/send_i_close" android:scaleType="fitCenter" />
+    </LinearLayout>
+    <com.kdt.mcgui.ProgressLayout android:id="@id/progress_layout" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="wrap_content" app:layout_constraintBottom_toBottomOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+'''
+open(f'{HERE}/res/activity_mojo_ui_land.xml', 'w').write(act)
 print('layout ok')

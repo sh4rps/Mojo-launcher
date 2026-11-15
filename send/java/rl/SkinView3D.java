@@ -17,7 +17,7 @@ import java.util.List;
 public class SkinView3D extends View {
     private Bitmap skin, cape;
     private boolean slim;
-    private float yaw = 25, pitch = 12;
+    protected float yaw = 25, pitch = 12;
     private long lastTouch;
     private float lx, ly;
     private boolean drag;
@@ -31,7 +31,10 @@ public class SkinView3D extends View {
     }
 
     protected float scaleMul = 1f, cyFrac = 0.5f;
-    protected boolean autoSpin = true;
+    protected boolean autoSpin = true, walk = true;
+    /** Keep re-drawing (~30 fps) while this is true; HomeStage turns it off when the pose is still. */
+    protected boolean keepAnimating() { return true; }
+    protected float unit() { return Math.min(getHeight() / 38f, getWidth() / 24f) * scaleMul; }
 
     public SkinView3D(Context c) {
         super(c);
@@ -74,7 +77,7 @@ public class SkinView3D extends View {
 
     @Override public boolean onTouchEvent(MotionEvent e) {
         switch (e.getActionMasked()) {
-            case MotionEvent.ACTION_DOWN: drag = true; lx = e.getX(); ly = e.getY(); getParent().requestDisallowInterceptTouchEvent(true); return true;
+            case MotionEvent.ACTION_DOWN: drag = true; lx = e.getX(); ly = e.getY(); if (getParent() != null) getParent().requestDisallowInterceptTouchEvent(true); return true;
             case MotionEvent.ACTION_MOVE:
                 yaw += (e.getX() - lx) * 0.6f;
                 pitch = Math.max(-40, Math.min(40, pitch + (e.getY() - ly) * 0.4f));
@@ -142,7 +145,7 @@ public class SkinView3D extends View {
         if (skin == null) return;
         if (autoSpin && !drag && System.currentTimeMillis() - lastTouch > 2500) yaw += 1.8f;
         float t = (System.currentTimeMillis() % 100000) / 1000f;
-        float sw = (float) Math.sin(t * 2.2) * 14;
+        float sw = walk ? (float) Math.sin(t * 2.2) * 14 : 0f;
         float aw = slim ? 3 : 4;
         float ax = 4 + aw / 2;
         Bitmap k = skin;
@@ -173,13 +176,13 @@ public class SkinView3D extends View {
     @Override protected void onDraw(Canvas c) {
         try { draw3d(c); } catch (Throwable t) { }
         // ~30 fps, and nothing at all while the view is hidden / the game is running on top
-        if (isShown() && getWindowVisibility() == View.VISIBLE) postInvalidateDelayed(33);
+        if (keepAnimating() && isShown() && getWindowVisibility() == View.VISIBLE) postInvalidateDelayed(33);
     }
 
     private void draw3d(Canvas c) {
         beforeModel(c);
         build();
-        float s = Math.min(getHeight() / 38f, getWidth() / 24f) * scaleMul;
+        float s = unit();
         float ox = getWidth() / 2f, oy = getHeight() * cyFrac;
         for (Face f : faces) {
             // outward normal = V x U ; draw only faces looking at the viewer (+z)

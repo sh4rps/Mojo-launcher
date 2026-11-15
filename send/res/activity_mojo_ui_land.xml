@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout android:background="@android:color/transparent" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.fragment.app.FragmentContainerView android:name="git.artdeell.mojo.fragments.MainMenuFragment" android:id="@id/container_fragment" android:layout_width="fill_parent" android:layout_height="0.0dip" app:layout_constraintBottom_toTopOf="@id/progress_layout" app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout android:id="@+id/send_topbar" android:orientation="horizontal" android:gravity="center_vertical" android:layout_width="wrap_content" android:layout_height="36dp" android:layout_marginTop="2dp" android:layout_marginEnd="6dp"
+        app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent">
+        <com.kdt.mcgui.AccountSpinner android:id="@id/account_spinner" android:layout_width="190dp" android:layout_height="32dp" android:dropDownWidth="260dp" android:dropDownVerticalOffset="34dp" />
+        <ImageButton android:id="@id/setting_button" android:tag="send_settings" android:background="?selectableItemBackground" android:padding="8dp" android:layout_width="36dp" android:layout_height="36dp" android:src="@drawable/send_i_gear" android:scaleType="fitCenter" android:layout_marginStart="6dp" />
+        <View android:background="#55c4b5fd" android:layout_width="1dp" android:layout_height="22dp" android:layout_marginStart="2dp" android:layout_marginEnd="2dp" />
+        <ImageButton android:tag="send_min" android:background="?selectableItemBackground" android:padding="10dp" android:layout_width="36dp" android:layout_height="36dp" android:src="@drawable/send_i_min" android:scaleType="fitCenter" />
+        <ImageButton android:tag="send_close" android:background="?selectableItemBackground" android:padding="10dp" android:layout_width="36dp" android:layout_height="36dp" android:src="@drawable/send_i_close" android:scaleType="fitCenter" />
+    </LinearLayout>
+    <com.kdt.mcgui.ProgressLayout android:id="@id/progress_layout" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="wrap_content" app:layout_constraintBottom_toBottomOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

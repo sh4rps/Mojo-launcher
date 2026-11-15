@@ -1,10 +1,13 @@
 package rl;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -17,7 +20,8 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /** Wires the Send Launcher home screen: sidebar, profile card, installed versions and quick actions. */
 public class Home {
@@ -33,6 +37,21 @@ public class Home {
         if (v != null) v.setOnClickListener(new View.OnClickListener() {
             public void onClick(View x) { try { r.run(); } catch (Throwable t) { } }
         });
+    }
+
+    private static void tapTop(final View root, String tag, final Runnable r) {
+        View v = root.getRootView().findViewWithTag(tag);
+        if (v != null) v.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View x) { try { r.run(); } catch (Throwable t) { } }
+        });
+    }
+
+    private static Activity activity(Context c) {
+        while (c instanceof android.content.ContextWrapper) {
+            if (c instanceof Activity) return (Activity) c;
+            c = ((android.content.ContextWrapper) c).getBaseContext();
+        }
+        return null;
     }
 
     private static Runnable click(final View root, final String tag, final boolean fromTop) {
@@ -61,6 +80,12 @@ public class Home {
             tap(root, "h_pencil", click(root, "robin_skins", false));
             tap(root, "h_home", new Runnable() { public void run() { } });
             tap(root, "h_about", new Runnable() { public void run() { about(root); } });
+            final Activity act = activity(root.getContext());
+            final Runnable top = new Runnable() { public void run() { try {
+                tapTop(root, "send_min", new Runnable() { public void run() { if (act != null) act.moveTaskToBack(true); } });
+                tapTop(root, "send_close", new Runnable() { public void run() { if (act != null) act.finishAndRemoveTask(); } });
+            } catch (Throwable t) { } } };
+            top.run(); root.post(top);
             online(root);
             versions(root);
             root.postDelayed(new Runnable() { public void run() { versions(root); online(root); } }, 2500);
@@ -111,45 +136,88 @@ public class Home {
         return g;
     }
 
+    private static final String[] SUGGEST = {"1.21.4", "1.21.1", "1.20.6", "1.19.4", "1.18.2"};
+
+    private static Drawable res(Context cx, String name) {
+        try {
+            int id = cx.getResources().getIdentifier(name, "drawable", cx.getPackageName());
+            return id == 0 ? null : cx.getResources().getDrawable(id);
+        } catch (Throwable t) { return null; }
+    }
+
+    private static void texts(View v, ArrayList<String> out) {
+        if (v instanceof TextView) out.add(String.valueOf(((TextView) v).getText()));
+        if (v instanceof ViewGroup) { ViewGroup g = (ViewGroup) v; for (int i = 0; i < g.getChildCount(); i++) texts(g.getChildAt(i), out); }
+    }
+
+    private static String selected(View spinner, ArrayList<String> names) {
+        try {
+            ArrayList<String> c = new ArrayList<String>();
+            if (spinner instanceof android.widget.Spinner) {
+                android.widget.Spinner sp = (android.widget.Spinner) spinner;
+                Object it = sp.getSelectedItem(); if (it != null) c.add(String.valueOf(it));
+                View sv = sp.getSelectedView(); if (sv != null) texts(sv, c);
+            }
+            texts(spinner, c);
+            for (String t : c) for (String n : names) if (t != null && t.trim().equals(n)) return n;
+            for (String t : c) for (String n : names) if (t != null && t.contains(n)) return n;
+        } catch (Throwable e) { }
+        return null;
+    }
+
     private static void versions(final View root) {
         try {
             final LinearLayout row = (LinearLayout) find(root, "h_vers");
             if (row == null) return;
             row.removeAllViews();
-            String[] names = null;
+            ArrayList<String> names = new ArrayList<String>();
             try {
                 String dir = (String) Class.forName("git.artdeell.mojo.Tools").getField("DIR_HOME_VERSION").get(null);
                 File[] fs = dir == null ? null : new File(dir).listFiles();
-                if (fs != null) {
-                    java.util.ArrayList<String> l = new java.util.ArrayList<String>();
-                    for (File f : fs) if (f.isDirectory() && new File(f, f.getName() + ".json").exists()) l.add(f.getName());
-                    Object[] o = l.toArray(); Arrays.sort(o);
-                    names = new String[o.length]; for (int i = 0; i < o.length; i++) names[i] = (String) o[i];
-                }
+                if (fs != null) for (File f : fs) if (f.isDirectory() && new File(f, f.getName() + ".json").exists()) names.add(f.getName());
             } catch (Throwable e) { }
+            Collections.sort(names, Collections.reverseOrder());
+            View sp = root.findViewWithTag("h_spinner");
+            String sel = selected(sp, names);
+            if (sel != null) { names.remove(sel); names.add(0, sel); }
             Context cx = root.getContext();
-            int n = names == null ? 0 : Math.min(3, names.length);
             View.OnClickListener open = new View.OnClickListener() { public void onClick(View x) {
                 View s = root.findViewWithTag("h_spinner"); if (s != null) s.performClick(); } };
-            if (n == 0) {
-                row.addView(vcard(cx, row, "No version yet", "Tap to add", false, open));
-                return;
+            int shown = 0;
+            for (int i = 0; i < names.size() && shown < 5; i++, shown++) row.addView(vcard(cx, row, names.get(i), shown == 0 && sel != null ? 0 : 1, open));
+            for (int i = 0; i < SUGGEST.length && shown < 5; i++) {
+                if (names.contains(SUGGEST[i])) continue;
+                row.addView(vcard(cx, row, SUGGEST[i], 2, open)); shown++;
             }
-            for (int i = 0; i < n; i++) row.addView(vcard(cx, row, names[i], "Installed", true, open));
         } catch (Throwable t) { }
     }
 
-    private static View vcard(Context cx, View ref, String title, String badge, boolean ok, View.OnClickListener l) {
+    /** state 0 = selected + installed, 1 = installed, 2 = not installed (download). */
+    private static View vcard(Context cx, View ref, String title, int state, View.OnClickListener l) {
         LinearLayout c = new LinearLayout(cx);
-        c.setOrientation(LinearLayout.VERTICAL); c.setGravity(Gravity.CENTER_VERTICAL);
-        c.setPadding(dp(ref, 10), dp(ref, 6), dp(ref, 10), dp(ref, 6));
-        c.setBackground(card(ref, 0xee1b1436, 0xff3b2a73));
+        c.setOrientation(LinearLayout.VERTICAL); c.setGravity(Gravity.CENTER);
+        c.setPadding(dp(ref, 2), dp(ref, 2), dp(ref, 2), dp(ref, 2));
+        GradientDrawable bg = card(ref, state == 0 ? 0xff241650 : 0xee1b1436, state == 0 ? 0xffa78bfa : 0xff3b2a73);
+        if (state == 0) bg.setStroke(dp(ref, 2), 0xffa78bfa);
+        c.setBackground(bg);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
-        lp.rightMargin = dp(ref, 6); c.setLayoutParams(lp);
-        TextView t = new TextView(cx); t.setText(title); t.setTextColor(0xfff5f3ff); t.setTextSize(13); t.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
-        t.setSingleLine(true); t.setEllipsize(android.text.TextUtils.TruncateAt.END);
-        TextView b = new TextView(cx); b.setText((ok ? "●  " : "") + badge); b.setTextSize(11); b.setTextColor(ok ? 0xff4ade80 : 0xffc4b5fd);
-        c.addView(t); c.addView(b);
+        lp.rightMargin = dp(ref, 4); c.setLayoutParams(lp);
+        ImageView ic = new ImageView(cx); Drawable g = res(cx, "send_grass"); if (g != null) ic.setImageDrawable(g);
+        ic.setLayoutParams(new LinearLayout.LayoutParams(dp(ref, 24), dp(ref, 24)));
+        c.addView(ic);
+        TextView t = new TextView(cx); t.setText(title); t.setTextColor(0xfff5f3ff); t.setTextSize(11f); t.setTypeface(Typeface.DEFAULT_BOLD);
+        t.setSingleLine(true); t.setEllipsize(android.text.TextUtils.TruncateAt.END); t.setGravity(Gravity.CENTER);
+        c.addView(t);
+        if (state == 2) {
+            ImageView d = new ImageView(cx); Drawable dd = res(cx, "send_i_dlv"); if (dd != null) d.setImageDrawable(dd);
+            d.setLayoutParams(new LinearLayout.LayoutParams(dp(ref, 14), dp(ref, 14)));
+            c.addView(d);
+        } else {
+            TextView b = new TextView(cx); b.setText(state == 0 ? "Installed" : "Ready"); b.setTextSize(8.5f); b.setGravity(Gravity.CENTER);
+            b.setTextColor(state == 0 ? 0xffffffff : 0xffc4b5fd);
+            if (state == 0) { GradientDrawable pill = new GradientDrawable(); pill.setColor(0xff6d28d9); pill.setCornerRadius(dp(ref, 7)); b.setBackground(pill); b.setPadding(dp(ref, 5), 0, dp(ref, 5), 0); }
+            c.addView(b);
+        }
         c.setClickable(true); c.setOnClickListener(l);
         return c;
     }
