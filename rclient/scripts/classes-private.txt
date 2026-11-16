@@ -1,0 +1,6 @@
+net.minecraft.client.render.GameRenderer
+net.minecraft.client.Mouse
+net.minecraft.entity.Entity
+net.minecraft.client.render.Camera
+net.minecraft.client.gui.hud.InGameHud
+net.minecraft.client.render.WorldRenderer

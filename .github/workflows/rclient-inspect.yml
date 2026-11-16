@@ -30,6 +30,11 @@ jobs:
             [ -z "$c" ] && continue
             javap -cp "$CP" -protected -constants "$c" > "sigs/$c.txt" 2>&1 || true
           done < scripts/classes.txt
+          mkdir -p sigs/private
+          while read c; do
+            [ -z "$c" ] && continue
+            javap -cp "$CP" -private "$c" > "sigs/private/$c.txt" 2>&1 || true
+          done < scripts/classes-private.txt
           ls sigs | wc -l
       - name: Commit sigs
         run: |
