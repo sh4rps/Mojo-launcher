@@ -2,7 +2,7 @@ package com.rclient.modules;
 
 import com.rclient.core.*;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.ParticlesMode;
+import net.minecraft.particle.ParticlesMode;
 import net.minecraft.client.option.Perspective;
 
 public final class MoveVisualMods {
