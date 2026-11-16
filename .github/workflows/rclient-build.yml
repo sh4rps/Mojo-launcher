@@ -34,6 +34,13 @@ jobs:
           echo "== Camera.update calls"; javap -cp "$MC" -private -c net.minecraft.client.render.Camera | awk '/ void update\(/,/return$/' | grep -E "invoke" | head -20
           echo "== GameRenderer.getFov returns"; javap -cp "$MC" -private -c net.minecraft.client.render.GameRenderer | awk '/ float getFov\(/,/freturn/' | grep -E "freturn|invoke" | head -20
           echo "== Entity.changeLookDirection"; javap -cp "$MC" -private net.minecraft.entity.Entity | grep changeLookDirection
+      - name: Debug refmap
+        working-directory: rclient
+        run: |
+          echo "== refmap files"; find build -iname '*refmap*' | head
+          echo "== classes dir top"; ls build/classes/java/main | head
+          echo "== mixins json in jar"; unzip -p build/libs/rclient-1.0.0.jar rclient.mixins.json
+          echo "== compile info"; gradle --no-daemon compileJava --rerun-tasks --info 2>&1 | grep -iE "mixin|refmap|processor|AinMap|AoutRef|-A" | head -30
       - uses: actions/upload-artifact@v4
         with:
           name: rclient-jar
