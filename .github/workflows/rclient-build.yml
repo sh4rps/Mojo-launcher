@@ -22,6 +22,18 @@ jobs:
           ./scripts/resolve-versions.sh 1.21.11
           gradle --no-daemon build
           ls -la build/libs
+      - name: Verify jar and mixin targets
+        working-directory: rclient
+        run: |
+          JAR=$(ls build/libs/rclient-*.jar | grep -v sources | head -1)
+          echo "== jar: $JAR"; unzip -l "$JAR" | tail -3
+          unzip -l "$JAR" | grep -E "mixins|refmap|fabric.mod|lang/en_us" || true
+          unzip -p "$JAR" rclient-refmap.json 2>/dev/null | head -40 || true
+          MC=$(find ~/.gradle .gradle -name '*.jar' -size +5M 2>/dev/null | while read j; do unzip -l "$j" 2>/dev/null | grep -q "net/minecraft/client/MinecraftClient.class" && echo "$j"; done | head -1)
+          echo "MC=$MC"
+          echo "== Camera.update calls"; javap -cp "$MC" -private -c net.minecraft.client.render.Camera | awk '/ void update\(/,/return$/' | grep -E "invoke" | head -20
+          echo "== GameRenderer.getFov returns"; javap -cp "$MC" -private -c net.minecraft.client.render.GameRenderer | awk '/ float getFov\(/,/freturn/' | grep -E "freturn|invoke" | head -20
+          echo "== Entity.changeLookDirection"; javap -cp "$MC" -private net.minecraft.entity.Entity | grep changeLookDirection
       - uses: actions/upload-artifact@v4
         with:
           name: rclient-jar
