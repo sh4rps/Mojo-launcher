@@ -25,7 +25,7 @@ public class ModMenuScreen extends RScreen {
 
     private String search = "";
     private boolean searchFocus = true;
-    private Module selected;
+    private Mod selected;
     private int scroll, contentH, sbScroll;
     private Object listening;          // Setting or the String "toggle"
     private Setting editing;
@@ -131,12 +131,12 @@ public class ModMenuScreen extends RScreen {
     }
 
     // --------------------------------------------------------------- grid
-    private List<Module> filtered() {
+    private List<Mod> filtered() {
         String q = search.toLowerCase(Locale.ROOT).trim();
-        List<Module> out = new ArrayList<>();
+        List<Mod> out = new ArrayList<>();
         String tn = TABS[tab];
-        if (tn.equals("Recent")) { for (String id : Config.recents) { Module m = ModuleManager.get(id); if (m != null) out.add(m); } }
-        else for (Module m : ModuleManager.all()) {
+        if (tn.equals("Recent")) { for (String id : Config.recents) { Mod m = ModuleManager.get(id); if (m != null) out.add(m); } }
+        else for (Mod m : ModuleManager.all()) {
             if (tn.equals("Favorites") && !Config.favorites.contains(m.id)) continue;
             if (tab >= 3 && tab <= 9 && !m.category.label.equals(tn)) continue;
             out.add(m);
@@ -146,7 +146,7 @@ public class ModMenuScreen extends RScreen {
     }
 
     private void drawGrid(DrawContext g, int mx, int my) {
-        List<Module> list = filtered();
+        List<Mod> list = filtered();
         int gap = 6, minW = 118;
         int cols = Math.max(1, (aw - 6 + gap) / (minW + gap));
         int cw = (aw - 8 - (cols - 1) * gap) / cols, chh = 46;
@@ -158,7 +158,7 @@ public class ModMenuScreen extends RScreen {
             return;
         }
         for (int i = 0; i < list.size(); i++) {
-            Module md = list.get(i);
+            Mod md = list.get(i);
             int cx = ax + (i % cols) * (cw + gap), cy = ay + (i / cols) * (chh + gap) - scroll;
             if (cy + chh < ay || cy > ay + ah) continue;
             boolean over = Ui.in(mx, my, cx, cy, cw, chh) && Ui.in(mx, my, ax, ay, aw, ah);
@@ -184,7 +184,7 @@ public class ModMenuScreen extends RScreen {
 
     // ----------------------------------------------------------- settings
     private void drawSettings(DrawContext g, int mx, int my) {
-        Module md = selected;
+        Mod md = selected;
         int y = ay - scroll;
         // back + title + toggle
         boolean ob = Ui.in(mx, my, ax, y, 40, 14);

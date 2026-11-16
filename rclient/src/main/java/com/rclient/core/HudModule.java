@@ -4,7 +4,7 @@ import com.rclient.ui.Ui;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 
-public abstract class HudModule extends Module {
+public abstract class HudModule extends Mod {
     public double fx, fy;
     public final double dfx, dfy;              // top-left as fraction of scaled screen
     public final Setting scale, color, background;

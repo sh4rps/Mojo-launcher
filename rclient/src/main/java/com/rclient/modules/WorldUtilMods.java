@@ -267,7 +267,7 @@ public final class WorldUtilMods {
     }
 
     // ------------------------------------------------------------- AutoText
-    public static final class AutoText extends Module {
+    public static final class AutoText extends Mod {
         final Setting k1 = add(Setting.key("k1", "Slot 1 key", -1)), t1 = add(Setting.string("t1", "Slot 1 text (/ = command)", "gg"));
         final Setting k2 = add(Setting.key("k2", "Slot 2 key", -1)), t2 = add(Setting.string("t2", "Slot 2 text", "/lobby"));
         final Setting k3 = add(Setting.key("k3", "Slot 3 key", -1)), t3 = add(Setting.string("t3", "Slot 3 text", "Hello!"));
@@ -287,7 +287,7 @@ public final class WorldUtilMods {
     }
 
     // ------------------------------------------------------------ Quickplay
-    public static final class Quickplay extends Module {
+    public static final class Quickplay extends Mod {
         final Setting kBw = add(Setting.key("bw", "BedWars solo key", -1));
         final Setting kSw = add(Setting.key("sw", "SkyWars solo key", -1));
         final Setting kDu = add(Setting.key("du", "Duels (classic) key", -1));
@@ -307,7 +307,7 @@ public final class WorldUtilMods {
     }
 
     // ---------------------------------------------------------- Performance
-    public static final class Performance extends Module {
+    public static final class Performance extends Mod {
         final Setting profile = add(Setting.choice("profile", "Profile", "Balanced", "Low", "Balanced", "High"));
         final Setting dynFps = add(Setting.bool("dynfps", "Dynamic FPS (limit when unfocused)", true));
         final Setting bgFps = add(Setting.num("bgfps", "Unfocused FPS", 15, 5, 60, 5));

@@ -270,7 +270,7 @@ public final class HudMods {
     }
 
     /** Controls which vanilla HUD pieces are shown (applied by replaceElement in RClient). */
-    public static final class VanillaHud extends Module {
+    public static final class VanillaHud extends Mod {
         public final Setting hideScoreboard = add(Setting.bool("scoreboard", "Hide scoreboard", false));
         public final Setting hideBossBar = add(Setting.bool("bossbar", "Hide boss bars", false));
         public final Setting hideActionBar = add(Setting.bool("actionbar", "Hide action bar text", false));

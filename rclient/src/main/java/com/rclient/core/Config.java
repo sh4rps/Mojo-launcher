@@ -83,7 +83,7 @@ public final class Config {
         JsonObject root = new JsonObject();
         root.addProperty("format", 1);
         JsonObject mods = new JsonObject();
-        for (Module m : ModuleManager.all()) {
+        for (Mod m : ModuleManager.all()) {
             JsonObject mo = new JsonObject();
             mo.addProperty("enabled", m.isEnabled());
             mo.addProperty("key", m.toggleKey);
@@ -109,7 +109,7 @@ public final class Config {
         loading = true;
         try {
             JsonObject mods = root.has("modules") ? root.getAsJsonObject("modules") : new JsonObject();
-            for (Module m : ModuleManager.all()) {
+            for (Mod m : ModuleManager.all()) {
                 JsonObject mo = mods.has(m.id) ? mods.getAsJsonObject(m.id) : null;
                 for (Setting st : m.settings) st.value = st.def;
                 m.toggleKey = -1;

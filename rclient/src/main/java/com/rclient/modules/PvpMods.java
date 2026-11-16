@@ -112,7 +112,7 @@ public final class PvpMods {
     }
 
     // ---------------------------------------------------- Custom crosshair
-    public static final class CrosshairMod extends Module {
+    public static final class CrosshairMod extends Mod {
         public final Setting style = add(Setting.choice("style", "Style", "Cross", "Cross", "Dot", "Circle", "Square"));
         public final Setting color = add(Setting.color("color", "Color", 0xFFFFFFFF));
         public final Setting hitColor = add(Setting.color("hitcolor", "Color on enemy", 0xFFF87171));
