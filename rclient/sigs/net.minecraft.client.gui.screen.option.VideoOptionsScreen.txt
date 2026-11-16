@@ -1,0 +1,12 @@
+Compiled from "VideoOptionsScreen.java"
+public class net.minecraft.client.gui.screen.option.VideoOptionsScreen extends net.minecraft.client.gui.screen.option.GameOptionsScreen {
+  public net.minecraft.client.gui.screen.option.VideoOptionsScreen(net.minecraft.client.gui.screen.Screen, net.minecraft.client.MinecraftClient, net.minecraft.client.option.GameOptions);
+  protected void addOptions();
+  public void tick();
+  public void close();
+  public void removed();
+  public boolean mouseClicked(net.minecraft.client.gui.Click, boolean);
+  public boolean mouseScrolled(double, double, double, double);
+  public void updateFullscreenButtonValue(boolean);
+  public void updateImprovedTransparencyButtonValue();
+}

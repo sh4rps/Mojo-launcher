@@ -1,0 +1,13 @@
+Compiled from "KeybindsScreen.java"
+public class net.minecraft.client.gui.screen.option.KeybindsScreen extends net.minecraft.client.gui.screen.option.GameOptionsScreen {
+  public net.minecraft.client.option.KeyBinding selectedKeyBinding;
+  public long lastKeyCodeUpdateTime;
+  public net.minecraft.client.gui.screen.option.KeybindsScreen(net.minecraft.client.gui.screen.Screen, net.minecraft.client.option.GameOptions);
+  protected void initBody();
+  protected void addOptions();
+  protected void initFooter();
+  protected void refreshWidgetPositions();
+  public boolean mouseClicked(net.minecraft.client.gui.Click, boolean);
+  public boolean keyPressed(net.minecraft.client.input.KeyInput);
+  public void render(net.minecraft.client.gui.DrawContext, int, int, float);
+}

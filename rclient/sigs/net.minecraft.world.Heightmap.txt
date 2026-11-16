@@ -1,0 +1,10 @@
+Compiled from "Heightmap.java"
+public class net.minecraft.world.Heightmap {
+  public net.minecraft.world.Heightmap(net.minecraft.world.chunk.Chunk, net.minecraft.world.Heightmap$Type);
+  public static void populateHeightmaps(net.minecraft.world.chunk.Chunk, java.util.Set<net.minecraft.world.Heightmap$Type>);
+  public boolean trackUpdate(int, int, int, net.minecraft.block.BlockState);
+  public int get(int, int);
+  public int getOneLower(int, int);
+  public void setTo(net.minecraft.world.chunk.Chunk, net.minecraft.world.Heightmap$Type, long[]);
+  public long[] asLongArray();
+}

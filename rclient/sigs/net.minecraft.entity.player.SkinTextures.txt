@@ -1,0 +1,14 @@
+Compiled from "SkinTextures.java"
+public final class net.minecraft.entity.player.SkinTextures extends java.lang.Record {
+  public net.minecraft.entity.player.SkinTextures(net.minecraft.util.AssetInfo$TextureAsset, net.minecraft.util.AssetInfo$TextureAsset, net.minecraft.util.AssetInfo$TextureAsset, net.minecraft.entity.player.PlayerSkinType, boolean);
+  public static net.minecraft.entity.player.SkinTextures create(net.minecraft.util.AssetInfo$TextureAsset, net.minecraft.util.AssetInfo$TextureAsset, net.minecraft.util.AssetInfo$TextureAsset, net.minecraft.entity.player.PlayerSkinType);
+  public net.minecraft.entity.player.SkinTextures withOverride(net.minecraft.entity.player.SkinTextures$SkinOverride);
+  public final java.lang.String toString();
+  public final int hashCode();
+  public final boolean equals(java.lang.Object);
+  public net.minecraft.util.AssetInfo$TextureAsset body();
+  public net.minecraft.util.AssetInfo$TextureAsset cape();
+  public net.minecraft.util.AssetInfo$TextureAsset elytra();
+  public net.minecraft.entity.player.PlayerSkinType model();
+  public boolean secure();
+}

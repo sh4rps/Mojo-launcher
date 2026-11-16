@@ -1,0 +1,10 @@
+Compiled from "FogRenderer.java"
+public class net.minecraft.client.render.fog.FogRenderer implements java.lang.AutoCloseable {
+  public static final int FOG_UBO_SIZE;
+  public net.minecraft.client.render.fog.FogRenderer();
+  public void close();
+  public void rotate();
+  public com.mojang.blaze3d.buffers.GpuBufferSlice getFogBuffer(net.minecraft.client.render.fog.FogRenderer$FogType);
+  public static boolean toggleFog();
+  public org.joml.Vector4f applyFog(net.minecraft.client.render.Camera, int, net.minecraft.client.render.RenderTickCounter, float, net.minecraft.client.world.ClientWorld);
+}

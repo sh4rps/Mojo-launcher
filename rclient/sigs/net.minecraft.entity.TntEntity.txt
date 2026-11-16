@@ -1,0 +1,22 @@
+Compiled from "TntEntity.java"
+public class net.minecraft.entity.TntEntity extends net.minecraft.entity.Entity implements net.minecraft.entity.Ownable {
+  public static final java.lang.String FUSE_NBT_KEY = "fuse";
+  public net.minecraft.entity.TntEntity(net.minecraft.entity.EntityType<? extends net.minecraft.entity.TntEntity>, net.minecraft.world.World);
+  public net.minecraft.entity.TntEntity(net.minecraft.world.World, double, double, double, net.minecraft.entity.LivingEntity);
+  protected void initDataTracker(net.minecraft.entity.data.DataTracker$Builder);
+  protected net.minecraft.entity.Entity$MoveEffect getMoveEffect();
+  public boolean canHit();
+  protected double getGravity();
+  public void tick();
+  protected void writeCustomData(net.minecraft.storage.WriteView);
+  protected void readCustomData(net.minecraft.storage.ReadView);
+  public net.minecraft.entity.LivingEntity getOwner();
+  public void copyFrom(net.minecraft.entity.Entity);
+  public void setFuse(int);
+  public int getFuse();
+  public void setBlockState(net.minecraft.block.BlockState);
+  public net.minecraft.block.BlockState getBlockState();
+  public net.minecraft.entity.Entity teleportTo(net.minecraft.world.TeleportTarget);
+  public final boolean damage(net.minecraft.server.world.ServerWorld, net.minecraft.entity.damage.DamageSource, float);
+  public net.minecraft.entity.Entity getOwner();
+}

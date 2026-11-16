@@ -1,0 +1,17 @@
+Compiled from "AbstractClientPlayerEntity.java"
+public abstract class net.minecraft.client.network.AbstractClientPlayerEntity extends net.minecraft.entity.player.PlayerEntity implements net.minecraft.client.network.ClientPlayerLikeEntity {
+  public net.minecraft.client.network.AbstractClientPlayerEntity(net.minecraft.client.world.ClientWorld, com.mojang.authlib.GameProfile);
+  public net.minecraft.world.GameMode getGameMode();
+  protected net.minecraft.client.network.PlayerListEntry getPlayerListEntry();
+  public void tick();
+  protected void addDistanceMoved(float);
+  public net.minecraft.client.network.ClientPlayerLikeState getState();
+  public net.minecraft.text.Text getMannequinName();
+  public net.minecraft.entity.player.SkinTextures getSkin();
+  public net.minecraft.entity.passive.ParrotEntity$Variant getShoulderParrotVariant(boolean);
+  public void tickRiding();
+  public void tickMovement();
+  protected void tickPlayerMovement();
+  public float getFovMultiplier(boolean, float);
+  public boolean hasExtraEars();
+}

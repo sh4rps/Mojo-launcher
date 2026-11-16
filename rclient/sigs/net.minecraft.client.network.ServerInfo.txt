@@ -1,0 +1,30 @@
+Compiled from "ServerInfo.java"
+public class net.minecraft.client.network.ServerInfo {
+  public java.lang.String name;
+  public java.lang.String address;
+  public net.minecraft.text.Text playerCountLabel;
+  public net.minecraft.text.Text label;
+  public net.minecraft.server.ServerMetadata$Players players;
+  public long ping;
+  public int protocolVersion;
+  public net.minecraft.text.Text version;
+  public java.util.List<net.minecraft.text.Text> playerListSummary;
+  public net.minecraft.client.network.ServerInfo(java.lang.String, java.lang.String, net.minecraft.client.network.ServerInfo$ServerType);
+  public net.minecraft.nbt.NbtCompound toNbt();
+  public net.minecraft.client.network.ServerInfo$ResourcePackPolicy getResourcePackPolicy();
+  public void setResourcePackPolicy(net.minecraft.client.network.ServerInfo$ResourcePackPolicy);
+  public static net.minecraft.client.network.ServerInfo fromNbt(net.minecraft.nbt.NbtCompound);
+  public byte[] getFavicon();
+  public void setFavicon(byte[]);
+  public boolean isLocal();
+  public boolean isRealm();
+  public net.minecraft.client.network.ServerInfo$ServerType getServerType();
+  public boolean hasAcceptedCodeOfConduct(java.lang.String);
+  public void setAcceptedCodeOfConduct(java.lang.String);
+  public void resetAcceptedCodeOfConduct();
+  public void copyFrom(net.minecraft.client.network.ServerInfo);
+  public void copyWithSettingsFrom(net.minecraft.client.network.ServerInfo);
+  public net.minecraft.client.network.ServerInfo$Status getStatus();
+  public void setStatus(net.minecraft.client.network.ServerInfo$Status);
+  public static byte[] validateFavicon(byte[]);
+}

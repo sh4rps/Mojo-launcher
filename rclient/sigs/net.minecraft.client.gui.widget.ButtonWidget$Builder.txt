@@ -1,0 +1,11 @@
+Compiled from "ButtonWidget.java"
+public class net.minecraft.client.gui.widget.ButtonWidget$Builder {
+  public net.minecraft.client.gui.widget.ButtonWidget$Builder(net.minecraft.text.Text, net.minecraft.client.gui.widget.ButtonWidget$PressAction);
+  public net.minecraft.client.gui.widget.ButtonWidget$Builder position(int, int);
+  public net.minecraft.client.gui.widget.ButtonWidget$Builder width(int);
+  public net.minecraft.client.gui.widget.ButtonWidget$Builder size(int, int);
+  public net.minecraft.client.gui.widget.ButtonWidget$Builder dimensions(int, int, int, int);
+  public net.minecraft.client.gui.widget.ButtonWidget$Builder tooltip(net.minecraft.client.gui.tooltip.Tooltip);
+  public net.minecraft.client.gui.widget.ButtonWidget$Builder narrationSupplier(net.minecraft.client.gui.widget.ButtonWidget$NarrationSupplier);
+  public net.minecraft.client.gui.widget.ButtonWidget build();
+}

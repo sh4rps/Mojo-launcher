@@ -1,0 +1,34 @@
+Compiled from "StatusEffect.java"
+public class net.minecraft.entity.effect.StatusEffect implements net.minecraft.resource.featuretoggle.ToggleableFeature {
+  public static final com.mojang.serialization.Codec<net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.effect.StatusEffect>> ENTRY_CODEC;
+  public static final net.minecraft.network.codec.PacketCodec<net.minecraft.network.RegistryByteBuf, net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.effect.StatusEffect>> ENTRY_PACKET_CODEC;
+  protected net.minecraft.entity.effect.StatusEffect(net.minecraft.entity.effect.StatusEffectCategory, int);
+  protected net.minecraft.entity.effect.StatusEffect(net.minecraft.entity.effect.StatusEffectCategory, int, net.minecraft.particle.ParticleEffect);
+  public int getFadeInTicks();
+  public int getFadeOutTicks();
+  public int getFadeOutThresholdTicks();
+  public boolean applyUpdateEffect(net.minecraft.server.world.ServerWorld, net.minecraft.entity.LivingEntity, int);
+  public void applyInstantEffect(net.minecraft.server.world.ServerWorld, net.minecraft.entity.Entity, net.minecraft.entity.Entity, net.minecraft.entity.LivingEntity, int, double);
+  public boolean canApplyUpdateEffect(int, int);
+  public void onApplied(net.minecraft.entity.LivingEntity, int);
+  public void playApplySound(net.minecraft.entity.LivingEntity, int);
+  public void onEntityRemoval(net.minecraft.server.world.ServerWorld, net.minecraft.entity.LivingEntity, int, net.minecraft.entity.Entity$RemovalReason);
+  public void onEntityDamage(net.minecraft.server.world.ServerWorld, net.minecraft.entity.LivingEntity, int, net.minecraft.entity.damage.DamageSource, float);
+  public boolean isInstant();
+  protected java.lang.String loadTranslationKey();
+  public java.lang.String getTranslationKey();
+  public net.minecraft.text.Text getName();
+  public net.minecraft.entity.effect.StatusEffectCategory getCategory();
+  public int getColor();
+  public net.minecraft.entity.effect.StatusEffect addAttributeModifier(net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.attribute.EntityAttribute>, net.minecraft.util.Identifier, double, net.minecraft.entity.attribute.EntityAttributeModifier$Operation);
+  public net.minecraft.entity.effect.StatusEffect fadeTicks(int);
+  public net.minecraft.entity.effect.StatusEffect fadeTicks(int, int, int);
+  public void forEachAttributeModifier(int, java.util.function.BiConsumer<net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.attribute.EntityAttribute>, net.minecraft.entity.attribute.EntityAttributeModifier>);
+  public void onRemoved(net.minecraft.entity.attribute.AttributeContainer);
+  public void onApplied(net.minecraft.entity.attribute.AttributeContainer, int);
+  public boolean isBeneficial();
+  public net.minecraft.particle.ParticleEffect createParticle(net.minecraft.entity.effect.StatusEffectInstance);
+  public net.minecraft.entity.effect.StatusEffect applySound(net.minecraft.sound.SoundEvent);
+  public net.minecraft.entity.effect.StatusEffect requires(net.minecraft.resource.featuretoggle.FeatureFlag...);
+  public net.minecraft.resource.featuretoggle.FeatureSet getRequiredFeatures();
+}

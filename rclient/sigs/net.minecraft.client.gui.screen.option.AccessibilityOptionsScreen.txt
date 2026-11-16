@@ -1,0 +1,9 @@
+Compiled from "AccessibilityOptionsScreen.java"
+public class net.minecraft.client.gui.screen.option.AccessibilityOptionsScreen extends net.minecraft.client.gui.screen.option.GameOptionsScreen {
+  public static final net.minecraft.text.Text TITLE_TEXT;
+  public net.minecraft.client.gui.screen.option.AccessibilityOptionsScreen(net.minecraft.client.gui.screen.Screen, net.minecraft.client.option.GameOptions);
+  protected void init();
+  protected void addOptions();
+  protected void initFooter();
+  protected boolean allowRotatingPanorama();
+}

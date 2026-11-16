@@ -1,0 +1,14 @@
+Compiled from "PotionEntity.java"
+public abstract class net.minecraft.entity.projectile.thrown.PotionEntity extends net.minecraft.entity.projectile.thrown.ThrownItemEntity {
+  public static final double field_30667 = 4.0d;
+  protected static final double WATER_POTION_EXPLOSION_SQUARED_RADIUS = 16.0d;
+  public static final java.util.function.Predicate<net.minecraft.entity.LivingEntity> AFFECTED_BY_WATER;
+  public net.minecraft.entity.projectile.thrown.PotionEntity(net.minecraft.entity.EntityType<? extends net.minecraft.entity.projectile.thrown.PotionEntity>, net.minecraft.world.World);
+  public net.minecraft.entity.projectile.thrown.PotionEntity(net.minecraft.entity.EntityType<? extends net.minecraft.entity.projectile.thrown.PotionEntity>, net.minecraft.world.World, net.minecraft.entity.LivingEntity, net.minecraft.item.ItemStack);
+  public net.minecraft.entity.projectile.thrown.PotionEntity(net.minecraft.entity.EntityType<? extends net.minecraft.entity.projectile.thrown.PotionEntity>, net.minecraft.world.World, double, double, double, net.minecraft.item.ItemStack);
+  protected double getGravity();
+  protected void onBlockHit(net.minecraft.util.hit.BlockHitResult);
+  protected void onCollision(net.minecraft.util.hit.HitResult);
+  protected abstract void spawnAreaEffectCloud(net.minecraft.server.world.ServerWorld, net.minecraft.item.ItemStack, net.minecraft.util.hit.HitResult);
+  public it.unimi.dsi.fastutil.doubles.DoubleDoubleImmutablePair getKnockback(net.minecraft.entity.LivingEntity, net.minecraft.entity.damage.DamageSource);
+}

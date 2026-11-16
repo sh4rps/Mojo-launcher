@@ -1,0 +1,43 @@
+Compiled from "StatusEffectInstance.java"
+public class net.minecraft.entity.effect.StatusEffectInstance implements java.lang.Comparable<net.minecraft.entity.effect.StatusEffectInstance> {
+  public static final int INFINITE = -1;
+  public static final int MIN_AMPLIFIER = 0;
+  public static final int MAX_AMPLIFIER = 255;
+  public static final com.mojang.serialization.Codec<net.minecraft.entity.effect.StatusEffectInstance> CODEC;
+  public static final net.minecraft.network.codec.PacketCodec<net.minecraft.network.RegistryByteBuf, net.minecraft.entity.effect.StatusEffectInstance> PACKET_CODEC;
+  public net.minecraft.entity.effect.StatusEffectInstance(net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.effect.StatusEffect>);
+  public net.minecraft.entity.effect.StatusEffectInstance(net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.effect.StatusEffect>, int);
+  public net.minecraft.entity.effect.StatusEffectInstance(net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.effect.StatusEffect>, int, int);
+  public net.minecraft.entity.effect.StatusEffectInstance(net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.effect.StatusEffect>, int, int, boolean, boolean);
+  public net.minecraft.entity.effect.StatusEffectInstance(net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.effect.StatusEffect>, int, int, boolean, boolean, boolean);
+  public net.minecraft.entity.effect.StatusEffectInstance(net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.effect.StatusEffect>, int, int, boolean, boolean, boolean, net.minecraft.entity.effect.StatusEffectInstance);
+  public net.minecraft.entity.effect.StatusEffectInstance(net.minecraft.entity.effect.StatusEffectInstance);
+  public float getFadeFactor(net.minecraft.entity.LivingEntity, float);
+  public net.minecraft.particle.ParticleEffect createParticle();
+  public boolean upgrade(net.minecraft.entity.effect.StatusEffectInstance);
+  public boolean isInfinite();
+  public boolean isDurationBelow(int);
+  public net.minecraft.entity.effect.StatusEffectInstance withScaledDuration(float);
+  public int mapDuration(it.unimi.dsi.fastutil.ints.Int2IntFunction);
+  public net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.effect.StatusEffect> getEffectType();
+  public int getDuration();
+  public int getAmplifier();
+  public boolean isAmbient();
+  public boolean shouldShowParticles();
+  public boolean shouldShowIcon();
+  public boolean update(net.minecraft.server.world.ServerWorld, net.minecraft.entity.LivingEntity, java.lang.Runnable);
+  public void tickClient();
+  public void onApplied(net.minecraft.entity.LivingEntity);
+  public void onEntityRemoval(net.minecraft.server.world.ServerWorld, net.minecraft.entity.LivingEntity, net.minecraft.entity.Entity$RemovalReason);
+  public void onEntityDamage(net.minecraft.server.world.ServerWorld, net.minecraft.entity.LivingEntity, net.minecraft.entity.damage.DamageSource, float);
+  public java.lang.String getTranslationKey();
+  public java.lang.String toString();
+  public boolean equals(java.lang.Object);
+  public int hashCode();
+  public int compareTo(net.minecraft.entity.effect.StatusEffectInstance);
+  public void playApplySound(net.minecraft.entity.LivingEntity);
+  public boolean equals(net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.effect.StatusEffect>);
+  public void copyFadingFrom(net.minecraft.entity.effect.StatusEffectInstance);
+  public void skipFading();
+  public int compareTo(java.lang.Object);
+}

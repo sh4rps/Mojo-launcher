@@ -1,0 +1,8 @@
+Compiled from "RenderTickCounter.java"
+public interface net.minecraft.client.render.RenderTickCounter {
+  public static final net.minecraft.client.render.RenderTickCounter ZERO;
+  public static final net.minecraft.client.render.RenderTickCounter ONE;
+  public abstract float getDynamicDeltaTicks();
+  public abstract float getTickProgress(boolean);
+  public abstract float getFixedDeltaTicks();
+}

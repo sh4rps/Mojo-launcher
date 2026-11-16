@@ -1,0 +1,9 @@
+Compiled from "ScreenshotRecorder.java"
+public class net.minecraft.client.util.ScreenshotRecorder {
+  public static final java.lang.String SCREENSHOTS_DIRECTORY = "screenshots";
+  public net.minecraft.client.util.ScreenshotRecorder();
+  public static void saveScreenshot(java.io.File, net.minecraft.client.gl.Framebuffer, java.util.function.Consumer<net.minecraft.text.Text>);
+  public static void saveScreenshot(java.io.File, java.lang.String, net.minecraft.client.gl.Framebuffer, int, java.util.function.Consumer<net.minecraft.text.Text>);
+  public static void takeScreenshot(net.minecraft.client.gl.Framebuffer, java.util.function.Consumer<net.minecraft.client.texture.NativeImage>);
+  public static void takeScreenshot(net.minecraft.client.gl.Framebuffer, int, java.util.function.Consumer<net.minecraft.client.texture.NativeImage>);
+}

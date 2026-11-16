@@ -1,0 +1,9 @@
+Compiled from "LanguageManager.java"
+public class net.minecraft.client.resource.language.LanguageManager implements net.minecraft.resource.SynchronousResourceReloader {
+  public net.minecraft.client.resource.language.LanguageManager(java.lang.String, java.util.function.Consumer<net.minecraft.client.resource.language.TranslationStorage>);
+  public void reload(net.minecraft.resource.ResourceManager);
+  public void setLanguage(java.lang.String);
+  public java.lang.String getLanguage();
+  public java.util.SortedMap<java.lang.String, net.minecraft.client.resource.language.LanguageDefinition> getAllLanguages();
+  public net.minecraft.client.resource.language.LanguageDefinition getLanguage(java.lang.String);
+}

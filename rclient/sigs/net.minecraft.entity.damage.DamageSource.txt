@@ -1,0 +1,23 @@
+Compiled from "DamageSource.java"
+public class net.minecraft.entity.damage.DamageSource {
+  public java.lang.String toString();
+  public float getExhaustion();
+  public boolean isDirect();
+  public net.minecraft.entity.damage.DamageSource(net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.damage.DamageType>, net.minecraft.entity.Entity, net.minecraft.entity.Entity);
+  public net.minecraft.entity.damage.DamageSource(net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.damage.DamageType>, net.minecraft.util.math.Vec3d);
+  public net.minecraft.entity.damage.DamageSource(net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.damage.DamageType>, net.minecraft.entity.Entity);
+  public net.minecraft.entity.damage.DamageSource(net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.damage.DamageType>);
+  public net.minecraft.entity.Entity getSource();
+  public net.minecraft.entity.Entity getAttacker();
+  public net.minecraft.item.ItemStack getWeaponStack();
+  public net.minecraft.text.Text getDeathMessage(net.minecraft.entity.LivingEntity);
+  public java.lang.String getName();
+  public boolean isScaledWithDifficulty();
+  public boolean isSourceCreativePlayer();
+  public net.minecraft.util.math.Vec3d getPosition();
+  public net.minecraft.util.math.Vec3d getStoredPosition();
+  public boolean isIn(net.minecraft.registry.tag.TagKey<net.minecraft.entity.damage.DamageType>);
+  public boolean isOf(net.minecraft.registry.RegistryKey<net.minecraft.entity.damage.DamageType>);
+  public net.minecraft.entity.damage.DamageType getType();
+  public net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.damage.DamageType> getTypeRegistryEntry();
+}

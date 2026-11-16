@@ -1,0 +1,14 @@
+Compiled from "BlockHitResult.java"
+public class net.minecraft.util.hit.BlockHitResult extends net.minecraft.util.hit.HitResult {
+  public static net.minecraft.util.hit.BlockHitResult createMissed(net.minecraft.util.math.Vec3d, net.minecraft.util.math.Direction, net.minecraft.util.math.BlockPos);
+  public net.minecraft.util.hit.BlockHitResult(net.minecraft.util.math.Vec3d, net.minecraft.util.math.Direction, net.minecraft.util.math.BlockPos, boolean);
+  public net.minecraft.util.hit.BlockHitResult(net.minecraft.util.math.Vec3d, net.minecraft.util.math.Direction, net.minecraft.util.math.BlockPos, boolean, boolean);
+  public net.minecraft.util.hit.BlockHitResult withSide(net.minecraft.util.math.Direction);
+  public net.minecraft.util.hit.BlockHitResult withBlockPos(net.minecraft.util.math.BlockPos);
+  public net.minecraft.util.hit.BlockHitResult againstWorldBorder();
+  public net.minecraft.util.math.BlockPos getBlockPos();
+  public net.minecraft.util.math.Direction getSide();
+  public net.minecraft.util.hit.HitResult$Type getType();
+  public boolean isInsideBlock();
+  public boolean isAgainstWorldBorder();
+}

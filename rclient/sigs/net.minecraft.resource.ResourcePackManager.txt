@@ -1,0 +1,18 @@
+Compiled from "ResourcePackManager.java"
+public class net.minecraft.resource.ResourcePackManager {
+  public net.minecraft.resource.ResourcePackManager(net.minecraft.resource.ResourcePackProvider...);
+  public static java.lang.String listPacks(java.util.Collection<net.minecraft.resource.ResourcePackProfile>);
+  public void scanPacks();
+  public boolean hasOptionalProfilesEnabled();
+  public void setEnabledProfiles(java.util.Collection<java.lang.String>);
+  public boolean enable(java.lang.String);
+  public boolean disable(java.lang.String);
+  public java.util.Collection<java.lang.String> getIds();
+  public java.util.Collection<net.minecraft.resource.ResourcePackProfile> getProfiles();
+  public java.util.Collection<java.lang.String> getEnabledIds();
+  public net.minecraft.resource.featuretoggle.FeatureSet getRequestedFeatures();
+  public java.util.Collection<net.minecraft.resource.ResourcePackProfile> getEnabledProfiles();
+  public net.minecraft.resource.ResourcePackProfile getProfile(java.lang.String);
+  public boolean hasProfile(java.lang.String);
+  public java.util.List<net.minecraft.resource.ResourcePack> createResourcePacks();
+}

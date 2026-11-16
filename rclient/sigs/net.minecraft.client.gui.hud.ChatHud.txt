@@ -1,0 +1,31 @@
+Compiled from "ChatHud.java"
+public class net.minecraft.client.gui.hud.ChatHud {
+  public static final int field_63862 = 8;
+  public static final net.minecraft.util.Identifier EXPAND_CHAT_QUEUE_ID;
+  public net.minecraft.client.gui.hud.ChatHud(net.minecraft.client.MinecraftClient);
+  public void tickRemovalQueueIfExists();
+  public void render(net.minecraft.client.gui.DrawContext, net.minecraft.client.font.TextRenderer, int, int, int, boolean, boolean);
+  public void render(net.minecraft.client.font.DrawnTextConsumer, int, int, boolean);
+  public void clear(boolean);
+  public void addMessage(net.minecraft.text.Text);
+  public void addMessage(net.minecraft.text.Text, net.minecraft.network.message.MessageSignatureData, net.minecraft.client.gui.hud.MessageIndicator);
+  public void removeMessage(net.minecraft.network.message.MessageSignatureData);
+  public void reset();
+  public net.minecraft.util.collection.ArrayListDeque<java.lang.String> getMessageHistory();
+  public void addToMessageHistory(java.lang.String);
+  public void resetScroll();
+  public void scroll(int);
+  public boolean isChatFocused();
+  public static int getWidth(double);
+  public static int getHeight(double);
+  public static double getDefaultUnfocusedHeight();
+  public int getVisibleLineCount();
+  public void saveDraft(java.lang.String);
+  public void discardDraft();
+  public <T extends net.minecraft.client.gui.screen.ChatScreen> T createScreen(net.minecraft.client.gui.hud.ChatHud$ChatMethod, net.minecraft.client.gui.screen.ChatScreen$Factory<T>);
+  public void setClientScreen(net.minecraft.client.gui.hud.ChatHud$ChatMethod, net.minecraft.client.gui.screen.ChatScreen$Factory<?>);
+  public void setScreen();
+  public net.minecraft.client.gui.screen.ChatScreen removeScreen();
+  public net.minecraft.client.gui.hud.ChatHud$ChatState toChatState();
+  public void restoreChatState(net.minecraft.client.gui.hud.ChatHud$ChatState);
+}

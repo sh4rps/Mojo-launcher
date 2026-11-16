@@ -1,0 +1,24 @@
+Compiled from "Mouse.java"
+public class net.minecraft.client.Mouse {
+  public static final long field_61505 = 250l;
+  protected int lastMouseButton;
+  public net.minecraft.client.Mouse(net.minecraft.client.MinecraftClient);
+  public void addCrashReportSection(net.minecraft.util.crash.CrashReportSection, net.minecraft.client.util.Window);
+  public void setup(net.minecraft.client.util.Window);
+  public void tick();
+  public static double scaleX(net.minecraft.client.util.Window, double);
+  public double getScaledX(net.minecraft.client.util.Window);
+  public static double scaleY(net.minecraft.client.util.Window, double);
+  public double getScaledY(net.minecraft.client.util.Window);
+  public boolean wasLeftButtonClicked();
+  public boolean wasMiddleButtonClicked();
+  public boolean wasRightButtonClicked();
+  public double getX();
+  public double getY();
+  public void onResolutionChanged();
+  public boolean isCursorLocked();
+  public void lockCursor();
+  public void unlockCursor();
+  public void setResolutionChanged();
+  public void drawScaledPos(net.minecraft.client.font.TextRenderer, net.minecraft.client.gui.DrawContext);
+}

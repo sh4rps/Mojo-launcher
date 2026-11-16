@@ -1,0 +1,40 @@
+Compiled from "WorldChunk.java"
+public class net.minecraft.world.chunk.WorldChunk extends net.minecraft.world.chunk.Chunk implements net.minecraft.world.debug.DebugTrackable {
+  public net.minecraft.world.chunk.WorldChunk(net.minecraft.world.World, net.minecraft.util.math.ChunkPos);
+  public net.minecraft.world.chunk.WorldChunk(net.minecraft.world.World, net.minecraft.util.math.ChunkPos, net.minecraft.world.chunk.UpgradeData, net.minecraft.world.tick.ChunkTickScheduler<net.minecraft.block.Block>, net.minecraft.world.tick.ChunkTickScheduler<net.minecraft.fluid.Fluid>, long, net.minecraft.world.chunk.ChunkSection[], net.minecraft.world.chunk.WorldChunk$EntityLoader, net.minecraft.world.gen.chunk.BlendingData);
+  public net.minecraft.world.chunk.WorldChunk(net.minecraft.server.world.ServerWorld, net.minecraft.world.chunk.ProtoChunk, net.minecraft.world.chunk.WorldChunk$EntityLoader);
+  public void setUnsavedListener(net.minecraft.world.chunk.WorldChunk$UnsavedListener);
+  public void markNeedsSaving();
+  public net.minecraft.world.tick.BasicTickScheduler<net.minecraft.block.Block> getBlockTickScheduler();
+  public net.minecraft.world.tick.BasicTickScheduler<net.minecraft.fluid.Fluid> getFluidTickScheduler();
+  public net.minecraft.world.chunk.Chunk$TickSchedulers getTickSchedulers(long);
+  public net.minecraft.world.event.listener.GameEventDispatcher getGameEventDispatcher(int);
+  public net.minecraft.block.BlockState getBlockState(net.minecraft.util.math.BlockPos);
+  public net.minecraft.fluid.FluidState getFluidState(net.minecraft.util.math.BlockPos);
+  public net.minecraft.fluid.FluidState getFluidState(int, int, int);
+  public net.minecraft.block.BlockState setBlockState(net.minecraft.util.math.BlockPos, net.minecraft.block.BlockState, int);
+  public void addEntity(net.minecraft.entity.Entity);
+  public net.minecraft.block.entity.BlockEntity getBlockEntity(net.minecraft.util.math.BlockPos);
+  public net.minecraft.block.entity.BlockEntity getBlockEntity(net.minecraft.util.math.BlockPos, net.minecraft.world.chunk.WorldChunk$CreationType);
+  public void addBlockEntity(net.minecraft.block.entity.BlockEntity);
+  public void setBlockEntity(net.minecraft.block.entity.BlockEntity);
+  public net.minecraft.nbt.NbtCompound getPackedBlockEntityNbt(net.minecraft.util.math.BlockPos, net.minecraft.registry.RegistryWrapper$WrapperLookup);
+  public void removeBlockEntity(net.minecraft.util.math.BlockPos);
+  public void loadEntities();
+  public boolean isEmpty();
+  public void loadFromPacket(net.minecraft.network.PacketByteBuf, java.util.Map<net.minecraft.world.Heightmap$Type, long[]>, java.util.function.Consumer<net.minecraft.network.packet.s2c.play.ChunkData$BlockEntityVisitor>);
+  public void loadBiomeFromPacket(net.minecraft.network.PacketByteBuf);
+  public void setLoadedToWorld(boolean);
+  public net.minecraft.world.World getWorld();
+  public java.util.Map<net.minecraft.util.math.BlockPos, net.minecraft.block.entity.BlockEntity> getBlockEntities();
+  public void runPostProcessing(net.minecraft.server.world.ServerWorld);
+  public void disableTickSchedulers(long);
+  public void addChunkTickSchedulers(net.minecraft.server.world.ServerWorld);
+  public void removeChunkTickSchedulers(net.minecraft.server.world.ServerWorld);
+  public void registerTracking(net.minecraft.server.world.ServerWorld, net.minecraft.world.debug.DebugTrackable$Tracker);
+  public net.minecraft.world.chunk.ChunkStatus getStatus();
+  public net.minecraft.server.world.ChunkLevelType getLevelType();
+  public void setLevelTypeProvider(java.util.function.Supplier<net.minecraft.server.world.ChunkLevelType>);
+  public void clear();
+  public void updateAllBlockEntities();
+}

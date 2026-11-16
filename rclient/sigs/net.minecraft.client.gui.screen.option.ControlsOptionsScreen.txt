@@ -1,0 +1,5 @@
+Compiled from "ControlsOptionsScreen.java"
+public class net.minecraft.client.gui.screen.option.ControlsOptionsScreen extends net.minecraft.client.gui.screen.option.GameOptionsScreen {
+  public net.minecraft.client.gui.screen.option.ControlsOptionsScreen(net.minecraft.client.gui.screen.Screen, net.minecraft.client.option.GameOptions);
+  protected void addOptions();
+}

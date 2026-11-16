@@ -1,0 +1,10 @@
+Compiled from "Session.java"
+public class net.minecraft.client.session.Session {
+  public net.minecraft.client.session.Session(java.lang.String, java.util.UUID, java.lang.String, java.util.Optional<java.lang.String>, java.util.Optional<java.lang.String>);
+  public java.lang.String getSessionId();
+  public java.util.UUID getUuidOrNull();
+  public java.lang.String getUsername();
+  public java.lang.String getAccessToken();
+  public java.util.Optional<java.lang.String> getClientId();
+  public java.util.Optional<java.lang.String> getXuid();
+}

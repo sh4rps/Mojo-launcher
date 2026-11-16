@@ -1,0 +1,27 @@
+Compiled from "ChatScreen.java"
+public class net.minecraft.client.gui.screen.ChatScreen extends net.minecraft.client.gui.screen.Screen {
+  public static final double SHIFT_SCROLL_AMOUNT = 7.0d;
+  protected net.minecraft.client.gui.widget.TextFieldWidget chatField;
+  protected java.lang.String originalChatText;
+  protected boolean draft;
+  protected net.minecraft.client.gui.screen.ChatScreen$CloseReason closeReason;
+  public net.minecraft.client.gui.screen.ChatScreen(java.lang.String, boolean);
+  protected void init();
+  protected void setInitialFocus();
+  public void resize(int, int);
+  public void close();
+  public void removed();
+  protected boolean shouldNotSaveDraft();
+  public boolean keyPressed(net.minecraft.client.input.KeyInput);
+  public boolean mouseScrolled(double, double, double, double);
+  public boolean mouseClicked(net.minecraft.client.gui.Click, boolean);
+  public void insertText(java.lang.String, boolean);
+  public void setChatFromHistory(int);
+  public void render(net.minecraft.client.gui.DrawContext, int, int, float);
+  public void renderBackground(net.minecraft.client.gui.DrawContext, int, int, float);
+  public boolean shouldPause();
+  public boolean keepOpenThroughPortal();
+  protected void addScreenNarrations(net.minecraft.client.gui.screen.narration.NarrationMessageBuilder);
+  public void sendMessage(java.lang.String, boolean);
+  public java.lang.String normalize(java.lang.String);
+}

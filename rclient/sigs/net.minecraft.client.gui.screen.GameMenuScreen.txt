@@ -1,0 +1,10 @@
+Compiled from "GameMenuScreen.java"
+public class net.minecraft.client.gui.screen.GameMenuScreen extends net.minecraft.client.gui.screen.Screen {
+  public net.minecraft.client.gui.screen.GameMenuScreen(boolean);
+  public boolean shouldShowMenu();
+  protected void init();
+  public void tick();
+  public void render(net.minecraft.client.gui.DrawContext, int, int, float);
+  public void renderBackground(net.minecraft.client.gui.DrawContext, int, int, float);
+  public boolean shouldShowNowPlayingToast();
+}

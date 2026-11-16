@@ -1,0 +1,29 @@
+Compiled from "PlayerEntityRenderer.java"
+public class net.minecraft.client.render.entity.PlayerEntityRenderer<AvatarlikeEntity extends net.minecraft.entity.PlayerLikeEntity & net.minecraft.client.network.ClientPlayerLikeEntity> extends net.minecraft.client.render.entity.LivingEntityRenderer<AvatarlikeEntity, net.minecraft.client.render.entity.state.PlayerEntityRenderState, net.minecraft.client.render.entity.model.PlayerEntityModel> {
+  public net.minecraft.client.render.entity.PlayerEntityRenderer(net.minecraft.client.render.entity.EntityRendererFactory$Context, boolean);
+  protected boolean shouldRenderFeatures(net.minecraft.client.render.entity.state.PlayerEntityRenderState);
+  public net.minecraft.util.math.Vec3d getPositionOffset(net.minecraft.client.render.entity.state.PlayerEntityRenderState);
+  public net.minecraft.util.Identifier getTexture(net.minecraft.client.render.entity.state.PlayerEntityRenderState);
+  protected void scale(net.minecraft.client.render.entity.state.PlayerEntityRenderState, net.minecraft.client.util.math.MatrixStack);
+  protected void renderLabelIfPresent(net.minecraft.client.render.entity.state.PlayerEntityRenderState, net.minecraft.client.util.math.MatrixStack, net.minecraft.client.render.command.OrderedRenderCommandQueue, net.minecraft.client.render.state.CameraRenderState);
+  public net.minecraft.client.render.entity.state.PlayerEntityRenderState createRenderState();
+  public void updateRenderState(AvatarlikeEntity, net.minecraft.client.render.entity.state.PlayerEntityRenderState, float);
+  protected boolean hasLabel(AvatarlikeEntity, double);
+  public void renderRightArm(net.minecraft.client.util.math.MatrixStack, net.minecraft.client.render.command.OrderedRenderCommandQueue, int, net.minecraft.util.Identifier, boolean);
+  public void renderLeftArm(net.minecraft.client.util.math.MatrixStack, net.minecraft.client.render.command.OrderedRenderCommandQueue, int, net.minecraft.util.Identifier, boolean);
+  protected void setupTransforms(net.minecraft.client.render.entity.state.PlayerEntityRenderState, net.minecraft.client.util.math.MatrixStack, float, float);
+  public boolean shouldFlipUpsideDown(AvatarlikeEntity);
+  public static boolean shouldFlipUpsideDown(net.minecraft.entity.player.PlayerEntity);
+  public void updateRenderState(net.minecraft.entity.LivingEntity, net.minecraft.client.render.entity.state.LivingEntityRenderState, float);
+  public boolean shouldFlipUpsideDown(net.minecraft.entity.LivingEntity);
+  protected boolean hasLabel(net.minecraft.entity.LivingEntity, double);
+  protected void scale(net.minecraft.client.render.entity.state.LivingEntityRenderState, net.minecraft.client.util.math.MatrixStack);
+  protected void setupTransforms(net.minecraft.client.render.entity.state.LivingEntityRenderState, net.minecraft.client.util.math.MatrixStack, float, float);
+  public net.minecraft.util.Identifier getTexture(net.minecraft.client.render.entity.state.LivingEntityRenderState);
+  protected boolean shouldRenderFeatures(net.minecraft.client.render.entity.state.LivingEntityRenderState);
+  public void updateRenderState(net.minecraft.entity.Entity, net.minecraft.client.render.entity.state.EntityRenderState, float);
+  public net.minecraft.client.render.entity.state.EntityRenderState createRenderState();
+  protected void renderLabelIfPresent(net.minecraft.client.render.entity.state.EntityRenderState, net.minecraft.client.util.math.MatrixStack, net.minecraft.client.render.command.OrderedRenderCommandQueue, net.minecraft.client.render.state.CameraRenderState);
+  protected boolean hasLabel(net.minecraft.entity.Entity, double);
+  public net.minecraft.util.math.Vec3d getPositionOffset(net.minecraft.client.render.entity.state.EntityRenderState);
+}

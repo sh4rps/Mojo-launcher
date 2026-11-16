@@ -1,0 +1,21 @@
+Compiled from "ResourcePackProfile.java"
+public class net.minecraft.resource.ResourcePackProfile {
+  public static net.minecraft.resource.ResourcePackProfile create(net.minecraft.resource.ResourcePackInfo, net.minecraft.resource.ResourcePackProfile$PackFactory, net.minecraft.resource.ResourceType, net.minecraft.resource.ResourcePackPosition);
+  public net.minecraft.resource.ResourcePackProfile(net.minecraft.resource.ResourcePackInfo, net.minecraft.resource.ResourcePackProfile$PackFactory, net.minecraft.resource.ResourcePackProfile$Metadata, net.minecraft.resource.ResourcePackPosition);
+  public static net.minecraft.resource.ResourcePackProfile$Metadata loadMetadata(net.minecraft.resource.ResourcePackInfo, net.minecraft.resource.ResourcePackProfile$PackFactory, net.minecraft.resource.PackVersion, net.minecraft.resource.ResourceType);
+  public net.minecraft.resource.ResourcePackInfo getInfo();
+  public net.minecraft.text.Text getDisplayName();
+  public net.minecraft.text.Text getDescription();
+  public net.minecraft.text.Text getInformationText(boolean);
+  public net.minecraft.resource.ResourcePackCompatibility getCompatibility();
+  public net.minecraft.resource.featuretoggle.FeatureSet getRequestedFeatures();
+  public net.minecraft.resource.ResourcePack createResourcePack();
+  public java.lang.String getId();
+  public net.minecraft.resource.ResourcePackPosition getPosition();
+  public boolean isRequired();
+  public boolean isPinned();
+  public net.minecraft.resource.ResourcePackProfile$InsertionPosition getInitialPosition();
+  public net.minecraft.resource.ResourcePackSource getSource();
+  public boolean equals(java.lang.Object);
+  public int hashCode();
+}

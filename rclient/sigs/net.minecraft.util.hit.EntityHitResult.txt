@@ -1,0 +1,7 @@
+Compiled from "EntityHitResult.java"
+public class net.minecraft.util.hit.EntityHitResult extends net.minecraft.util.hit.HitResult {
+  public net.minecraft.util.hit.EntityHitResult(net.minecraft.entity.Entity);
+  public net.minecraft.util.hit.EntityHitResult(net.minecraft.entity.Entity, net.minecraft.util.math.Vec3d);
+  public net.minecraft.entity.Entity getEntity();
+  public net.minecraft.util.hit.HitResult$Type getType();
+}

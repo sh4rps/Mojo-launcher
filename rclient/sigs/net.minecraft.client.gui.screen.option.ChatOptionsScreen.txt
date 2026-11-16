@@ -1,0 +1,5 @@
+Compiled from "ChatOptionsScreen.java"
+public class net.minecraft.client.gui.screen.option.ChatOptionsScreen extends net.minecraft.client.gui.screen.option.GameOptionsScreen {
+  public net.minecraft.client.gui.screen.option.ChatOptionsScreen(net.minecraft.client.gui.screen.Screen, net.minecraft.client.option.GameOptions);
+  protected void addOptions();
+}

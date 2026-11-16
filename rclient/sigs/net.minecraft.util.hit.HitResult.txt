@@ -1,0 +1,8 @@
+Compiled from "HitResult.java"
+public abstract class net.minecraft.util.hit.HitResult {
+  protected final net.minecraft.util.math.Vec3d pos;
+  protected net.minecraft.util.hit.HitResult(net.minecraft.util.math.Vec3d);
+  public double squaredDistanceTo(net.minecraft.entity.Entity);
+  public abstract net.minecraft.util.hit.HitResult$Type getType();
+  public net.minecraft.util.math.Vec3d getPos();
+}

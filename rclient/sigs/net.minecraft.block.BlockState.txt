@@ -1,0 +1,6 @@
+Compiled from "BlockState.java"
+public class net.minecraft.block.BlockState extends net.minecraft.block.AbstractBlock$AbstractBlockState {
+  public static final com.mojang.serialization.Codec<net.minecraft.block.BlockState> CODEC;
+  public net.minecraft.block.BlockState(net.minecraft.block.Block, it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap<net.minecraft.state.property.Property<?>, java.lang.Comparable<?>>, com.mojang.serialization.MapCodec<net.minecraft.block.BlockState>);
+  protected net.minecraft.block.BlockState asBlockState();
+}
