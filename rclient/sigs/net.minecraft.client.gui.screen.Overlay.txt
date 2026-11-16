@@ -1,0 +1,6 @@
+Compiled from "Overlay.java"
+public abstract class net.minecraft.client.gui.screen.Overlay implements net.minecraft.client.gui.Drawable {
+  public net.minecraft.client.gui.screen.Overlay();
+  public boolean pausesGame();
+  public void tick();
+}

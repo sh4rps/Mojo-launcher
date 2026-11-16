@@ -1,0 +1,29 @@
+Compiled from "EquipmentSlot.java"
+public final class net.minecraft.entity.EquipmentSlot extends java.lang.Enum<net.minecraft.entity.EquipmentSlot> implements net.minecraft.util.StringIdentifiable {
+  public static final net.minecraft.entity.EquipmentSlot MAINHAND;
+  public static final net.minecraft.entity.EquipmentSlot OFFHAND;
+  public static final net.minecraft.entity.EquipmentSlot FEET;
+  public static final net.minecraft.entity.EquipmentSlot LEGS;
+  public static final net.minecraft.entity.EquipmentSlot CHEST;
+  public static final net.minecraft.entity.EquipmentSlot HEAD;
+  public static final net.minecraft.entity.EquipmentSlot BODY;
+  public static final net.minecraft.entity.EquipmentSlot SADDLE;
+  public static final int NO_MAX_COUNT = 0;
+  public static final java.util.List<net.minecraft.entity.EquipmentSlot> VALUES;
+  public static final java.util.function.IntFunction<net.minecraft.entity.EquipmentSlot> FROM_INDEX;
+  public static final net.minecraft.util.StringIdentifiable$EnumCodec<net.minecraft.entity.EquipmentSlot> CODEC;
+  public static final net.minecraft.network.codec.PacketCodec<io.netty.buffer.ByteBuf, net.minecraft.entity.EquipmentSlot> PACKET_CODEC;
+  public static net.minecraft.entity.EquipmentSlot[] values();
+  public static net.minecraft.entity.EquipmentSlot valueOf(java.lang.String);
+  public net.minecraft.entity.EquipmentSlot$Type getType();
+  public int getEntitySlotId();
+  public int getOffsetEntitySlotId(int);
+  public net.minecraft.item.ItemStack split(net.minecraft.item.ItemStack);
+  public int getIndex();
+  public int getOffsetIndex(int);
+  public java.lang.String getName();
+  public boolean isArmorSlot();
+  public java.lang.String asString();
+  public boolean increasesDroppedExperience();
+  public static net.minecraft.entity.EquipmentSlot byName(java.lang.String);
+}

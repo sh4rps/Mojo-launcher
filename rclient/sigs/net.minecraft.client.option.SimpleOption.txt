@@ -1,0 +1,22 @@
+Compiled from "SimpleOption.java"
+public final class net.minecraft.client.option.SimpleOption<T> {
+  public static final net.minecraft.client.option.SimpleOption$PotentialValuesBasedCallbacks<java.lang.Boolean> BOOLEAN;
+  public static final net.minecraft.client.option.SimpleOption$ValueTextGetter<java.lang.Boolean> BOOLEAN_TEXT_GETTER;
+  public static net.minecraft.client.option.SimpleOption<java.lang.Boolean> ofBoolean(java.lang.String, boolean, java.util.function.Consumer<java.lang.Boolean>);
+  public static net.minecraft.client.option.SimpleOption<java.lang.Boolean> ofBoolean(java.lang.String, boolean);
+  public static net.minecraft.client.option.SimpleOption<java.lang.Boolean> ofBoolean(java.lang.String, net.minecraft.client.option.SimpleOption$TooltipFactory<java.lang.Boolean>, boolean);
+  public static net.minecraft.client.option.SimpleOption<java.lang.Boolean> ofBoolean(java.lang.String, net.minecraft.client.option.SimpleOption$TooltipFactory<java.lang.Boolean>, boolean, java.util.function.Consumer<java.lang.Boolean>);
+  public static net.minecraft.client.option.SimpleOption<java.lang.Boolean> ofBoolean(java.lang.String, net.minecraft.client.option.SimpleOption$TooltipFactory<java.lang.Boolean>, net.minecraft.client.option.SimpleOption$ValueTextGetter<java.lang.Boolean>, boolean, java.util.function.Consumer<java.lang.Boolean>);
+  public net.minecraft.client.option.SimpleOption(java.lang.String, net.minecraft.client.option.SimpleOption$TooltipFactory<T>, net.minecraft.client.option.SimpleOption$ValueTextGetter<T>, net.minecraft.client.option.SimpleOption$Callbacks<T>, T, java.util.function.Consumer<T>);
+  public net.minecraft.client.option.SimpleOption(java.lang.String, net.minecraft.client.option.SimpleOption$TooltipFactory<T>, net.minecraft.client.option.SimpleOption$ValueTextGetter<T>, net.minecraft.client.option.SimpleOption$Callbacks<T>, com.mojang.serialization.Codec<T>, T, java.util.function.Consumer<T>);
+  public static <T> net.minecraft.client.option.SimpleOption$TooltipFactory<T> emptyTooltip();
+  public static <T> net.minecraft.client.option.SimpleOption$TooltipFactory<T> constantTooltip(net.minecraft.text.Text);
+  public net.minecraft.client.gui.widget.ClickableWidget createWidget(net.minecraft.client.option.GameOptions);
+  public net.minecraft.client.gui.widget.ClickableWidget createWidget(net.minecraft.client.option.GameOptions, int, int, int);
+  public net.minecraft.client.gui.widget.ClickableWidget createWidget(net.minecraft.client.option.GameOptions, int, int, int, java.util.function.Consumer<T>);
+  public T getValue();
+  public com.mojang.serialization.Codec<T> getCodec();
+  public java.lang.String toString();
+  public void setValue(T);
+  public net.minecraft.client.option.SimpleOption$Callbacks<T> getCallbacks();
+}

@@ -1,0 +1,10 @@
+Compiled from "BossBarHud.java"
+public class net.minecraft.client.gui.hud.BossBarHud {
+  public net.minecraft.client.gui.hud.BossBarHud(net.minecraft.client.MinecraftClient);
+  public void render(net.minecraft.client.gui.DrawContext);
+  public void handlePacket(net.minecraft.network.packet.s2c.play.BossBarS2CPacket);
+  public void clear();
+  public boolean shouldPlayDragonMusic();
+  public boolean shouldDarkenSky();
+  public boolean shouldThickenFog();
+}

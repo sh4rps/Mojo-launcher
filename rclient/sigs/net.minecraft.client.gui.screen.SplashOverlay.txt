@@ -1,0 +1,11 @@
+Compiled from "SplashOverlay.java"
+public class net.minecraft.client.gui.screen.SplashOverlay extends net.minecraft.client.gui.screen.Overlay {
+  public static final net.minecraft.util.Identifier LOGO;
+  public static final long RELOAD_COMPLETE_FADE_DURATION = 1000l;
+  public static final long RELOAD_START_FADE_DURATION = 500l;
+  public net.minecraft.client.gui.screen.SplashOverlay(net.minecraft.client.MinecraftClient, net.minecraft.resource.ResourceReload, java.util.function.Consumer<java.util.Optional<java.lang.Throwable>>, boolean);
+  public static void init(net.minecraft.client.texture.TextureManager);
+  public void render(net.minecraft.client.gui.DrawContext, int, int, float);
+  public void tick();
+  public boolean pausesGame();
+}

@@ -1,0 +1,10 @@
+Compiled from "ActionResult.java"
+public interface net.minecraft.util.ActionResult {
+  public static final net.minecraft.util.ActionResult$Success SUCCESS;
+  public static final net.minecraft.util.ActionResult$Success SUCCESS_SERVER;
+  public static final net.minecraft.util.ActionResult$Success CONSUME;
+  public static final net.minecraft.util.ActionResult$Fail FAIL;
+  public static final net.minecraft.util.ActionResult$Pass PASS;
+  public static final net.minecraft.util.ActionResult$PassToDefaultBlockAction PASS_TO_DEFAULT_BLOCK_ACTION;
+  public default boolean isAccepted();
+}

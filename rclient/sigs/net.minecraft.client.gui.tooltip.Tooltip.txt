@@ -1,0 +1,8 @@
+Compiled from "Tooltip.java"
+public class net.minecraft.client.gui.tooltip.Tooltip implements net.minecraft.client.gui.Narratable {
+  public static net.minecraft.client.gui.tooltip.Tooltip of(net.minecraft.text.Text, net.minecraft.text.Text);
+  public static net.minecraft.client.gui.tooltip.Tooltip of(net.minecraft.text.Text);
+  public void appendNarrations(net.minecraft.client.gui.screen.narration.NarrationMessageBuilder);
+  public java.util.List<net.minecraft.text.OrderedText> getLines(net.minecraft.client.MinecraftClient);
+  public static java.util.List<net.minecraft.text.OrderedText> wrapLines(net.minecraft.client.MinecraftClient, net.minecraft.text.Text);
+}

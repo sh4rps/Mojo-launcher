@@ -1,0 +1,38 @@
+Compiled from "DimensionType.java"
+public final class net.minecraft.world.dimension.DimensionType extends java.lang.Record {
+  public static final int SIZE_BITS_Y;
+  public static final int field_33411 = 16;
+  public static final int MAX_HEIGHT;
+  public static final int MAX_COLUMN_HEIGHT;
+  public static final int MIN_HEIGHT;
+  public static final int field_35478;
+  public static final int field_35479;
+  public static final com.mojang.serialization.Codec<net.minecraft.world.dimension.DimensionType> CODEC;
+  public static final com.mojang.serialization.Codec<net.minecraft.world.dimension.DimensionType> NETWORK_CODEC;
+  public static final net.minecraft.network.codec.PacketCodec<net.minecraft.network.RegistryByteBuf, net.minecraft.registry.entry.RegistryEntry<net.minecraft.world.dimension.DimensionType>> PACKET_CODEC;
+  public static final float[] MOON_SIZES;
+  public static final com.mojang.serialization.Codec<net.minecraft.registry.entry.RegistryEntry<net.minecraft.world.dimension.DimensionType>> REGISTRY_CODEC;
+  public net.minecraft.world.dimension.DimensionType(boolean, boolean, boolean, double, int, int, int, net.minecraft.registry.tag.TagKey<net.minecraft.block.Block>, float, net.minecraft.world.dimension.DimensionType$MonsterSettings, net.minecraft.world.dimension.DimensionType$Skybox, net.minecraft.world.dimension.DimensionType$CardinalLightType, net.minecraft.world.attribute.EnvironmentAttributeMap, net.minecraft.registry.entry.RegistryEntryList<net.minecraft.world.attribute.timeline.Timeline>);
+  public static double getCoordinateScaleFactor(net.minecraft.world.dimension.DimensionType, net.minecraft.world.dimension.DimensionType);
+  public static java.nio.file.Path getSaveDirectory(net.minecraft.registry.RegistryKey<net.minecraft.world.World>, java.nio.file.Path);
+  public net.minecraft.util.math.intprovider.IntProvider monsterSpawnLightTest();
+  public int monsterSpawnBlockLightLimit();
+  public boolean getSkybox();
+  public final java.lang.String toString();
+  public final int hashCode();
+  public final boolean equals(java.lang.Object);
+  public boolean hasFixedTime();
+  public boolean hasSkyLight();
+  public boolean hasCeiling();
+  public double coordinateScale();
+  public int minY();
+  public int height();
+  public int logicalHeight();
+  public net.minecraft.registry.tag.TagKey<net.minecraft.block.Block> infiniburn();
+  public float ambientLight();
+  public net.minecraft.world.dimension.DimensionType$MonsterSettings monsterSettings();
+  public net.minecraft.world.dimension.DimensionType$Skybox skybox();
+  public net.minecraft.world.dimension.DimensionType$CardinalLightType cardinalLightType();
+  public net.minecraft.world.attribute.EnvironmentAttributeMap attributes();
+  public net.minecraft.registry.entry.RegistryEntryList<net.minecraft.world.attribute.timeline.Timeline> timelines();
+}

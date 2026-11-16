@@ -1,0 +1,43 @@
+Compiled from "Formatting.java"
+public final class net.minecraft.util.Formatting extends java.lang.Enum<net.minecraft.util.Formatting> implements net.minecraft.util.StringIdentifiable {
+  public static final net.minecraft.util.Formatting BLACK;
+  public static final net.minecraft.util.Formatting DARK_BLUE;
+  public static final net.minecraft.util.Formatting DARK_GREEN;
+  public static final net.minecraft.util.Formatting DARK_AQUA;
+  public static final net.minecraft.util.Formatting DARK_RED;
+  public static final net.minecraft.util.Formatting DARK_PURPLE;
+  public static final net.minecraft.util.Formatting GOLD;
+  public static final net.minecraft.util.Formatting GRAY;
+  public static final net.minecraft.util.Formatting DARK_GRAY;
+  public static final net.minecraft.util.Formatting BLUE;
+  public static final net.minecraft.util.Formatting GREEN;
+  public static final net.minecraft.util.Formatting AQUA;
+  public static final net.minecraft.util.Formatting RED;
+  public static final net.minecraft.util.Formatting LIGHT_PURPLE;
+  public static final net.minecraft.util.Formatting YELLOW;
+  public static final net.minecraft.util.Formatting WHITE;
+  public static final net.minecraft.util.Formatting OBFUSCATED;
+  public static final net.minecraft.util.Formatting BOLD;
+  public static final net.minecraft.util.Formatting STRIKETHROUGH;
+  public static final net.minecraft.util.Formatting UNDERLINE;
+  public static final net.minecraft.util.Formatting ITALIC;
+  public static final net.minecraft.util.Formatting RESET;
+  public static final com.mojang.serialization.Codec<net.minecraft.util.Formatting> CODEC;
+  public static final com.mojang.serialization.Codec<net.minecraft.util.Formatting> COLOR_CODEC;
+  public static final char FORMATTING_CODE_PREFIX = '\u00a7';
+  public static net.minecraft.util.Formatting[] values();
+  public static net.minecraft.util.Formatting valueOf(java.lang.String);
+  public char getCode();
+  public int getColorIndex();
+  public boolean isModifier();
+  public boolean isColor();
+  public java.lang.Integer getColorValue();
+  public java.lang.String getName();
+  public java.lang.String toString();
+  public static java.lang.String strip(java.lang.String);
+  public static net.minecraft.util.Formatting byName(java.lang.String);
+  public static net.minecraft.util.Formatting byColorIndex(int);
+  public static net.minecraft.util.Formatting byCode(char);
+  public static java.util.Collection<java.lang.String> getNames(boolean, boolean);
+  public java.lang.String asString();
+}

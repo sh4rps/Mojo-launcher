@@ -1,0 +1,38 @@
+Compiled from "ClientPlayerInteractionManager.java"
+public class net.minecraft.client.network.ClientPlayerInteractionManager {
+  public net.minecraft.client.network.ClientPlayerInteractionManager(net.minecraft.client.MinecraftClient, net.minecraft.client.network.ClientPlayNetworkHandler);
+  public void copyAbilities(net.minecraft.entity.player.PlayerEntity);
+  public void setGameModes(net.minecraft.world.GameMode, net.minecraft.world.GameMode);
+  public void setGameMode(net.minecraft.world.GameMode);
+  public boolean hasStatusBars();
+  public boolean breakBlock(net.minecraft.util.math.BlockPos);
+  public boolean attackBlock(net.minecraft.util.math.BlockPos, net.minecraft.util.math.Direction);
+  public void cancelBlockBreaking();
+  public boolean updateBlockBreakingProgress(net.minecraft.util.math.BlockPos, net.minecraft.util.math.Direction);
+  public void tick();
+  public net.minecraft.util.ActionResult interactBlock(net.minecraft.client.network.ClientPlayerEntity, net.minecraft.util.Hand, net.minecraft.util.hit.BlockHitResult);
+  public net.minecraft.util.ActionResult interactItem(net.minecraft.entity.player.PlayerEntity, net.minecraft.util.Hand);
+  public net.minecraft.client.network.ClientPlayerEntity createPlayer(net.minecraft.client.world.ClientWorld, net.minecraft.stat.StatHandler, net.minecraft.client.recipebook.ClientRecipeBook);
+  public net.minecraft.client.network.ClientPlayerEntity createPlayer(net.minecraft.client.world.ClientWorld, net.minecraft.stat.StatHandler, net.minecraft.client.recipebook.ClientRecipeBook, net.minecraft.util.PlayerInput, boolean);
+  public void attackEntity(net.minecraft.entity.player.PlayerEntity, net.minecraft.entity.Entity);
+  public net.minecraft.util.ActionResult interactEntity(net.minecraft.entity.player.PlayerEntity, net.minecraft.entity.Entity, net.minecraft.util.Hand);
+  public net.minecraft.util.ActionResult interactEntityAtLocation(net.minecraft.entity.player.PlayerEntity, net.minecraft.entity.Entity, net.minecraft.util.hit.EntityHitResult, net.minecraft.util.Hand);
+  public void clickSlot(int, int, int, net.minecraft.screen.slot.SlotActionType, net.minecraft.entity.player.PlayerEntity);
+  public void clickRecipe(int, net.minecraft.recipe.NetworkRecipeId, boolean);
+  public void clickButton(int, int);
+  public void clickCreativeStack(net.minecraft.item.ItemStack, int);
+  public void dropCreativeStack(net.minecraft.item.ItemStack);
+  public void stopUsingItem(net.minecraft.entity.player.PlayerEntity);
+  public void attackWithPiercingWeapon(net.minecraft.component.type.PiercingWeaponComponent);
+  public boolean hasExperienceBar();
+  public boolean hasLimitedAttackSpeed();
+  public boolean hasRidingInventory();
+  public boolean isFlyingLocked();
+  public net.minecraft.world.GameMode getPreviousGameMode();
+  public net.minecraft.world.GameMode getCurrentGameMode();
+  public boolean isBreakingBlock();
+  public int getBlockBreakingProgress();
+  public void pickItemFromBlock(net.minecraft.util.math.BlockPos, boolean);
+  public void pickItemFromEntity(net.minecraft.entity.Entity, boolean);
+  public void slotChangedState(int, int, boolean);
+}

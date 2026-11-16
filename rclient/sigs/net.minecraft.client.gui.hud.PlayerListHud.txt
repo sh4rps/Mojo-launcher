@@ -1,0 +1,12 @@
+Compiled from "PlayerListHud.java"
+public class net.minecraft.client.gui.hud.PlayerListHud {
+  public static final int MAX_ROWS = 20;
+  public net.minecraft.client.gui.hud.PlayerListHud(net.minecraft.client.MinecraftClient, net.minecraft.client.gui.hud.InGameHud);
+  public net.minecraft.text.Text getPlayerName(net.minecraft.client.network.PlayerListEntry);
+  public void setVisible(boolean);
+  public void render(net.minecraft.client.gui.DrawContext, int, net.minecraft.scoreboard.Scoreboard, net.minecraft.scoreboard.ScoreboardObjective);
+  protected void renderLatencyIcon(net.minecraft.client.gui.DrawContext, int, int, int, net.minecraft.client.network.PlayerListEntry);
+  public void setFooter(net.minecraft.text.Text);
+  public void setHeader(net.minecraft.text.Text);
+  public void clear();
+}

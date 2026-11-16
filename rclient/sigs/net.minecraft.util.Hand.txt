@@ -1,0 +1,8 @@
+Compiled from "Hand.java"
+public final class net.minecraft.util.Hand extends java.lang.Enum<net.minecraft.util.Hand> {
+  public static final net.minecraft.util.Hand MAIN_HAND;
+  public static final net.minecraft.util.Hand OFF_HAND;
+  public static net.minecraft.util.Hand[] values();
+  public static net.minecraft.util.Hand valueOf(java.lang.String);
+  public net.minecraft.entity.EquipmentSlot getEquipmentSlot();
+}
