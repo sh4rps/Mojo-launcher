@@ -1,0 +1,5 @@
+Compiled from "SkinOptionsScreen.java"
+public class net.minecraft.client.gui.screen.option.SkinOptionsScreen extends net.minecraft.client.gui.screen.option.GameOptionsScreen {
+  public net.minecraft.client.gui.screen.option.SkinOptionsScreen(net.minecraft.client.gui.screen.Screen, net.minecraft.client.option.GameOptions);
+  protected void addOptions();
+}

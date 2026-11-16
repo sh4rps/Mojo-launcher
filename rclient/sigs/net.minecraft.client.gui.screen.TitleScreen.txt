@@ -1,0 +1,17 @@
+Compiled from "TitleScreen.java"
+public class net.minecraft.client.gui.screen.TitleScreen extends net.minecraft.client.gui.screen.Screen {
+  public net.minecraft.client.gui.screen.TitleScreen();
+  public net.minecraft.client.gui.screen.TitleScreen(boolean);
+  public net.minecraft.client.gui.screen.TitleScreen(boolean, net.minecraft.client.gui.LogoDrawer);
+  public void tick();
+  public static void registerTextures(net.minecraft.client.texture.TextureManager);
+  public boolean shouldPause();
+  public boolean shouldCloseOnEsc();
+  protected void init();
+  public void render(net.minecraft.client.gui.DrawContext, int, int, float);
+  public void renderBackground(net.minecraft.client.gui.DrawContext, int, int, float);
+  public boolean mouseClicked(net.minecraft.client.gui.Click, boolean);
+  public void removed();
+  public void onDisplayed();
+  public boolean canInterruptOtherScreen();
+}

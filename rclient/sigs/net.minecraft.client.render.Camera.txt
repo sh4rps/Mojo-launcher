@@ -1,0 +1,27 @@
+Compiled from "Camera.java"
+public class net.minecraft.client.render.Camera implements net.minecraft.world.waypoint.TrackedWaypoint$YawProvider {
+  public net.minecraft.client.render.Camera();
+  public void update(net.minecraft.world.World, net.minecraft.entity.Entity, boolean, boolean, float);
+  public void updateEyeHeight();
+  protected void moveBy(float, float, float);
+  protected void setRotation(float, float);
+  protected void setPos(double, double, double);
+  protected void setPos(net.minecraft.util.math.Vec3d);
+  public net.minecraft.util.math.Vec3d getCameraPos();
+  public net.minecraft.util.math.BlockPos getBlockPos();
+  public float getPitch();
+  public float getYaw();
+  public float getCameraYaw();
+  public org.joml.Quaternionf getRotation();
+  public net.minecraft.entity.Entity getFocusedEntity();
+  public boolean isReady();
+  public boolean isThirdPerson();
+  public net.minecraft.world.attribute.EnvironmentAttributeInterpolator getEnvironmentAttributeInterpolator();
+  public net.minecraft.client.render.Camera$Projection getProjection();
+  public net.minecraft.block.enums.CameraSubmersionType getSubmersionType();
+  public org.joml.Vector3fc getHorizontalPlane();
+  public org.joml.Vector3fc getVerticalPlane();
+  public org.joml.Vector3fc getDiagonalPlane();
+  public void reset();
+  public float getLastTickProgress();
+}

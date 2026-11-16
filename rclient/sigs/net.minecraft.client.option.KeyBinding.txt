@@ -1,0 +1,34 @@
+Compiled from "KeyBinding.java"
+public class net.minecraft.client.option.KeyBinding implements java.lang.Comparable<net.minecraft.client.option.KeyBinding> {
+  protected net.minecraft.client.util.InputUtil$Key boundKey;
+  public static void onKeyPressed(net.minecraft.client.util.InputUtil$Key);
+  public static void setKeyPressed(net.minecraft.client.util.InputUtil$Key, boolean);
+  public static void updatePressedStates();
+  public static void unpressAll();
+  public static void restoreToggleStates();
+  public static void untoggleStickyKeys();
+  public static void updateKeysByCode();
+  public net.minecraft.client.option.KeyBinding(java.lang.String, int, net.minecraft.client.option.KeyBinding$Category);
+  public net.minecraft.client.option.KeyBinding(java.lang.String, net.minecraft.client.util.InputUtil$Type, int, net.minecraft.client.option.KeyBinding$Category);
+  public net.minecraft.client.option.KeyBinding(java.lang.String, net.minecraft.client.util.InputUtil$Type, int, net.minecraft.client.option.KeyBinding$Category, int);
+  public boolean isPressed();
+  public net.minecraft.client.option.KeyBinding$Category getCategory();
+  public boolean wasPressed();
+  protected void reset();
+  protected boolean shouldSetOnGameFocus();
+  public java.lang.String getId();
+  public net.minecraft.client.util.InputUtil$Key getDefaultKey();
+  public void setBoundKey(net.minecraft.client.util.InputUtil$Key);
+  public int compareTo(net.minecraft.client.option.KeyBinding);
+  public static java.util.function.Supplier<net.minecraft.text.Text> getLocalizedName(java.lang.String);
+  public boolean equals(net.minecraft.client.option.KeyBinding);
+  public boolean isUnbound();
+  public boolean matchesKey(net.minecraft.client.input.KeyInput);
+  public boolean matchesMouse(net.minecraft.client.gui.Click);
+  public net.minecraft.text.Text getBoundKeyLocalizedText();
+  public boolean isDefault();
+  public java.lang.String getBoundKeyTranslationKey();
+  public void setPressed(boolean);
+  public static net.minecraft.client.option.KeyBinding byId(java.lang.String);
+  public int compareTo(java.lang.Object);
+}

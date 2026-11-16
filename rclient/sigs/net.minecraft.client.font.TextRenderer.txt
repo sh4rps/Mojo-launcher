@@ -1,0 +1,24 @@
+Compiled from "TextRenderer.java"
+public class net.minecraft.client.font.TextRenderer {
+  public static final float FORWARD_SHIFT = 0.03f;
+  public final int fontHeight = 9;
+  public net.minecraft.client.font.TextRenderer(net.minecraft.client.font.TextRenderer$GlyphsProvider);
+  public java.lang.String mirror(java.lang.String);
+  public void draw(java.lang.String, float, float, int, boolean, org.joml.Matrix4f, net.minecraft.client.render.VertexConsumerProvider, net.minecraft.client.font.TextRenderer$TextLayerType, int, int);
+  public void draw(net.minecraft.text.Text, float, float, int, boolean, org.joml.Matrix4f, net.minecraft.client.render.VertexConsumerProvider, net.minecraft.client.font.TextRenderer$TextLayerType, int, int);
+  public void draw(net.minecraft.text.OrderedText, float, float, int, boolean, org.joml.Matrix4f, net.minecraft.client.render.VertexConsumerProvider, net.minecraft.client.font.TextRenderer$TextLayerType, int, int);
+  public void drawWithOutline(net.minecraft.text.OrderedText, float, float, int, int, org.joml.Matrix4f, net.minecraft.client.render.VertexConsumerProvider, int);
+  public net.minecraft.client.font.TextRenderer$GlyphDrawable prepare(java.lang.String, float, float, int, boolean, int);
+  public net.minecraft.client.font.TextRenderer$GlyphDrawable prepare(net.minecraft.text.OrderedText, float, float, int, boolean, boolean, int);
+  public int getWidth(java.lang.String);
+  public int getWidth(net.minecraft.text.StringVisitable);
+  public int getWidth(net.minecraft.text.OrderedText);
+  public java.lang.String trimToWidth(java.lang.String, int, boolean);
+  public java.lang.String trimToWidth(java.lang.String, int);
+  public net.minecraft.text.StringVisitable trimToWidth(net.minecraft.text.StringVisitable, int);
+  public int getWrappedLinesHeight(net.minecraft.text.StringVisitable, int);
+  public java.util.List<net.minecraft.text.OrderedText> wrapLines(net.minecraft.text.StringVisitable, int);
+  public java.util.List<net.minecraft.text.StringVisitable> wrapLinesWithoutLanguage(net.minecraft.text.StringVisitable, int);
+  public boolean isRightToLeft();
+  public net.minecraft.client.font.TextHandler getTextHandler();
+}

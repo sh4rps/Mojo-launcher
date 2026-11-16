@@ -1,0 +1,22 @@
+Compiled from "PlayerListEntry.java"
+public class net.minecraft.client.network.PlayerListEntry {
+  public net.minecraft.client.network.PlayerListEntry(com.mojang.authlib.GameProfile, boolean);
+  public com.mojang.authlib.GameProfile getProfile();
+  public net.minecraft.network.encryption.PublicPlayerSession getSession();
+  public net.minecraft.network.message.MessageVerifier getMessageVerifier();
+  public boolean hasPublicKey();
+  protected void setSession(net.minecraft.network.encryption.PublicPlayerSession);
+  protected void resetSession(boolean);
+  public net.minecraft.world.GameMode getGameMode();
+  protected void setGameMode(net.minecraft.world.GameMode);
+  public int getLatency();
+  protected void setLatency(int);
+  public net.minecraft.entity.player.SkinTextures getSkinTextures();
+  public net.minecraft.scoreboard.Team getScoreboardTeam();
+  public void setDisplayName(net.minecraft.text.Text);
+  public net.minecraft.text.Text getDisplayName();
+  public void setShowHat(boolean);
+  public boolean shouldShowHat();
+  public void setListOrder(int);
+  public int getListOrder();
+}

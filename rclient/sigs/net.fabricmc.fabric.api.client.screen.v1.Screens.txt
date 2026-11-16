@@ -1,0 +1,6 @@
+Compiled from "Screens.java"
+public final class net.fabricmc.fabric.api.client.screen.v1.Screens {
+  public static java.util.List<net.minecraft.class_339> getButtons(net.minecraft.class_437);
+  public static net.minecraft.class_327 getTextRenderer(net.minecraft.class_437);
+  public static net.minecraft.class_310 getClient(net.minecraft.class_437);
+}

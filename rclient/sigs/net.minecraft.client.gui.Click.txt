@@ -1,0 +1,13 @@
+Compiled from "Click.java"
+public final class net.minecraft.client.gui.Click extends java.lang.Record implements net.minecraft.client.input.AbstractInput {
+  public net.minecraft.client.gui.Click(double, double, net.minecraft.client.input.MouseInput);
+  public int getKeycode();
+  public int button();
+  public int modifiers();
+  public final java.lang.String toString();
+  public final int hashCode();
+  public final boolean equals(java.lang.Object);
+  public double x();
+  public double y();
+  public net.minecraft.client.input.MouseInput buttonInfo();
+}

@@ -1,0 +1,10 @@
+Compiled from "OptionsScreen.java"
+public class net.minecraft.client.gui.screen.option.OptionsScreen extends net.minecraft.client.gui.screen.Screen {
+  public static final net.minecraft.text.Text CONTROL_TEXT;
+  public net.minecraft.client.gui.screen.option.OptionsScreen(net.minecraft.client.gui.screen.Screen, net.minecraft.client.option.GameOptions);
+  protected void init();
+  protected void refreshWidgetPositions();
+  public void close();
+  public static net.minecraft.client.gui.widget.CyclingButtonWidget<net.minecraft.world.Difficulty> createDifficultyButtonWidget(int, int, java.lang.String, net.minecraft.client.MinecraftClient);
+  public void removed();
+}

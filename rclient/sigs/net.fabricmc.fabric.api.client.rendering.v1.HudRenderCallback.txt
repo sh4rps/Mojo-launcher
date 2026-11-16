@@ -1,0 +1,5 @@
+Compiled from "HudRenderCallback.java"
+public interface net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback {
+  public static final net.fabricmc.fabric.api.event.Event<net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback> EVENT;
+  public abstract void onHudRender(net.minecraft.class_332, net.minecraft.class_9779);
+}

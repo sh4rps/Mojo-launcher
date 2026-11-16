@@ -1,0 +1,40 @@
+Compiled from "Identifier.java"
+public final class net.minecraft.util.Identifier implements java.lang.Comparable<net.minecraft.util.Identifier> {
+  public static final com.mojang.serialization.Codec<net.minecraft.util.Identifier> CODEC;
+  public static final net.minecraft.network.codec.PacketCodec<io.netty.buffer.ByteBuf, net.minecraft.util.Identifier> PACKET_CODEC;
+  public static final com.mojang.brigadier.exceptions.SimpleCommandExceptionType COMMAND_EXCEPTION;
+  public static final char NAMESPACE_SEPARATOR = ':';
+  public static final java.lang.String DEFAULT_NAMESPACE = "minecraft";
+  public static final java.lang.String REALMS_NAMESPACE = "realms";
+  public static net.minecraft.util.Identifier of(java.lang.String, java.lang.String);
+  public static net.minecraft.util.Identifier of(java.lang.String);
+  public static net.minecraft.util.Identifier ofVanilla(java.lang.String);
+  public static net.minecraft.util.Identifier tryParse(java.lang.String);
+  public static net.minecraft.util.Identifier tryParse(java.lang.String, java.lang.String);
+  public static net.minecraft.util.Identifier splitOn(java.lang.String, char);
+  public static net.minecraft.util.Identifier trySplitOn(java.lang.String, char);
+  public static com.mojang.serialization.DataResult<net.minecraft.util.Identifier> validate(java.lang.String);
+  public java.lang.String getPath();
+  public java.lang.String getNamespace();
+  public net.minecraft.util.Identifier withPath(java.lang.String);
+  public net.minecraft.util.Identifier withPath(java.util.function.UnaryOperator<java.lang.String>);
+  public net.minecraft.util.Identifier withPrefixedPath(java.lang.String);
+  public net.minecraft.util.Identifier withSuffixedPath(java.lang.String);
+  public java.lang.String toString();
+  public boolean equals(java.lang.Object);
+  public int hashCode();
+  public int compareTo(net.minecraft.util.Identifier);
+  public java.lang.String toUnderscoreSeparatedString();
+  public java.lang.String toTranslationKey();
+  public java.lang.String toShortTranslationKey();
+  public java.lang.String toShortString();
+  public java.lang.String toTranslationKey(java.lang.String);
+  public java.lang.String toTranslationKey(java.lang.String, java.lang.String);
+  public static net.minecraft.util.Identifier fromCommandInput(com.mojang.brigadier.StringReader) throws com.mojang.brigadier.exceptions.CommandSyntaxException;
+  public static net.minecraft.util.Identifier fromCommandInputNonEmpty(com.mojang.brigadier.StringReader) throws com.mojang.brigadier.exceptions.CommandSyntaxException;
+  public static boolean isCharValid(char);
+  public static boolean isPathValid(java.lang.String);
+  public static boolean isNamespaceValid(java.lang.String);
+  public static boolean isPathCharacterValid(char);
+  public int compareTo(java.lang.Object);
+}

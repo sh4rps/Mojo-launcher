@@ -1,0 +1,6 @@
+Compiled from "ClientPlayConnectionEvents.java"
+public final class net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents {
+  public static final net.fabricmc.fabric.api.event.Event<net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents$Init> INIT;
+  public static final net.fabricmc.fabric.api.event.Event<net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents$Join> JOIN;
+  public static final net.fabricmc.fabric.api.event.Event<net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents$Disconnect> DISCONNECT;
+}

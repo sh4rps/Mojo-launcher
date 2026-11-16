@@ -1,0 +1,11 @@
+Compiled from "Perspective.java"
+public final class net.minecraft.client.option.Perspective extends java.lang.Enum<net.minecraft.client.option.Perspective> {
+  public static final net.minecraft.client.option.Perspective FIRST_PERSON;
+  public static final net.minecraft.client.option.Perspective THIRD_PERSON_BACK;
+  public static final net.minecraft.client.option.Perspective THIRD_PERSON_FRONT;
+  public static net.minecraft.client.option.Perspective[] values();
+  public static net.minecraft.client.option.Perspective valueOf(java.lang.String);
+  public boolean isFirstPerson();
+  public boolean isFrontView();
+  public net.minecraft.client.option.Perspective next();
+}

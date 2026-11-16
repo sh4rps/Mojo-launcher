@@ -1,0 +1,11 @@
+Compiled from "LanguageOptionsScreen.java"
+public class net.minecraft.client.gui.screen.option.LanguageOptionsScreen extends net.minecraft.client.gui.screen.option.GameOptionsScreen {
+  public net.minecraft.client.gui.screen.option.LanguageOptionsScreen(net.minecraft.client.gui.screen.Screen, net.minecraft.client.option.GameOptions, net.minecraft.client.resource.language.LanguageManager);
+  protected void initHeader();
+  protected void setInitialFocus();
+  protected void initBody();
+  protected void addOptions();
+  protected void initFooter();
+  protected void refreshWidgetPositions();
+  protected boolean allowRotatingPanorama();
+}

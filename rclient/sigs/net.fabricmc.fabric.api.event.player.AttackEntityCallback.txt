@@ -1,0 +1,5 @@
+Compiled from "AttackEntityCallback.java"
+public interface net.fabricmc.fabric.api.event.player.AttackEntityCallback {
+  public static final net.fabricmc.fabric.api.event.Event<net.fabricmc.fabric.api.event.player.AttackEntityCallback> EVENT;
+  public abstract net.minecraft.class_1269 interact(net.minecraft.class_1657, net.minecraft.class_1937, net.minecraft.class_1268, net.minecraft.class_1297, net.minecraft.class_3966);
+}

@@ -1,0 +1,5 @@
+Compiled from "KeyBindingHelper.java"
+public final class net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper {
+  public static net.minecraft.class_304 registerKeyBinding(net.minecraft.class_304);
+  public static net.minecraft.class_3675$class_306 getBoundKeyOf(net.minecraft.class_304);
+}

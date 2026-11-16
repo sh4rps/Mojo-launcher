@@ -1,0 +1,19 @@
+Compiled from "Element.java"
+public interface net.minecraft.client.gui.Element extends net.minecraft.client.gui.navigation.Navigable {
+  public default void mouseMoved(double, double);
+  public default boolean mouseClicked(net.minecraft.client.gui.Click, boolean);
+  public default boolean mouseReleased(net.minecraft.client.gui.Click);
+  public default boolean mouseDragged(net.minecraft.client.gui.Click, double, double);
+  public default boolean mouseScrolled(double, double, double, double);
+  public default boolean keyPressed(net.minecraft.client.input.KeyInput);
+  public default boolean keyReleased(net.minecraft.client.input.KeyInput);
+  public default boolean charTyped(net.minecraft.client.input.CharInput);
+  public default net.minecraft.client.gui.navigation.GuiNavigationPath getNavigationPath(net.minecraft.client.gui.navigation.GuiNavigation);
+  public default boolean isMouseOver(double, double);
+  public abstract void setFocused(boolean);
+  public abstract boolean isFocused();
+  public default boolean isClickable();
+  public default net.minecraft.client.gui.navigation.GuiNavigationPath getFocusedPath();
+  public default net.minecraft.client.gui.ScreenRect getNavigationFocus();
+  public default net.minecraft.client.gui.ScreenRect getBorder(net.minecraft.client.gui.navigation.NavigationDirection);
+}

@@ -1,0 +1,15 @@
+Compiled from "InventoryScreen.java"
+public class net.minecraft.client.gui.screen.ingame.InventoryScreen extends net.minecraft.client.gui.screen.ingame.RecipeBookScreen<net.minecraft.screen.PlayerScreenHandler> {
+  public net.minecraft.client.gui.screen.ingame.InventoryScreen(net.minecraft.entity.player.PlayerEntity);
+  public void handledScreenTick();
+  protected void init();
+  protected net.minecraft.client.gui.ScreenPos getRecipeBookButtonPos();
+  protected void onRecipeBookToggled();
+  protected void drawForeground(net.minecraft.client.gui.DrawContext, int, int);
+  public void render(net.minecraft.client.gui.DrawContext, int, int, float);
+  public boolean showsStatusEffects();
+  protected boolean shouldAddPaddingToGhostResult();
+  protected void drawBackground(net.minecraft.client.gui.DrawContext, float, int, int);
+  public static void drawEntity(net.minecraft.client.gui.DrawContext, int, int, int, int, int, float, float, float, net.minecraft.entity.LivingEntity);
+  public boolean mouseReleased(net.minecraft.client.gui.Click);
+}

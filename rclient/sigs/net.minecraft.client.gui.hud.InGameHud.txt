@@ -1,0 +1,30 @@
+Compiled from "InGameHud.java"
+public class net.minecraft.client.gui.hud.InGameHud {
+  public static final net.minecraft.util.Identifier NAUSEA_TEXTURE;
+  public float vignetteDarkness;
+  public net.minecraft.client.gui.hud.InGameHud(net.minecraft.client.MinecraftClient);
+  public void setDefaultTitleFade();
+  public void render(net.minecraft.client.gui.DrawContext, net.minecraft.client.render.RenderTickCounter);
+  public void renderDebugHud(net.minecraft.client.gui.DrawContext);
+  public void renderDeferredSubtitles();
+  public static net.minecraft.util.Identifier getEffectTexture(net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.effect.StatusEffect>);
+  public void tick(boolean);
+  public void setRecordPlayingOverlay(net.minecraft.text.Text);
+  public void setOverlayMessage(net.minecraft.text.Text, boolean);
+  public void setCanShowChatDisabledScreen(boolean);
+  public boolean shouldShowChatDisabledScreen();
+  public void setTitleTicks(int, int, int);
+  public void setSubtitle(net.minecraft.text.Text);
+  public void setTitle(net.minecraft.text.Text);
+  public void clearTitle();
+  public net.minecraft.client.gui.hud.ChatHud getChatHud();
+  public int getTicks();
+  public net.minecraft.client.font.TextRenderer getTextRenderer();
+  public net.minecraft.client.gui.hud.SpectatorHud getSpectatorHud();
+  public net.minecraft.client.gui.hud.PlayerListHud getPlayerListHud();
+  public void clear();
+  public net.minecraft.client.gui.hud.BossBarHud getBossBarHud();
+  public net.minecraft.client.gui.hud.DebugHud getDebugHud();
+  public void resetDebugHudChunk();
+  public void renderAutosaveIndicator(net.minecraft.client.gui.DrawContext, net.minecraft.client.render.RenderTickCounter);
+}

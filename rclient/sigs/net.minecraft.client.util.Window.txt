@@ -1,0 +1,46 @@
+Compiled from "Window.java"
+public final class net.minecraft.client.util.Window implements java.lang.AutoCloseable {
+  public static final int FRAMEBUFFER_WIDTH_SCALE = 320;
+  public static final int FRAMEBUFFER_HEIGHT_SCALE = 240;
+  public net.minecraft.client.util.Window(net.minecraft.client.WindowEventHandler, net.minecraft.client.util.MonitorTracker, net.minecraft.client.WindowSettings, java.lang.String, java.lang.String);
+  public static java.lang.String getGlfwPlatform();
+  public int getRefreshRate();
+  public boolean shouldClose();
+  public static void acceptError(java.util.function.BiConsumer<java.lang.Integer, java.lang.String>);
+  public void setIcon(net.minecraft.resource.ResourcePack, net.minecraft.client.util.Icons) throws java.io.IOException;
+  public void setPhase(java.lang.String);
+  public void logGlError(int, long);
+  public void logOnGlError();
+  public void setVsync(boolean);
+  public void close();
+  public void swapBuffers(net.minecraft.client.util.tracy.TracyFrameCapturer);
+  public java.util.Optional<net.minecraft.client.util.VideoMode> getFullscreenVideoMode();
+  public void setFullscreenVideoMode(java.util.Optional<net.minecraft.client.util.VideoMode>);
+  public void applyFullscreenVideoMode();
+  public void toggleFullscreen();
+  public void setWindowedSize(int, int);
+  public int calculateScaleFactor(int, boolean);
+  public void setScaleFactor(int);
+  public void setTitle(java.lang.String);
+  public long getHandle();
+  public boolean isFullscreen();
+  public boolean isMinimized();
+  public int getFramebufferWidth();
+  public int getFramebufferHeight();
+  public void setFramebufferWidth(int);
+  public void setFramebufferHeight(int);
+  public int getWidth();
+  public int getHeight();
+  public int getScaledWidth();
+  public int getScaledHeight();
+  public int getX();
+  public int getY();
+  public int getScaleFactor();
+  public net.minecraft.client.util.Monitor getMonitor();
+  public void setRawMouseMotion(boolean);
+  public void setCloseCallback(java.lang.Runnable);
+  public boolean hasZeroWidthOrHeight();
+  public void setAllowCursorChanges(boolean);
+  public void setCursor(net.minecraft.client.gui.cursor.Cursor);
+  public float getMinimumLineWidth();
+}

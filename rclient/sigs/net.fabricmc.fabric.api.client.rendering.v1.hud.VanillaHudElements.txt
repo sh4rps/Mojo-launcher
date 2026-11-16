@@ -1,0 +1,26 @@
+Compiled from "VanillaHudElements.java"
+public final class net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements {
+  public static final net.minecraft.class_2960 MISC_OVERLAYS;
+  public static final net.minecraft.class_2960 CROSSHAIR;
+  public static final net.minecraft.class_2960 SPECTATOR_MENU;
+  public static final net.minecraft.class_2960 HOTBAR;
+  public static final net.minecraft.class_2960 ARMOR_BAR;
+  public static final net.minecraft.class_2960 HEALTH_BAR;
+  public static final net.minecraft.class_2960 FOOD_BAR;
+  public static final net.minecraft.class_2960 AIR_BAR;
+  public static final net.minecraft.class_2960 MOUNT_HEALTH;
+  public static final net.minecraft.class_2960 INFO_BAR;
+  public static final net.minecraft.class_2960 EXPERIENCE_LEVEL;
+  public static final net.minecraft.class_2960 HELD_ITEM_TOOLTIP;
+  public static final net.minecraft.class_2960 SPECTATOR_TOOLTIP;
+  public static final net.minecraft.class_2960 STATUS_EFFECTS;
+  public static final net.minecraft.class_2960 BOSS_BAR;
+  public static final net.minecraft.class_2960 SLEEP;
+  public static final net.minecraft.class_2960 DEMO_TIMER;
+  public static final net.minecraft.class_2960 SCOREBOARD;
+  public static final net.minecraft.class_2960 OVERLAY_MESSAGE;
+  public static final net.minecraft.class_2960 TITLE_AND_SUBTITLE;
+  public static final net.minecraft.class_2960 CHAT;
+  public static final net.minecraft.class_2960 PLAYER_LIST;
+  public static final net.minecraft.class_2960 SUBTITLES;
+}

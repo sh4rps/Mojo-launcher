@@ -1,0 +1,6 @@
+Compiled from "PlayerSkinProvider.java"
+public class net.minecraft.client.texture.PlayerSkinProvider {
+  public net.minecraft.client.texture.PlayerSkinProvider(java.nio.file.Path, net.minecraft.util.ApiServices, net.minecraft.client.texture.PlayerSkinTextureDownloader, java.util.concurrent.Executor);
+  public java.util.function.Supplier<net.minecraft.entity.player.SkinTextures> supplySkinTextures(com.mojang.authlib.GameProfile, boolean);
+  public java.util.concurrent.CompletableFuture<java.util.Optional<net.minecraft.entity.player.SkinTextures>> fetchSkinTextures(com.mojang.authlib.GameProfile);
+}

@@ -1,0 +1,47 @@
+Compiled from "GameRenderer.java"
+public class net.minecraft.client.render.GameRenderer implements net.minecraft.world.waypoint.TrackedWaypoint$PitchProvider,java.lang.AutoCloseable {
+  public static final int field_49904 = 10;
+  public static final float CAMERA_DEPTH = 0.05f;
+  public static final float field_60107 = 100.0f;
+  public final net.minecraft.client.render.item.HeldItemRenderer firstPersonRenderer;
+  protected final net.minecraft.client.gui.CubeMapRenderer panoramaRenderer;
+  protected final net.minecraft.client.gui.RotatingCubeMapRenderer rotatingPanoramaRenderer;
+  public net.minecraft.client.render.GameRenderer(net.minecraft.client.MinecraftClient, net.minecraft.client.render.item.HeldItemRenderer, net.minecraft.client.render.BufferBuilderStorage, net.minecraft.client.render.block.BlockRenderManager);
+  public void close();
+  public net.minecraft.client.render.command.OrderedRenderCommandQueueImpl getEntityRenderCommandQueue();
+  public net.minecraft.client.render.command.RenderDispatcher getEntityRenderDispatcher();
+  public net.minecraft.client.render.state.WorldRenderState getEntityRenderStates();
+  public void setBlockOutlineEnabled(boolean);
+  public void setCameraOverride(net.minecraft.client.render.CameraOverride);
+  public net.minecraft.client.render.CameraOverride getCameraOverride();
+  public boolean isRenderingPanorama();
+  public void clearPostProcessor();
+  public void togglePostProcessorEnabled();
+  public void onCameraEntitySet(net.minecraft.entity.Entity);
+  public void renderBlur();
+  public void preloadPrograms(net.minecraft.resource.ResourceFactory);
+  public void tick();
+  public net.minecraft.util.Identifier getPostProcessorId();
+  public void onResized(int, int);
+  public void updateCrosshairTarget(float);
+  public org.joml.Matrix4f getBasicProjectionMatrix(float);
+  public float getFarPlaneDistance();
+  public static float getNightVisionStrength(net.minecraft.entity.LivingEntity, float);
+  public void render(net.minecraft.client.render.RenderTickCounter, boolean);
+  public void updateCamera(net.minecraft.client.render.RenderTickCounter);
+  public void renderWorld(net.minecraft.client.render.RenderTickCounter);
+  public void reset();
+  public void showFloatingItem(net.minecraft.item.ItemStack);
+  public net.minecraft.client.MinecraftClient getClient();
+  public float getSkyDarkness(float);
+  public float getViewDistanceBlocks();
+  public net.minecraft.client.render.Camera getCamera();
+  public net.minecraft.client.render.LightmapTextureManager getLightmapTextureManager();
+  public net.minecraft.client.render.OverlayTexture getOverlayTexture();
+  public net.minecraft.util.math.Vec3d project(net.minecraft.util.math.Vec3d);
+  public double getPitch();
+  public net.minecraft.client.gl.GlobalSettings getGlobalSettings();
+  public net.minecraft.client.render.DiffuseLighting getDiffuseLighting();
+  public void setWorld(net.minecraft.client.world.ClientWorld);
+  public net.minecraft.client.gui.RotatingCubeMapRenderer getRotatingPanoramaRenderer();
+}

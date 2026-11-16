@@ -1,0 +1,15 @@
+Compiled from "MultiplayerScreen.java"
+public class net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen extends net.minecraft.client.gui.screen.Screen {
+  protected net.minecraft.client.gui.screen.multiplayer.MultiplayerServerListWidget serverListWidget;
+  public net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen(net.minecraft.client.gui.screen.Screen);
+  protected void init();
+  protected void refreshWidgetPositions();
+  public void close();
+  public void tick();
+  public void removed();
+  public boolean keyPressed(net.minecraft.client.input.KeyInput);
+  public void connect(net.minecraft.client.network.ServerInfo);
+  protected void updateButtonActivationStates();
+  public net.minecraft.client.network.MultiplayerServerListPinger getServerListPinger();
+  public net.minecraft.client.option.ServerList getServerList();
+}

@@ -1,0 +1,11 @@
+Compiled from "PackScreen.java"
+public class net.minecraft.client.gui.screen.pack.PackScreen extends net.minecraft.client.gui.screen.Screen {
+  public net.minecraft.client.gui.screen.pack.PackScreen(net.minecraft.resource.ResourcePackManager, java.util.function.Consumer<net.minecraft.resource.ResourcePackManager>, java.nio.file.Path, net.minecraft.text.Text);
+  public void close();
+  protected void init();
+  protected void setInitialFocus();
+  protected void refreshWidgetPositions();
+  public void tick();
+  protected static void copyPacks(net.minecraft.client.MinecraftClient, java.util.List<java.nio.file.Path>, java.nio.file.Path);
+  public void onFilesDropped(java.util.List<java.nio.file.Path>);
+}

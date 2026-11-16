@@ -1,0 +1,28 @@
+Compiled from "PlayerEntityRenderState.java"
+public class net.minecraft.client.render.entity.state.PlayerEntityRenderState extends net.minecraft.client.render.entity.state.BipedEntityRenderState {
+  public net.minecraft.entity.player.SkinTextures skinTextures;
+  public float field_53536;
+  public float field_53537;
+  public float field_53538;
+  public int stuckArrowCount;
+  public int stingerCount;
+  public boolean spectator;
+  public boolean hatVisible;
+  public boolean jacketVisible;
+  public boolean leftPantsLegVisible;
+  public boolean rightPantsLegVisible;
+  public boolean leftSleeveVisible;
+  public boolean rightSleeveVisible;
+  public boolean capeVisible;
+  public float glidingTicks;
+  public boolean applyFlyingRotation;
+  public float flyingRotation;
+  public net.minecraft.text.Text playerName;
+  public net.minecraft.entity.passive.ParrotEntity$Variant leftShoulderParrotVariant;
+  public net.minecraft.entity.passive.ParrotEntity$Variant rightShoulderParrotVariant;
+  public int id;
+  public boolean extraEars;
+  public final net.minecraft.client.render.item.ItemRenderState spyglassState;
+  public net.minecraft.client.render.entity.state.PlayerEntityRenderState();
+  public float getGlidingProgress();
+}

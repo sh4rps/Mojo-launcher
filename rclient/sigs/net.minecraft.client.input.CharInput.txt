@@ -1,0 +1,11 @@
+Compiled from "CharInput.java"
+public final class net.minecraft.client.input.CharInput extends java.lang.Record {
+  public net.minecraft.client.input.CharInput(int, int);
+  public java.lang.String asString();
+  public boolean isValidChar();
+  public final java.lang.String toString();
+  public final int hashCode();
+  public final boolean equals(java.lang.Object);
+  public int codepoint();
+  public int modifiers();
+}

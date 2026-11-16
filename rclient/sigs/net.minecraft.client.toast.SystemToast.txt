@@ -1,0 +1,24 @@
+Compiled from "SystemToast.java"
+public class net.minecraft.client.toast.SystemToast implements net.minecraft.client.toast.Toast {
+  public net.minecraft.client.toast.SystemToast(net.minecraft.client.toast.SystemToast$Type, net.minecraft.text.Text, net.minecraft.text.Text);
+  public static net.minecraft.client.toast.SystemToast create(net.minecraft.client.MinecraftClient, net.minecraft.client.toast.SystemToast$Type, net.minecraft.text.Text, net.minecraft.text.Text);
+  public int getWidth();
+  public int getHeight();
+  public void hide();
+  public net.minecraft.client.toast.Toast$Visibility getVisibility();
+  public void update(net.minecraft.client.toast.ToastManager, long);
+  public void draw(net.minecraft.client.gui.DrawContext, net.minecraft.client.font.TextRenderer, long);
+  public void setContent(net.minecraft.text.Text, net.minecraft.text.Text);
+  public net.minecraft.client.toast.SystemToast$Type getType();
+  public static void add(net.minecraft.client.toast.ToastManager, net.minecraft.client.toast.SystemToast$Type, net.minecraft.text.Text, net.minecraft.text.Text);
+  public static void show(net.minecraft.client.toast.ToastManager, net.minecraft.client.toast.SystemToast$Type, net.minecraft.text.Text, net.minecraft.text.Text);
+  public static void hide(net.minecraft.client.toast.ToastManager, net.minecraft.client.toast.SystemToast$Type);
+  public static void addWorldAccessFailureToast(net.minecraft.client.MinecraftClient, java.lang.String);
+  public static void addWorldDeleteFailureToast(net.minecraft.client.MinecraftClient, java.lang.String);
+  public static void addPackCopyFailure(net.minecraft.client.MinecraftClient, java.lang.String);
+  public static void addFileDropFailure(net.minecraft.client.MinecraftClient, int);
+  public static void addLowDiskSpace(net.minecraft.client.MinecraftClient);
+  public static void addChunkLoadFailure(net.minecraft.client.MinecraftClient, net.minecraft.util.math.ChunkPos);
+  public static void addChunkSaveFailure(net.minecraft.client.MinecraftClient, net.minecraft.util.math.ChunkPos);
+  public java.lang.Object getType();
+}
