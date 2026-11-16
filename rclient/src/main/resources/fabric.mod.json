@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "rclient",
+  "version": "${version}",
+  "name": "RClient",
+  "description": "Modular PvP / HUD / utility client for Minecraft Java.",
+  "authors": ["RClient"],
+  "environment": "client",
+  "entrypoints": { "client": ["com.rclient.RClient"] },
+  "depends": { "fabricloader": ">=0.16.0", "minecraft": "~1.21.11", "java": ">=21", "fabric-api": "*" }
+}

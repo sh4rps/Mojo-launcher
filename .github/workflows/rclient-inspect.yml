@@ -1,0 +1,39 @@
+name: RClient inspect API
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.14.3' }
+      - name: Resolve versions
+        working-directory: rclient
+        run: ./scripts/resolve-versions.sh 1.21.11
+      - name: Compile stub (fills loom cache)
+        working-directory: rclient
+        run: gradle --no-daemon compileJava
+      - name: javap
+        working-directory: rclient
+        run: |
+          mkdir -p sigs
+          MC=$(find ~/.gradle .gradle -name '*.jar' -size +5M 2>/dev/null | while read j; do unzip -l "$j" 2>/dev/null | grep -q "net/minecraft/client/MinecraftClient.class" && echo "$j"; done | head -1)
+          echo "MC jar: $MC"; echo "$MC" > sigs/_mcjar.txt
+          FAPI=$(find ~/.gradle -name 'fabric-*-v*-*.jar' -not -name '*sources*' 2>/dev/null | tr '\n' ':')
+          CP="$MC:$FAPI"
+          while read c; do
+            [ -z "$c" ] && continue
+            javap -cp "$CP" -protected -constants "$c" > "sigs/$c.txt" 2>&1 || true
+          done < scripts/classes.txt
+          ls sigs | wc -l
+      - name: Commit sigs
+        run: |
+          git config user.name rclient-ci; git config user.email ci@example.com
+          git add rclient/sigs rclient/gradle.properties
+          git commit -m "rclient: API signatures [skip ci]" || true
+          git push || true
