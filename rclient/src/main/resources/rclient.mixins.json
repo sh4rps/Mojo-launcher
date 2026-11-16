@@ -1,0 +1,8 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.rclient.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["GameRendererMixin", "EntityMixin", "CameraMixin"],
+  "injectors": { "defaultRequire": 0 }
+}
