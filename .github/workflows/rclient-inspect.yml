@@ -35,6 +35,10 @@ jobs:
             [ -z "$c" ] && continue
             javap -cp "$CP" -private "$c" > "sigs/private/$c.txt" 2>&1 || true
           done < scripts/classes-private.txt
+          mkdir -p sigs/code
+          for c in net.minecraft.client.render.Camera net.minecraft.client.render.GameRenderer net.minecraft.entity.Entity; do
+            javap -cp "$CP" -private -c "$c" > "sigs/code/$c.txt" 2>&1 || true
+          done
           ls sigs | wc -l
       - name: Commit sigs
         run: |
