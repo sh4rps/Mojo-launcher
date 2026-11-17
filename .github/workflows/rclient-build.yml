@@ -37,7 +37,7 @@ jobs:
       - name: Debug refmap
         working-directory: rclient
         run: |
-          echo "== refmap files"; find build -iname '*refmap*' | head
+          echo "== refmap files"; find build -iname "*refmap*" | head; cat build/classes/java/main/rclient-refmap.json
           echo "== classes dir top"; ls build/classes/java/main | head
           echo "== mixins json in jar"; unzip -p build/libs/rclient-1.0.0.jar rclient.mixins.json
           echo "== compile info"; gradle --no-daemon compileJava --rerun-tasks --info 2>&1 | grep -iE "mixin|refmap|processor|AinMap|AoutRef|-A" | head -30
