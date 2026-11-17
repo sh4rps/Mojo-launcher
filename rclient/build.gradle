@@ -25,3 +25,11 @@ java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
 }
+
+loom {
+    mixin {
+        // Yarn (non-Mojmap) projects need the legacy AP to emit rclient-refmap.json
+        useLegacyMixinAp = true
+        defaultRefmapName = "rclient-refmap.json"
+    }
+}
