@@ -1,0 +1,32 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.robin.pro'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'com.robin.pro'
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName '1.0'
+    }
+    signingConfigs {
+        release {
+            storeFile file("${rootDir}/../v2/robin.jks")
+            storePassword 'mojogames'
+            keyAlias 'mojo'
+            keyPassword 'mojogames'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    lint { abortOnError false; checkReleaseBuilds false }
+}
