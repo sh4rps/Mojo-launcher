@@ -59,7 +59,7 @@ public class MainActivity extends Activity {
         addSlider(col, "Top offset (dp)", "y", 0, 120, 8);
         addSlider(col, "Left / right shift (dp)", "x", -150, 150, 0);
         addSlider(col, "Text size", "t", 8, 24, 14);
-        col.addView(text("Island appears only when a notification arrives, and stays hidden in landscape (games/videos). Tap it to open that notification.", 12, 0xFF9A9AAE), m);
+        col.addView(text("Island stays on top in portrait and widens when a notification arrives (shows the app name, title and text). It hides in landscape (games/videos). Tap the wide island to open that notification.", 12, 0xFF9A9AAE), m);
         ScrollView sv = new ScrollView(this);
         sv.setBackgroundColor(0xFF14141C);
         sv.addView(col);
@@ -75,6 +75,7 @@ public class MainActivity extends Activity {
         s.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override public void onProgressChanged(SeekBar sb, int v, boolean user) {
                 p.edit().putInt(key, v + min).apply();
+                if (user && IslandService.running) IslandService.start(MainActivity.this);
                 t.setText(label + ": " + (v + min));
                 
             }

@@ -39,6 +39,7 @@ public class IslandService extends Service {
     private WindowManager.LayoutParams lp;
     private boolean attached;
     private PendingIntent target;
+    private boolean expanded;
     private ValueAnimator anim;
     private final Handler h = new Handler(Looper.getMainLooper());
     private final Runnable hideTask = this::collapse;
@@ -49,9 +50,11 @@ public class IslandService extends Service {
         if (Build.VERSION.SDK_INT >= 26) c.startForegroundService(i); else c.startService(i);
     }
 
-    public static void show(Drawable ic, String t, String b, PendingIntent pi) {
+    public static void show(Drawable ic, String t, String b, PendingIntent pi) { show(ic, "", t, b, pi); }
+
+    public static void show(Drawable ic, String label, String t, String b, PendingIntent pi) {
         IslandService s = inst;
-        if (s != null) s.h.post(() -> s.display(ic, t, b, pi));
+        if (s != null) s.h.post(() -> s.display(ic, label, t, b, pi));
     }
 
     @Override public IBinder onBind(Intent i) { return null; }
@@ -81,7 +84,7 @@ public class IslandService extends Service {
         view.addView(tx, new LinearLayout.LayoutParams(0, -2, 1f));
         view.setOnClickListener(v -> {
             if (target != null) { try { target.send(); } catch (Exception ignored) { } }
-            hideNow();
+            if (expanded) collapse();
         });
         lp = new WindowManager.LayoutParams(-2, -2,
                 Build.VERSION.SDK_INT >= 26 ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_PHONE,
@@ -93,19 +96,39 @@ public class IslandService extends Service {
         dl = new DisplayManager.DisplayListener() {
             @Override public void onDisplayAdded(int id) { }
             @Override public void onDisplayRemoved(int id) { }
-            @Override public void onDisplayChanged(int id) { if (landscape()) hideNow(); }
+            @Override public void onDisplayChanged(int id) { if (landscape()) hideNow(); else if (!attached) attachIdle(); }
         };
         dm.registerDisplayListener(dl, h);
+        if (!landscape()) attachIdle();
     }
 
-    @Override public int onStartCommand(Intent i, int f, int id) { return START_STICKY; }
+    @Override public int onStartCommand(Intent i, int f, int id) {
+        if (!landscape()) { if (!attached) attachIdle(); else if (!expanded) applyIdle(); }
+        return START_STICKY;
+    }
+
+    private void applyIdle() {
+        android.content.SharedPreferences p = getSharedPreferences("island", 0);
+        lp.width = dp(p.getInt("w", 150)); lp.height = dp(p.getInt("h", 34));
+        lp.x = dp(p.getInt("x", 0)); lp.y = dp(p.getInt("y", 8));
+        bg.setCornerRadius(lp.height / 2f);
+        icon.setAlpha(0f); title.setAlpha(0f); body.setAlpha(0f);
+        view.setAlpha(1f);
+        if (attached) { try { wm.updateViewLayout(view, lp); } catch (Exception ignored) { } }
+    }
+
+    private void attachIdle() {
+        if (attached) return;
+        applyIdle();
+        try { wm.addView(view, lp); attached = true; expanded = false; } catch (Exception ignored) { }
+    }
 
     private boolean landscape() {
         int r = wm.getDefaultDisplay().getRotation();
         return r == Surface.ROTATION_90 || r == Surface.ROTATION_270;
     }
 
-    private void display(Drawable ic, String t, String b, PendingIntent pi) {
+    private void display(Drawable ic, String label, String t, String b, PendingIntent pi) {
         if (landscape()) return;
         android.content.SharedPreferences p = getSharedPreferences("island", 0);
         final int w = dp(p.getInt("w", 150)), hh = dp(p.getInt("h", 34));
@@ -115,18 +138,16 @@ public class IslandService extends Service {
         int ts = p.getInt("t", 14);
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, ts);
         body.setTextSize(TypedValue.COMPLEX_UNIT_SP, Math.max(8, ts - 2));
-        title.setText(t.isEmpty() ? " " : t); body.setText(b);
+        String head = label.isEmpty() ? t : (t.isEmpty() ? label : label + "  \u2022  " + t);
+        title.setText(head.isEmpty() ? " " : head); body.setText(b);
         body.setVisibility(b.isEmpty() ? View.GONE : View.VISIBLE);
         icon.setImageDrawable(ic);
         target = pi;
         lp.x = dp(p.getInt("x", 0)); lp.y = dp(p.getInt("y", 8));
         h.removeCallbacks(hideTask);
         if (anim != null) anim.cancel();
-        if (!attached) {
-            lp.width = w; lp.height = hh;
-            view.setAlpha(0f);
-            try { wm.addView(view, lp); attached = true; } catch (Exception e) { return; }
-        }
+        if (!attached) { attachIdle(); if (!attached) return; }
+        expanded = true;
         final int sw0 = lp.width, sh0 = lp.height;
         animate(sw0, sh0, ew, eh, w, hh, true, () -> h.postDelayed(hideTask, 5000));
     }
@@ -145,7 +166,7 @@ public class IslandService extends Service {
             float k = (float) lp.height / Math.max(1, eh());
             bg.setCornerRadius(Math.min(lp.height / 2f, r0 + (r1 - r0) * Math.min(1f, k)));
             float e = show ? f : 1f - f;
-            view.setAlpha(show ? Math.min(1f, f * 4f) : Math.min(1f, (1f - f) * 3f));
+            view.setAlpha(1f);
             float c = show ? Math.max(0f, (f - 0.45f) * 1.8f) : Math.max(0f, 1f - f * 2.2f);
             icon.setAlpha(c); title.setAlpha(c); body.setAlpha(c);
             try { wm.updateViewLayout(view, lp); } catch (Exception ignored) { }
@@ -164,12 +185,13 @@ public class IslandService extends Service {
         if (!attached) return;
         android.content.SharedPreferences p = getSharedPreferences("island", 0);
         int w = dp(p.getInt("w", 150)), hh = dp(p.getInt("h", 34));
-        animate(lp.width, lp.height, w, hh, w, hh, false, this::hideNow);
+        animate(lp.width, lp.height, w, hh, w, hh, false, () -> { expanded = false; applyIdle(); });
     }
 
     private void hideNow() {
         h.removeCallbacks(hideTask);
         if (anim != null) anim.cancel();
+        expanded = false;
         if (attached) { try { wm.removeView(view); } catch (Exception ignored) { } attached = false; }
     }
 

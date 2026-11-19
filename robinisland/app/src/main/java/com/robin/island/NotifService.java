@@ -17,7 +17,8 @@ public class NotifService extends NotificationListenerService {
             CharSequence t = e.getCharSequence(Notification.EXTRA_TITLE), b = e.getCharSequence(Notification.EXTRA_TEXT);
             if (t == null && b == null) return;
             Drawable ic = getPackageManager().getApplicationIcon(sbn.getPackageName());
-            IslandService.show(ic, t == null ? "" : t.toString(), b == null ? "" : b.toString(), n.contentIntent);
+            CharSequence lbl = getPackageManager().getApplicationLabel(getPackageManager().getApplicationInfo(sbn.getPackageName(), 0));
+            IslandService.show(ic, lbl.toString(), t == null ? "" : t.toString(), b == null ? "" : b.toString(), n.contentIntent);
         } catch (Exception ignored) { }
     }
 }
