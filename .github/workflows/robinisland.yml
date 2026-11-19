@@ -1,0 +1,35 @@
+name: ROBINISLAND build
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Publish a GitHub release'
+        default: 'true'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.9' }
+      - name: Build
+        working-directory: robinisland
+        run: gradle --no-daemon assembleRelease
+      - name: Collect APK
+        run: |
+          mkdir -p out
+          cp robinisland/app/build/outputs/apk/release/*.apk out/ROBINISLAND.apk
+          ls -la out
+      - uses: actions/upload-artifact@v4
+        with: { name: robinisland-apk, path: out/ROBINISLAND.apk }
+      - name: Release
+        if: ${{ github.event.inputs.release == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete robinisland-v1.0 --cleanup-tag --yes || true
+          gh release create robinisland-v1.0 out/ROBINISLAND.apk --title "ROBINISLAND 1.0" --notes "Always-active floating island overlay with adjustable size."
