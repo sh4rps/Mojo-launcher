@@ -47,12 +47,19 @@ public class MainActivity extends Activity {
             try { startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName()))); } catch (Exception ignored) { }
         }), m);
 
-        addSlider(col, "Width (dp)", "w", 60, 400, 120);
-        addSlider(col, "Height (dp)", "h", 20, 80, 32);
-        addSlider(col, "Top offset (dp)", "y", 0, 120, 6);
+        col.addView(btn("3b. Allow notification access (island shows notifications)", false, () -> {
+            try { startActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")); } catch (Exception ignored) { }
+        }), m);
+        col.addView(btn("Test island", false, () -> {
+            if (!IslandService.running) { Toast.makeText(this, "Start the island first", Toast.LENGTH_SHORT).show(); return; }
+            IslandService.show(getApplicationInfo().loadIcon(getPackageManager()), "Robin", "Island is working", null);
+        }), m);
+        addSlider(col, "Width (dp)", "w", 60, 400, 150);
+        addSlider(col, "Height (dp)", "h", 20, 80, 34);
+        addSlider(col, "Top offset (dp)", "y", 0, 120, 8);
         addSlider(col, "Left / right shift (dp)", "x", -150, 150, 0);
-        addSlider(col, "Text size", "t", 8, 24, 13);
-        col.addView(text("Tap the island to expand/collapse it.", 12, 0xFF9A9AAE), m);
+        addSlider(col, "Text size", "t", 8, 24, 14);
+        col.addView(text("Island appears only when a notification arrives, and stays hidden in landscape (games/videos). Tap it to open that notification.", 12, 0xFF9A9AAE), m);
         ScrollView sv = new ScrollView(this);
         sv.setBackgroundColor(0xFF14141C);
         sv.addView(col);
@@ -69,7 +76,7 @@ public class MainActivity extends Activity {
             @Override public void onProgressChanged(SeekBar sb, int v, boolean user) {
                 p.edit().putInt(key, v + min).apply();
                 t.setText(label + ": " + (v + min));
-                if (user && IslandService.running) IslandService.start(MainActivity.this);
+                
             }
             @Override public void onStartTrackingTouch(SeekBar sb) { }
             @Override public void onStopTrackingTouch(SeekBar sb) { }
