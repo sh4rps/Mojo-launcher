@@ -1,0 +1,44 @@
+name: Robin Windows build (Winlator fork build)
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Publish a GitHub release'
+        default: 'true'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get Winlator app source
+        run: git clone --depth 1 https://github.com/brunodev85/winlator-app src
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - name: Rename app label
+        working-directory: src
+        run: sed -i 's#<string name="app_name">Winlator</string>#<string name="app_name">Robin Windows</string>#' app/src/main/res/values/strings.xml
+      - name: Install NDK and CMake
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses >/dev/null || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;24.0.8215888" "cmake;3.22.1" "platforms;android-35" "build-tools;35.0.0"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build
+        working-directory: src
+        run: ./gradlew --no-daemon assembleDebug
+      - name: Collect APK
+        run: |
+          mkdir -p out
+          cp src/app/build/outputs/apk/debug/*.apk out/RobinWindows.apk
+          ls -la out
+      - uses: actions/upload-artifact@v4
+        with: { name: robinwin-apk, path: out/RobinWindows.apk }
+      - name: Release
+        if: ${{ github.event.inputs.release == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete robinwin-v1.0 --cleanup-tag --yes || true
+          gh release create robinwin-v1.0 out/RobinWindows.apk --title "Robin Windows 1.0" --notes "Winlator (open source, by brunodev85) built from source and renamed. Runs Windows .exe via Wine + Box64 on Android 8+ ARM64 phones."
