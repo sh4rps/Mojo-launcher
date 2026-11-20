@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "autocartpvp",
+  "version": "${version}",
+  "name": "Auto CartPvP",
+  "description": "Client-side rail, TNT minecart, and Flame bow sequence (1.21.4 port with instant-shoot fix).",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["dev.kodari.autocartpvp.AutoCartClient"],
+    "modmenu": ["dev.kodari.autocartpvp.ModMenuIntegration"]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.4",
+    "java": ">=21",
+    "fabric-api": "*",
+    "yet_another_config_lib_v3": ">=3.6.0"
+  },
+  "suggests": { "modmenu": "*" }
+}
