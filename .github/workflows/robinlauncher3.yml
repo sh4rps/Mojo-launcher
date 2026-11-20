@@ -1,0 +1,61 @@
+name: Robin Launcher 3 (MojoLauncher fork) build
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Publish a GitHub release'
+        default: 'true'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get MojoLauncher source (GPLv3, with submodules)
+        run: git clone --depth 1 --recurse-submodules --shallow-submodules https://github.com/MojoLauncher/MojoLauncher src
+      - name: Get LTW renderer
+        uses: dawidd6/action-download-artifact@v6
+        continue-on-error: true
+        with:
+          repo: MojoLauncher/LTW
+          workflow: android.yml
+          workflow_conclusion: success
+          name: output-aar
+          path: src/app_mojo/libs
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.14.5' }
+      - name: Install NDK
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses >/dev/null || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;29.0.14206865" "platforms;android-36" "build-tools;36.0.0"
+      - name: Fork identity (separate package + name so it installs beside the original)
+        working-directory: src
+        run: |
+          sed -i 's/git\.artdeell\.mjlaunch/com.robin.launcher3/g' app_mojo/build.gradle
+          sed -i 's#<string name="app_short_name">[^<]*</string>#<string name="app_short_name">Robin Launcher 3</string>#' app_mojo/src/main/res/values*/strings.xml
+          grep -n "com.robin.launcher3" app_mojo/build.gradle
+          grep -rn 'app_short_name">' app_mojo/src/main/res/values/strings.xml
+      - name: Build
+        working-directory: src
+        run: gradle --no-daemon :app_mojo:assembleFullRelease
+      - name: Sign
+        run: |
+          BT=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)
+          APK=$(ls src/app_mojo/build/outputs/apk/full/release/*.apk | head -1)
+          echo "built: $APK"
+          $BT/zipalign -f -p 4 "$APK" aligned.apk
+          $BT/apksigner sign --ks v2/robin.jks --ks-key-alias mojo --ks-pass pass:mojogames --key-pass pass:mojogames --out RobinLauncher3.apk aligned.apk
+          $BT/apksigner verify RobinLauncher3.apk && ls -la RobinLauncher3.apk
+      - uses: actions/upload-artifact@v4
+        with: { name: robinlauncher3-apk, path: RobinLauncher3.apk }
+      - name: Release
+        if: ${{ github.event.inputs.release == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete robinlauncher3-v1 --cleanup-tag --yes || true
+          gh release create robinlauncher3-v1 RobinLauncher3.apk --title "Robin Launcher 3" --notes "Fork of MojoLauncher (GPLv3, based on PojavLauncher) built from the upstream source with its own package id (com.robin.launcher3) and name, so it installs next to the original. Includes Modrinth/CurseForge modpack support from upstream. Credit: MojoLauncher team, PojavLauncher team."
