@@ -138,7 +138,7 @@ public class CartSequence {
         if (hd < 1.8) { cancel(mc, "Too close: step back at least 2 blocks"); return; }
         // point on the line eye -> cart, 1.2 blocks before the cart: the fire goes in that cell so the arrow passes through it
         double qx = c.x + hx / hd * 1.2, qz = c.z + hz / hd * 1.2, qy = c.y + (eye.y - c.y) * (1.2 / hd);
-        BlockPos fire = BlockPos.ofFloor(qx, qy, qz);
+        BlockPos fire = new BlockPos(net.minecraft.util.math.MathHelper.floor(qx), net.minecraft.util.math.MathHelper.floor(qy), net.minecraft.util.math.MathHelper.floor(qz));
         BlockPos sup = fire.down();
         BlockPos pb = mc.player.getBlockPos();
         if (fire.getY() != railPos.getY() || fire.equals(railPos) || fire.equals(pb) || fire.equals(pb.up())) { cancel(mc, "Bad angle or too close for the fire"); return; }
