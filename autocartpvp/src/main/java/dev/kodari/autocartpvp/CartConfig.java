@@ -30,6 +30,10 @@ public class CartConfig {
     @SerialEntry public boolean hud = true;
     /** Ticks to hold the bow before releasing. A bow released under ~3 ticks never fires; 5 leaves margin for server lag. */
     @SerialEntry public int drawTicks = 5;
+    /** true: rail, cart, flint fire, crossbow shot through the fire in one tick. false: old Flame bow sequence. */
+    @SerialEntry public boolean crossbowMode = true;
+    /** In crossbow mode, load the crossbow first when it is not already charged. */
+    @SerialEntry public boolean autoLoad = true;
 
     public static CartConfig get() { return HANDLER.instance(); }
 
@@ -41,6 +45,14 @@ public class CartConfig {
                 .category(ConfigCategory.createBuilder().name(Text.literal("General"))
                         .option(Option.<Boolean>createBuilder().name(Text.literal("Enabled"))
                                 .binding(d.enabled, () -> c.enabled, v -> c.enabled = v)
+                                .controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<Boolean>createBuilder().name(Text.literal("Crossbow + flint mode"))
+                                .description(OptionDescription.of(Text.literal("On: place rail and TNT minecart, light fire in front of you with flint and steel, then shoot a crossbow through the fire, all in one tick. Off: old Flame bow sequence.")))
+                                .binding(d.crossbowMode, () -> c.crossbowMode, v -> c.crossbowMode = v)
+                                .controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<Boolean>createBuilder().name(Text.literal("Auto-load crossbow"))
+                                .description(OptionDescription.of(Text.literal("If the crossbow is not charged, charge it first, then run the one-tick sequence.")))
+                                .binding(d.autoLoad, () -> c.autoLoad, v -> c.autoLoad = v)
                                 .controller(TickBoxControllerBuilder::create).build())
                         .option(Option.<Boolean>createBuilder().name(Text.literal("Search main inventory"))
                                 .description(OptionDescription.of(Text.literal("When disabled, required equipment must be in the hotbar. Arrows may be anywhere in the inventory.")))

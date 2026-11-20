@@ -22,7 +22,7 @@ public class AutoCartClient implements ClientModInitializer {
         HudRenderCallback.EVENT.register((ctx, tick) -> {
             MinecraftClient mc = MinecraftClient.getInstance();
             if (!CartConfig.get().hud || mc.player == null || mc.world == null) return;
-            boolean ready = Equipment.scan(mc.player.getInventory(), CartConfig.get().autoDetect).ready();
+            boolean ready = Equipment.scan(mc.player.getInventory(), CartConfig.get().autoDetect).ready(CartConfig.get().crossbowMode);
             String s = sequence.active() ? "ACTIVE" : ready ? "READY" : "MISSING ITEMS";
             int color = sequence.active() ? 0xFFFF55 : ready ? 0x55FF55 : 0xFF5555;
             ctx.drawTextWithShadow(mc.textRenderer, "Auto CartPvP: " + s, 6, 6, 0xFF000000 | color);
