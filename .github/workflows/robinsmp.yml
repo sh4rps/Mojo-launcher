@@ -1,0 +1,29 @@
+name: Robin SMP Pack build
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Publish a GitHub release'
+        default: 'true'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build pack
+        working-directory: robinsmp
+        run: |
+          pip install pillow
+          python3 build_pack.py
+          unzip -l Robin-SMP-Pack-1.21.11.zip | tail -5
+      - uses: actions/upload-artifact@v4
+        with: { name: robin-smp-pack, path: robinsmp/Robin-SMP-Pack-1.21.11.zip }
+      - name: Release
+        if: ${{ github.event.inputs.release == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete robinsmp-1.21.11 --cleanup-tag --yes || true
+          gh release create robinsmp-1.21.11 robinsmp/Robin-SMP-Pack-1.21.11.zip --title "Robin SMP Pack 1.21.11" --notes "Robin SMP Pack for Minecraft Java 1.21.11: low shield, low fire, swords 1px smaller in hand, clear water, calm grass, no particles (small crit particles). Made by Robin / Claude."
