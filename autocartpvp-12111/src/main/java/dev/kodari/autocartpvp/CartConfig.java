@@ -39,7 +39,7 @@ public class CartConfig {
     /** Place any slab from the hotbar in front of you before the shot to soak up the blast. */
     @SerialEntry public boolean slabMode = true;
     /** 1 = bottom slab, 2 = double slab (full block, still low enough for the arrow to fly over). */
-    @SerialEntry public int slabLayers = 2;
+    @SerialEntry public int slabLayers = 1;
     /** Ticks the shield is raised before the shot (vanilla needs 5). */
     @SerialEntry public int shieldDelay = 7;
     /** Ticks the shield stays up after the shot, until the explosion has passed. */
