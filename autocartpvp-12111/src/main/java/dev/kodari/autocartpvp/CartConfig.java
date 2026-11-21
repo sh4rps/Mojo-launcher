@@ -34,6 +34,12 @@ public class CartConfig {
     @SerialEntry public boolean crossbowMode = true;
     /** In crossbow mode, load the crossbow first when it is not already charged. */
     @SerialEntry public boolean autoLoad = true;
+    /** Raise a shield (moved to the off-hand) before the blast: raised shields block explosion damage. */
+    @SerialEntry public boolean blastShield = true;
+    /** Ticks the shield is raised before the shot (vanilla needs 5). */
+    @SerialEntry public int shieldDelay = 7;
+    /** Ticks the shield stays up after the shot, until the explosion has passed. */
+    @SerialEntry public int shieldHold = 15;
 
     public static CartConfig get() { return HANDLER.instance(); }
 
@@ -54,6 +60,16 @@ public class CartConfig {
                                 .description(OptionDescription.of(Text.literal("If the crossbow is not charged, charge it first, then run the one-tick sequence.")))
                                 .binding(d.autoLoad, () -> c.autoLoad, v -> c.autoLoad = v)
                                 .controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<Boolean>createBuilder().name(Text.literal("Blast shield (no explosion damage)"))
+                                .description(OptionDescription.of(Text.literal("Needs a shield in your inventory. It is moved to the off-hand and raised before the shot, so the TNT minecart blast cannot hurt you (face the cart).")))
+                                .binding(d.blastShield, () -> c.blastShield, v -> c.blastShield = v)
+                                .controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<Integer>createBuilder().name(Text.literal("Shield raise time before shot (ticks)"))
+                                .binding(d.shieldDelay, () -> c.shieldDelay, v -> c.shieldDelay = v)
+                                .controller(o -> IntegerSliderControllerBuilder.create(o).range(5, 20).step(1)).build())
+                        .option(Option.<Integer>createBuilder().name(Text.literal("Shield hold time after shot (ticks)"))
+                                .binding(d.shieldHold, () -> c.shieldHold, v -> c.shieldHold = v)
+                                .controller(o -> IntegerSliderControllerBuilder.create(o).range(5, 40).step(1)).build())
                         .option(Option.<Boolean>createBuilder().name(Text.literal("Search main inventory"))
                                 .description(OptionDescription.of(Text.literal("When disabled, required equipment must be in the hotbar. Arrows may be anywhere in the inventory.")))
                                 .binding(d.autoDetect, () -> c.autoDetect, v -> c.autoDetect = v)
