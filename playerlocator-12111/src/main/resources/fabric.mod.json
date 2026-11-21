@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "playerlocator",
+  "version": "${version}",
+  "name": "Player Locator HUD",
+  "description": "Locator strip above the XP bar showing other players' skin heads (direction + distance up to 30,000 blocks, as far as the server shares it).",
+  "environment": "client",
+  "entrypoints": { "client": ["dev.robin.playerlocator.PlayerLocatorClient"] },
+  "depends": { "fabricloader": ">=0.16.0", "minecraft": "~1.21.11", "java": ">=21", "fabric-api": "*" }
+}
