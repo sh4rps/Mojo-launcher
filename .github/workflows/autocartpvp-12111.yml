@@ -1,0 +1,33 @@
+name: AutoCartPvP 1.21.11 build
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Publish a GitHub release'
+        default: 'true'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: "9.2.0" }
+      - name: Build
+        working-directory: autocartpvp-12111
+        run: |
+          ./scripts/resolve-versions.sh 1.21.11
+          gradle --no-daemon build
+          ls -la build/libs
+      - uses: actions/upload-artifact@v4
+        with: { name: autocartpvp-jar, path: autocartpvp-12111/build/libs/*.jar }
+      - name: Release
+        if: ${{ github.event.inputs.release == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete autocartpvp-1.21.11 --cleanup-tag --yes || true
+          gh release create autocartpvp-1.21.11 autocartpvp-12111/build/libs/autocartpvp-*.jar --title "Auto CartPvP 1.21.11" --notes "Port for Minecraft 1.21.11 Fabric. v1.1: crossbow + flint mode - rail, TNT minecart, fire in front of you and a crossbow shot through the fire, all in one tick (old Flame bow mode still available in config). Needs Fabric API and YACL 3.6+ (ModMenu optional)."
