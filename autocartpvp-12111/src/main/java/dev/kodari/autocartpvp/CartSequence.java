@@ -179,7 +179,7 @@ public class CartSequence {
                         BlockPos t = new BlockPos(net.minecraft.util.math.MathHelper.floor(eye.x + ux * dd),
                                 pb.getY() + dy, net.minecraft.util.math.MathHelper.floor(eye.z + uz * dd));
                         if (t.equals(pb) || t.equals(railPos) || t.equals(railPos.up())) continue;
-                        if (t.squaredDistanceTo(railPos) < 2.0) continue;
+                        if (t.getSquaredDistance(railPos) < 2.0) continue;
                         var st = mc.world.getBlockState(t);
                         if (!(st.isAir() || st.isReplaceable())) continue;
                         if (!mc.world.getBlockState(t.down()).isSideSolidFullSquare(mc.world, t.down(), Direction.UP)) continue;
