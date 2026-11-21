@@ -35,7 +35,9 @@ public class CartConfig {
     /** In crossbow mode, load the crossbow first when it is not already charged. */
     @SerialEntry public boolean autoLoad = true;
     /** Raise a shield (moved to the off-hand) before the blast: raised shields block explosion damage. */
-    @SerialEntry public boolean blastShield = true;
+    @SerialEntry public boolean blastShield = false;
+    @SerialEntry public boolean slabMode = true;
+    @SerialEntry public int slabLayers = 2;
     /** Ticks the shield is raised before the shot (vanilla needs 5). */
     @SerialEntry public int shieldDelay = 7;
     /** Ticks the shield stays up after the shot, until the explosion has passed. */
@@ -60,6 +62,14 @@ public class CartConfig {
                                 .description(OptionDescription.of(Text.literal("If the crossbow is not charged, charge it first, then run the one-tick sequence.")))
                                 .binding(d.autoLoad, () -> c.autoLoad, v -> c.autoLoad = v)
                                 .controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<Boolean>createBuilder().name(Text.literal("Blast slab in front of you"))
+                                .description(OptionDescription.of(Text.literal("Any slab in your hotbar is placed on the ground in front of you before the shot. It blocks part of the explosion; the arrow flies over it.")))
+                                .binding(d.slabMode, () -> c.slabMode, v -> c.slabMode = v)
+                                .controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<Integer>createBuilder().name(Text.literal("Slab layers (1 or 2)"))
+                                .description(OptionDescription.of(Text.literal("2 stacks a second slab on the first (needs 2 slabs of the same kind in the stack).")))
+                                .binding(d.slabLayers, () -> c.slabLayers, v -> c.slabLayers = v)
+                                .controller(o -> IntegerSliderControllerBuilder.create(o).range(1, 2).step(1)).build())
                         .option(Option.<Boolean>createBuilder().name(Text.literal("Blast shield (no explosion damage)"))
                                 .description(OptionDescription.of(Text.literal("Needs a shield in your inventory. It is moved to the off-hand and raised before the shot, so the TNT minecart blast cannot hurt you (face the cart).")))
                                 .binding(d.blastShield, () -> c.blastShield, v -> c.blastShield = v)

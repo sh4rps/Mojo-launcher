@@ -172,6 +172,25 @@ public class CartSequence {
             cancel(mc, "No free solid ground for the fire in front of you"); return;
         }
 
+        // slab plan: a slab cell 1 block in front of you on the line to the cart (arrow flies over it)
+        BlockPos slabCell = null; int slabs = 0;
+        if (CartConfig.get().slabMode) {
+            if (eq.slab() < 0) message(mc, "No slab in hotbar: blast will hurt");
+            else {
+                if (hd < 3.0) { cancel(mc, "Too close for slab + fire: step back 3+ blocks"); return; }
+                double ux = -hx / hd, uz = -hz / hd;
+                for (double dd : new double[]{1.0, 1.3, 1.6}) {
+                    BlockPos t = new BlockPos(net.minecraft.util.math.MathHelper.floor(eye.x + ux * dd), pb.getY(), net.minecraft.util.math.MathHelper.floor(eye.z + uz * dd));
+                    if (!t.equals(pb)) { slabCell = t; break; }
+                }
+                if (slabCell == null || slabCell.equals(fire) || slabCell.equals(railPos) || !mc.world.getBlockState(slabCell).isAir()
+                        || !mc.world.getBlockState(slabCell.down()).isSideSolidFullSquare(mc.world, slabCell.down(), Direction.UP)) {
+                    cancel(mc, "No free solid ground for the slab in front of you"); return;
+                }
+                slabs = Math.max(1, Math.min(CartConfig.get().slabLayers, mc.player.getInventory().getStack(eq.slab()).getCount()));
+            }
+        }
+
         // 1. rail
         if (!select(mc, eq.rail()) || !mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, target).isAccepted()) { cancel(mc, "Rail placement failed"); return; }
         // 2. TNT minecart
@@ -180,6 +199,19 @@ public class CartSequence {
         eq = Equipment.scan(mc.player.getInventory(), CartConfig.get().autoDetect);
         BlockHitResult fireHit = new BlockHitResult(new Vec3d(sup.getX() + 0.5, sup.getY() + 1.0, sup.getZ() + 0.5), Direction.UP, sup, false);
         if (!select(mc, eq.flint()) || !mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, fireHit).isAccepted()) { cancel(mc, "Could not light the fire"); return; }
+        // 3b. blast slab(s) in front of you
+        if (slabCell != null) {
+            for (int i = 0; i < slabs; i++) {
+                Equipment e2 = Equipment.scan(mc.player.getInventory(), CartConfig.get().autoDetect);
+                BlockHitResult h = i == 0
+                        ? new BlockHitResult(new Vec3d(slabCell.getX() + 0.5, slabCell.getY(), slabCell.getZ() + 0.5), Direction.UP, slabCell.down(), false)
+                        : new BlockHitResult(new Vec3d(slabCell.getX() + 0.5, slabCell.getY() + 0.5, slabCell.getZ() + 0.5), Direction.UP, slabCell, false);
+                if (!select(mc, e2.slab()) || !mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, h).isAccepted()) {
+                    if (i == 0) { cancel(mc, "Could not place slab"); return; }
+                    break;
+                }
+            }
+        }
         // 4. aim at the cart and shoot the loaded crossbow through the fire
         float oldYaw = mc.player.getYaw(), oldPitch = mc.player.getPitch();
         double dx = c.x - eye.x, dy = c.y - eye.y, dz = c.z - eye.z;
