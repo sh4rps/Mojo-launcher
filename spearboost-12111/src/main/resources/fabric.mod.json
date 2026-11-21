@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "id": "spearboost",
+  "version": "${version}",
+  "name": "Spear Boost",
+  "description": "Press O: swaps to the spear (Lunge preferred) from your inventory, jabs to dash, and swaps back.",
+  "environment": "client",
+  "entrypoints": { "client": ["dev.robin.spearboost.SpearBoostClient"] },
+  "depends": { "fabricloader": ">=0.16.0", "minecraft": "~1.21.11", "java": ">=21", "fabric-api": "*" }
+}
