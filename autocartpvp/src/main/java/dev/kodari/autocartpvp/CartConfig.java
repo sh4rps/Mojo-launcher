@@ -37,7 +37,7 @@ public class CartConfig {
     /** Raise a shield (moved to the off-hand) before the blast: raised shields block explosion damage. */
     @SerialEntry public boolean blastShield = false;
     @SerialEntry public boolean slabMode = true;
-    @SerialEntry public int slabLayers = 2;
+    @SerialEntry public int slabLayers = 1;
     /** Ticks the shield is raised before the shot (vanilla needs 5). */
     @SerialEntry public int shieldDelay = 7;
     /** Ticks the shield stays up after the shot, until the explosion has passed. */

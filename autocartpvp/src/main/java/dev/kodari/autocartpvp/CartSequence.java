@@ -187,7 +187,7 @@ public class CartSequence {
                         || !mc.world.getBlockState(slabCell.down()).isSideSolidFullSquare(mc.world, slabCell.down(), Direction.UP)) {
                     cancel(mc, "No free solid ground for the slab in front of you"); return;
                 }
-                slabs = Math.max(1, Math.min(CartConfig.get().slabLayers, mc.player.getInventory().getStack(eq.slab()).getCount()));
+                slabs = 1; // always a single slab
             }
         }
 
