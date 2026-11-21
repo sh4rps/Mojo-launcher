@@ -5,6 +5,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
@@ -20,13 +21,13 @@ import net.minecraft.util.math.Vec3d;
  * Bow mode (config off): rail, cart, then draw and release a Flame bow.
  */
 public class CartSequence {
-    enum Stage { IDLE, RAIL, CART, DRAW, LOAD, BURST }
+    enum Stage { IDLE, RAIL, CART, DRAW, LOAD, SHIELD, BURST, HOLD }
 
     private Stage stage = Stage.IDLE;
     private BlockHitResult target;
     private BlockPos railPos;
     private int wait, originalSlot;
-    private boolean loading;
+    private boolean loading, shieldOn, shieldUp;
 
     public boolean active() { return stage != Stage.IDLE; }
 
@@ -49,10 +50,12 @@ public class CartSequence {
         target = bhr;
         railPos = bhr.getBlockPos().offset(bhr.getSide());
         originalSlot = mc.player.getInventory().selectedSlot;
-        wait = 0; loading = false;
+        wait = 0; loading = false; shieldUp = false;
+        shieldOn = cfg.crossbowMode && cfg.blastShield && (eq.shield() >= 0 || mc.player.getOffHandStack().isOf(Items.SHIELD));
+        if (cfg.crossbowMode && cfg.blastShield && !shieldOn) message(mc, "No shield found: blast will hurt");
         if (cfg.crossbowMode) {
             boolean charged = CrossbowItem.isCharged(mc.player.getInventory().getStack(eq.crossbow()));
-            stage = charged ? Stage.BURST : Stage.LOAD;
+            stage = charged ? (shieldOn ? Stage.SHIELD : Stage.BURST) : Stage.LOAD;
         } else stage = Stage.RAIL;
     }
 
@@ -63,13 +66,20 @@ public class CartSequence {
         if (!cfg.enabled || mc.currentScreen != null || mc.player.currentScreenHandler != mc.player.playerScreenHandler) {
             cancel(mc, "Interrupted"); return;
         }
-        if (mc.player.getEyePos().squaredDistanceTo(target.getPos()) > (double) (cfg.range * cfg.range)) { cancel(mc, "Target out of range"); return; }
+        if (stage != Stage.HOLD && mc.player.getEyePos().squaredDistanceTo(target.getPos()) > (double) (cfg.range * cfg.range)) { cancel(mc, "Target out of range"); return; }
         if (wait-- > 0) return;
 
         Equipment eq = Equipment.scan(mc.player.getInventory(), cfg.autoDetect);
         switch (stage) {
             case LOAD -> load(mc, eq, cfg);
+            case SHIELD -> raiseShield(mc, cfg);
             case BURST -> burst(mc, eq);
+            case HOLD -> {
+                mc.options.useKey.setPressed(false);
+                if (mc.player.isUsingItem()) mc.interactionManager.stopUsingItem(mc.player);
+                stage = Stage.IDLE;
+                message(mc, "Boom (shield down)");
+            }
             case RAIL -> {
                 if (!select(mc, eq.rail()) || !mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, target).isAccepted()) {
                     cancel(mc, "Rail placement failed"); return;
@@ -115,14 +125,30 @@ public class CartSequence {
         ItemStack main = mc.player.getMainHandStack();
         if (!mc.player.isUsingItem()) {
             mc.options.useKey.setPressed(false);
-            if (CrossbowItem.isCharged(main)) { stage = Stage.BURST; wait = 2; } else cancel(mc, "Loading failed");
+            if (CrossbowItem.isCharged(main)) { stage = shieldOn ? Stage.SHIELD : Stage.BURST; wait = 2; } else cancel(mc, "Loading failed");
             return;
         }
         if (mc.player.getItemUseTime() >= CrossbowItem.getPullTime(main, mc.player) + 1) {
             mc.options.useKey.setPressed(false);
             mc.interactionManager.stopUsingItem(mc.player);
-            stage = Stage.BURST; wait = 3;
+            stage = shieldOn ? Stage.SHIELD : Stage.BURST; wait = 3;
         }
+    }
+
+    /** Put a shield in the off-hand and raise it; vanilla blocks explosion damage from the front once it has been up ~5 ticks. */
+    private void raiseShield(MinecraftClient mc, CartConfig cfg) {
+        if (!mc.player.getOffHandStack().isOf(Items.SHIELD)) {
+            int s = Equipment.scan(mc.player.getInventory(), true).shield();
+            if (s < 0) { cancel(mc, "Shield missing"); return; }
+            int screenSlot = s < 9 ? 36 + s : s;
+            mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId, screenSlot, 40, SlotActionType.SWAP, mc.player);
+            if (!mc.player.getOffHandStack().isOf(Items.SHIELD)) { cancel(mc, "Could not move shield to off-hand"); return; }
+        }
+        if (!mc.interactionManager.interactItem(mc.player, Hand.OFF_HAND).isAccepted()) { cancel(mc, "Could not raise shield"); return; }
+        mc.options.useKey.setPressed(true);
+        shieldUp = true;
+        stage = Stage.BURST;
+        wait = Math.max(5, cfg.shieldDelay);
     }
 
     private boolean hasProjectile(MinecraftClient mc) { return mc.player.getOffHandStack().getItem() instanceof net.minecraft.item.ArrowItem; }
@@ -163,8 +189,9 @@ public class CartSequence {
         boolean shot = select(mc, eq.crossbow()) && mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND).isAccepted();
         mc.player.setYaw(oldYaw); mc.player.setPitch(oldPitch);
         if (!shot) { cancel(mc, "Crossbow shot failed"); return; }
-        finish(mc);
-        message(mc, "Boom");
+        mc.player.getInventory().selectedSlot = originalSlot;
+        if (shieldUp) { stage = Stage.HOLD; wait = Math.max(5, CartConfig.get().shieldHold); }
+        else { stage = Stage.IDLE; message(mc, "Boom"); }
     }
 
     private boolean placeCart(MinecraftClient mc, Equipment eq) {
@@ -187,10 +214,8 @@ public class CartSequence {
     }
 
     private void cancel(MinecraftClient mc, String why) {
-        if (stage == Stage.DRAW || stage == Stage.LOAD) {
-            mc.options.useKey.setPressed(false);
-            if (mc.player.isUsingItem()) mc.interactionManager.stopUsingItem(mc.player);
-        }
+        mc.options.useKey.setPressed(false);
+        if (mc.player.isUsingItem()) mc.interactionManager.stopUsingItem(mc.player);
         finish(mc);
         message(mc, why);
     }
