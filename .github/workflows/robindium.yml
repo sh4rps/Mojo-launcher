@@ -24,8 +24,9 @@ jobs:
       - name: Pick jar
         run: |
           mkdir -p out
-          for f in $(find robindium/fabric/build/libs -name "*.jar"); do case "$f" in *sources*|*dev*|*shadow*|*-all*) ;; *) cp "$f" out/ ;; esac; done
+          for f in $(find robindium/fabric/build/libs -name "*.jar"); do case "$f" in *sources*|*dev*|*shadow*|*-all*) ;; *) cp "$f" "out/Robindium-0.9.5+mc1.21.11.jar" ;; esac; done
           ls -la out
+          unzip -p out/Robindium-0.9.5+mc1.21.11.jar fabric.mod.json | head -8
       - uses: actions/upload-artifact@v4
         with: { name: robindium, path: out/*.jar }
       - name: Release
