@@ -29,4 +29,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release delete spearboost-1.21.11 --cleanup-tag --yes || true
-          gh release create spearboost-1.21.11 spearboost-12111/build/libs/spearboost-*.jar --title "Spear Boost 1.21.11" --notes "Spear Boost 1.0 for Minecraft 1.21.11 Fabric. Press O: swaps to the spear (Lunge preferred) from hotbar or inventory, jabs to dash, swaps back. Needs Fabric API. Key can be changed in Controls."
+          gh release create spearboost-1.21.11 spearboost-12111/build/libs/spearboost-*.jar --title "Spear Boost 1.21.11" --notes "Spear Boost 1.1 (calls the jab directly, shows status in the action bar) for Minecraft 1.21.11 Fabric. Press O: swaps to the spear (Lunge preferred) from hotbar or inventory, jabs to dash, swaps back. Needs Fabric API. Key can be changed in Controls."

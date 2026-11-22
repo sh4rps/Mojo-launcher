@@ -5,7 +5,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -69,7 +68,7 @@ public class SpearBoostClient implements ClientModInitializer {
             mc.interactionManager.clickSlot(mc.player.playerScreenHandler.syncId, s, origSlot, SlotActionType.SWAP, mc.player);
         }
         stage = Stage.ATTACK;
-        wait = 1; // let the client sync the new slot to the server first
+        wait = 2; // let the client sync the new slot to the server first
     }
 
     private void tick(MinecraftClient mc) {
@@ -78,11 +77,15 @@ public class SpearBoostClient implements ClientModInitializer {
         if (wait-- > 0) return;
         switch (stage) {
             case ATTACK -> {
-                // queue one attack click; it is processed at the start of the next tick with the spear already selected
-                KeyBinding atk = mc.options.attackKey;
-                KeyBinding.onKeyPressed(InputUtil.fromTranslationKey(atk.getBoundKeyTranslationKey()));
+                // spear is selected and the slot change has reached the server: jab now
+                var acc = (dev.robin.spearboost.mixin.MinecraftClientAccessor) mc;
+                acc.spearboost$setAttackCooldown(0);
+                boolean ok = acc.spearboost$doAttack();
+                ItemStack held = mc.player.getMainHandStack();
+                msg(mc, (ok ? "Jab sent" : "Jab blocked") + " with " + held.getName().getString()
+                        + (isSpear(held) ? "" : " (NOT a spear: swap failed)") + ", food " + mc.player.getHungerManager().getFoodLevel());
                 stage = Stage.RESTORE;
-                wait = 2;
+                wait = 3;
             }
             case RESTORE -> {
                 PlayerInventory inv = mc.player.getInventory();
