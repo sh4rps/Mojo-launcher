@@ -1,0 +1,29 @@
+name: Recon javap
+on: workflow_dispatch
+jobs:
+  r:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: "9.2.0" }
+      - name: Build skeleton to get mapped jar
+        working-directory: spearboost-12111
+        run: gradle --no-daemon build -q || true
+      - name: javap
+        working-directory: spearboost-12111
+        run: |
+          J=$(find . ~/.gradle -name "minecraft-merged*1.21.11*.jar" 2>/dev/null | grep -v sources | head -1); echo "JAR $J"
+          [ -z "$J" ] && find / -name "*.jar" -path "*1.21.11*" 2>/dev/null | head -20
+          for c in net.minecraft.client.util.Window net.minecraft.client.gl.Framebuffer net.minecraft.client.gl.WindowFramebuffer net.minecraft.client.gl.SimpleFramebuffer; do echo "=== $c"; javap -p -cp "$J" $c 2>&1 | head -80; done
+          echo "=== MinecraftClient"
+          javap -p -c -cp "$J" net.minecraft.client.MinecraftClient > mc.txt 2>&1
+          grep -nE "^  (public|private|protected|static).*\(" mc.txt | grep -iE "resolution|render\(|framebuffer|blit|resize|scaleFactor" 
+          echo "--- onResolutionChanged body"
+          awk '/void onResolutionChanged/{f=1} f{print} /^$/{if(f)exit}' mc.txt | grep -E "invoke|Method|getfield" | head -40
+          echo "--- render body refs"
+          awk '/void render\(boolean\)/{f=1} f{print} /^$/{if(f)exit}' mc.txt | grep -iE "framebuffer|blit|Window|swap|present" | head -40
+          echo "=== GameRenderer render refs"
+          javap -p -c -cp "$J" net.minecraft.client.render.GameRenderer 2>&1 | grep -iE "Framebuffer|getFramebufferWidth|getFramebufferHeight|getScaleFactor" | sort | uniq -c | head -30
