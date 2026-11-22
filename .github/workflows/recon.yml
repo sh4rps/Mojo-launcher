@@ -1,0 +1,19 @@
+name: Recon javap
+on: workflow_dispatch
+jobs:
+  r:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: "9.2.0" }
+      - name: Build skeleton to get mapped jar
+        working-directory: spearboost-12111
+        run: gradle --no-daemon build -q || true
+      - name: javap
+        working-directory: spearboost-12111
+        run: |
+          J=$(find . -name "minecraft-merged*1.21.11*.jar" 2>/dev/null | grep -v sources | head -1)
+          for c in net.minecraft.client.render.entity.EntityRenderManager net.minecraft.client.render.block.entity.BlockEntityRenderManager net.minecraft.client.particle.ParticleManager net.minecraft.client.render.WorldRenderer; do echo "=== $c"; javap -p -cp "$J" $c 2>&1 | grep -E "class |shouldRender|render|add|Particle|collect|update|extract|submit|Frustum|totalSize|count" | head -50; done
