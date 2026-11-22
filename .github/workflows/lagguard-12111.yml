@@ -1,0 +1,32 @@
+name: LagGuard 1.21.11 build
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Publish a GitHub release'
+        default: 'true'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: "9.2.0" }
+      - name: Build
+        working-directory: lagguard-12111
+        run: |
+          gradle --no-daemon build
+          ls -la build/libs
+      - uses: actions/upload-artifact@v4
+        with: { name: robinlagguard-jar, path: lagguard-12111/build/libs/*.jar }
+      - name: Release
+        if: ${{ github.event.inputs.release == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete robinlagguard-1.21.11 --cleanup-tag --yes || true
+          gh release create robinlagguard-1.21.11 lagguard-12111/build/libs/robinlagguard-*.jar --title "Robin Lag Guard 1.21.11" --notes "Robin Lag Guard 1.0 for Minecraft 1.21.11 Fabric. Limits the render distance of players, mobs, decorations, block entities and particles to cut lag near big structures and crowds. Semicolon key cycles Gentle/Balanced/Aggressive/Off. Config: config/robinlagguard.properties. Needs Fabric API."

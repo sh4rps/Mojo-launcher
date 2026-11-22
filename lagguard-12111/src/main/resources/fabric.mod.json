@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "robinlagguard",
+  "version": "${version}",
+  "name": "Robin Lag Guard",
+  "description": "Cuts lag near big structures and crowds: limits how far away players, mobs, decorations, block entities and particles are rendered. ; cycles Gentle / Balanced / Aggressive / Off.",
+  "environment": "client",
+  "mixins": ["lagguard.mixins.json"],
+  "entrypoints": { "client": ["dev.robin.lagguard.LagGuard"] },
+  "depends": { "fabricloader": ">=0.16.0", "minecraft": "~1.21.11", "java": ">=21", "fabric-api": "*" }
+}

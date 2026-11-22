@@ -1,0 +1,7 @@
+{
+  "required": true,
+  "package": "dev.robin.lagguard.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["EntityRenderManagerMixin", "BlockEntityRenderManagerMixin", "ParticleManagerMixin"],
+  "injectors": { "defaultRequire": 1 }
+}
