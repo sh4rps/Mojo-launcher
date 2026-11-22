@@ -7,7 +7,7 @@ group = 'dev.robin'
 version = '1.0.0'
 archivesBaseName = 'safewalk'
 
-sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+tasks.withType(JavaCompile).configureEach { options.release = 8 }
 
 loom {
     forge {
