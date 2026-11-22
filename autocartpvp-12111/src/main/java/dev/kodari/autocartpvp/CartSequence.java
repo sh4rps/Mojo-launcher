@@ -2,6 +2,7 @@ package dev.kodari.autocartpvp;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.ItemStack;
@@ -21,13 +22,15 @@ import net.minecraft.util.math.Vec3d;
  * Bow mode (config off): rail, cart, then draw and release a Flame bow.
  */
 public class CartSequence {
-    enum Stage { IDLE, RAIL, CART, DRAW, LOAD, SHIELD, BURST, HOLD }
+    enum Stage { IDLE, RAIL, CART, DRAW, LOAD, SHIELD, BURST, HOLD, RETREAT }
 
     private Stage stage = Stage.IDLE;
     private BlockHitResult target;
     private BlockPos railPos;
     private int wait, originalSlot;
     private boolean loading, shieldOn, shieldUp;
+    private int retreatLeft;
+    private Vec3d cartCenter = Vec3d.ZERO;
 
     public boolean active() { return stage != Stage.IDLE; }
 
@@ -70,7 +73,7 @@ public class CartSequence {
         if (!cfg.enabled || mc.currentScreen != null || mc.player.currentScreenHandler != mc.player.playerScreenHandler) {
             cancel(mc, "Interrupted"); return;
         }
-        if (stage != Stage.HOLD && mc.player.getEyePos().squaredDistanceTo(target.getPos()) > (double) ((cfg.range + 1) * (cfg.range + 1))) { cancel(mc, "Target out of range"); return; }
+        if (stage != Stage.HOLD && stage != Stage.RETREAT && mc.player.getEyePos().squaredDistanceTo(target.getPos()) > (double) ((cfg.range + 1) * (cfg.range + 1))) { cancel(mc, "Target out of range"); return; }
         if (wait-- > 0) return;
 
         Equipment eq = Equipment.scan(mc.player.getInventory(), cfg.autoDetect);
@@ -78,6 +81,10 @@ public class CartSequence {
             case LOAD -> load(mc, eq, cfg);
             case SHIELD -> raiseShield(mc, cfg);
             case BURST -> burst(mc, eq);
+            case RETREAT -> {
+                if (retreatLeft-- <= 0) { releaseMove(); stage = Stage.IDLE; message(mc, "Boom"); }
+                else steerAway(mc);
+            }
             case HOLD -> {
                 mc.options.useKey.setPressed(false);
                 if (mc.player.isUsingItem()) mc.interactionManager.stopUsingItem(mc.player);
@@ -233,7 +240,18 @@ public class CartSequence {
         mc.player.setYaw(oldYaw); mc.player.setPitch(oldPitch);
         if (!shot) { cancel(mc, "Crossbow shot failed"); return; }
         mc.player.getInventory().setSelectedSlot(originalSlot);
-        if (shieldUp) { stage = Stage.HOLD; wait = Math.max(5, CartConfig.get().shieldHold); }
+        cartCenter = c;
+        CartConfig rc = CartConfig.get();
+        if (shieldUp) { stage = Stage.HOLD; wait = Math.max(5, rc.shieldHold); }
+        else if (rc.retreat && rc.retreatTicks > 0) {
+            stage = Stage.RETREAT; retreatLeft = rc.retreatTicks; wait = 0;
+            Vec3d away = new Vec3d(mc.player.getX() - c.x, 0, mc.player.getZ() - c.z);
+            if (away.lengthSquared() > 1.0E-4 && rc.retreatPush > 0) {
+                away = away.normalize().multiply(rc.retreatPush / 100.0);
+                mc.player.setVelocity(mc.player.getVelocity().add(away.x, 0, away.z));
+            }
+            steerAway(mc);
+        }
         else { stage = Stage.IDLE; message(mc, "Boom"); }
     }
 
@@ -256,7 +274,33 @@ public class CartSequence {
         return true;
     }
 
+    /** Presses the movement keys (W/A/S/D combos) that move the player directly away from the cart, whatever way they look. */
+    private void steerAway(MinecraftClient mc) {
+        double dx = mc.player.getX() - cartCenter.x, dz = mc.player.getZ() - cartCenter.z;
+        double awayYaw = Math.toDegrees(Math.atan2(dz, dx)) - 90.0;
+        double rel = net.minecraft.util.math.MathHelper.wrapDegrees(awayYaw - mc.player.getYaw());
+        int sector = (int) Math.round(rel / 45.0);   // 0 = straight ahead, 4 = straight behind
+        boolean f = false, b = false, l = false, r = false;
+        switch (sector) {
+            case 0 -> f = true;
+            case 1 -> { f = true; r = true; }
+            case 2 -> r = true;
+            case 3 -> { b = true; r = true; }
+            case -1 -> { f = true; l = true; }
+            case -2 -> l = true;
+            case -3 -> { b = true; l = true; }
+            default -> b = true;
+        }
+        mc.options.forwardKey.setPressed(f); mc.options.backKey.setPressed(b);
+        mc.options.leftKey.setPressed(l); mc.options.rightKey.setPressed(r);
+    }
+
+    private void releaseMove() {
+        KeyBinding.updatePressedStates();   // hand the keys back to the real keyboard state
+    }
+
     private void cancel(MinecraftClient mc, String why) {
+        if (stage == Stage.RETREAT) releaseMove();
         mc.options.useKey.setPressed(false);
         if (mc.player.isUsingItem()) mc.interactionManager.stopUsingItem(mc.player);
         finish(mc);

@@ -40,6 +40,11 @@ public class CartConfig {
     @SerialEntry public boolean slabMode = true;
     /** 1 = bottom slab, 2 = double slab (full block, still low enough for the arrow to fly over). */
     @SerialEntry public int slabLayers = 1;
+    /** After the shot, automatically step away from the cart (presses the right W/A/S/D keys, whatever way you face). */
+    @SerialEntry public boolean retreat = true;
+    @SerialEntry public int retreatTicks = 8;
+    /** Small instant push away from the cart, in hundredths of a block per tick of velocity. */
+    @SerialEntry public int retreatPush = 25;
     /** Ticks the shield is raised before the shot (vanilla needs 5). */
     @SerialEntry public int shieldDelay = 7;
     /** Ticks the shield stays up after the shot, until the explosion has passed. */
@@ -64,6 +69,16 @@ public class CartConfig {
                                 .description(OptionDescription.of(Text.literal("If the crossbow is not charged, charge it first, then run the one-tick sequence.")))
                                 .binding(d.autoLoad, () -> c.autoLoad, v -> c.autoLoad = v)
                                 .controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<Boolean>createBuilder().name(Text.literal("Auto back-step after shot"))
+                                .description(OptionDescription.of(Text.literal("After the crossbow shot you automatically move away from the cart (the right W/A/S/D keys are pressed for you), so the blast hurts less.")))
+                                .binding(d.retreat, () -> c.retreat, v -> c.retreat = v)
+                                .controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<Integer>createBuilder().name(Text.literal("Back-step time (ticks)"))
+                                .binding(d.retreatTicks, () -> c.retreatTicks, v -> c.retreatTicks = v)
+                                .controller(o -> IntegerSliderControllerBuilder.create(o).range(1, 20).step(1)).build())
+                        .option(Option.<Integer>createBuilder().name(Text.literal("Back-step push (0 = off)"))
+                                .binding(d.retreatPush, () -> c.retreatPush, v -> c.retreatPush = v)
+                                .controller(o -> IntegerSliderControllerBuilder.create(o).range(0, 60).step(5)).build())
                         .option(Option.<Boolean>createBuilder().name(Text.literal("Blast slab in front of you"))
                                 .description(OptionDescription.of(Text.literal("Any slab in your hotbar is placed on the ground in front of you before the shot. It blocks part of the explosion; the arrow flies over it.")))
                                 .binding(d.slabMode, () -> c.slabMode, v -> c.slabMode = v)
