@@ -35,10 +35,15 @@ def add(slug_or_ver, is_version=False):
     if v["id"] in seen: return
     seen.add(v["id"])
     f = next((x for x in v["files"] if x.get("primary")), v["files"][0])
-    print(f"{v['project_id']} {v['name']} -> {f['filename']} (mc {v['game_versions'][-4:]})")
+    print(f"{v['project_id']} {v['name']} -> {f['filename']} (mc {v['game_versions']})")
     data = get(f["url"])
     assert hashlib.sha512(data).hexdigest() == f["hashes"]["sha512"], "hash mismatch " + f["filename"]
     files[f["filename"]] = data
+    try:
+        zf = zipfile.ZipFile(__import__("io").BytesIO(data)); fm = json.loads(zf.read("fabric.mod.json"))
+        print("   fabric.mod.json depends:", json.dumps(fm.get("depends")), "breaks:", json.dumps(fm.get("breaks"))[:200])
+        print("   pojav-related entries:", [n for n in zf.namelist() if "ojav" in n][:5])
+    except Exception as e: print("   (could not inspect)", e)
     chosen.append((v["name"], f["filename"]))
     for d in v.get("dependencies", []):
         if d["dependency_type"] == "required" and d.get("version_id"):
