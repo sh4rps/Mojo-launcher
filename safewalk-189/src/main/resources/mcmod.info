@@ -1,0 +1,8 @@
+[{
+  "modid": "safewalk",
+  "name": "Robin SafeWalk",
+  "description": "Auto-sneak at block edges and extend the floor so you never fall. Press V to toggle.",
+  "version": "${version}",
+  "mcversion": "1.8.9",
+  "authorList": ["Robin"]
+}]
