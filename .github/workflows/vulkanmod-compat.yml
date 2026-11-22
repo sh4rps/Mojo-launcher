@@ -1,0 +1,37 @@
+name: VulkanMod phone-compat build
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Publish a GitHub release'
+        default: 'true'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: "9.2.1" }
+      - name: Build
+        working-directory: vulkanmod-compat
+        run: |
+          gradle --no-daemon build
+          ls -la build/libs
+      - name: Pick jar
+        run: |
+          mkdir -p out
+          for f in vulkanmod-compat/build/libs/*.jar; do case "$f" in *sources*|*dev*) ;; *) cp "$f" out/ ;; esac; done
+          ls -la out
+      - uses: actions/upload-artifact@v4
+        with: { name: vulkanmod-compat, path: out/*.jar }
+      - name: Release
+        if: ${{ github.event.inputs.release == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete vulkanmod-compat-1.21.11 --cleanup-tag --yes || true
+          gh release create vulkanmod-compat-1.21.11 out/*.jar --title "VulkanMod 0.6.8 phone-compat (1.21.11)" --notes "VulkanMod 0.6.8 with a compatibility patch for phones: instance/device/VMA/shaderc follow the real Vulkan version (1.0/1.1/1.2), VK_KHR_dynamic_rendering and synchronization2 are no longer required (classic render passes are used when dynamic rendering is missing), and the log prints [compat] lines with your GPU info. Same mod id (vulkanmod) so other mods stay compatible. LGPL-3.0, based on https://github.com/xCollateral/VulkanMod . Untested on devices."

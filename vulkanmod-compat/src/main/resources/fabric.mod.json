@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "vulkanmod",
+  "version": "${version}",
+
+  "name": "VulkanMod (Phone Compat)",
+  "description": "VulkanMod 0.6.8 with a compatibility patch: runs on Vulkan 1.0/1.1/1.2 drivers, uses classic render passes when VK_KHR_dynamic_rendering is missing.",
+  "authors": [
+    "Collateral"
+  ],
+  "contact": {
+    "homepage": "",
+    "sources": "https://github.com/xCollateral/VulkanMod"
+  },
+
+  "icon": "assets/vulkanmod/vlogo.png",
+
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "net.vulkanmod.Initializer"
+    ]
+  },
+  "mixins": [
+    "vulkanmod.mixins.json"
+  ],
+  "accessWidener" : "vulkanmod.accesswidener",
+
+  "depends": {
+    "fabricloader": ">=0.14.14",
+    "minecraft": "1.21.11"
+  },
+  "custom": {
+    "fabric-renderer-api-v1:contains_renderer": true
+  }
+}
