@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "motionblur",
+  "version": "${version}",
+  "name": "Motion Blur",
+  "description": "Smooth frame-blending motion blur. B toggles, N changes the strength.",
+  "environment": "client",
+  "mixins": ["motionblur.mixins.json"],
+  "entrypoints": { "client": ["dev.robin.motionblur.MotionBlurMod"] },
+  "depends": { "fabricloader": ">=0.16.0", "minecraft": "~1.21.11", "java": ">=21", "fabric-api": "*" }
+}

@@ -1,0 +1,32 @@
+name: MotionBlur 1.21.11 build
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Publish a GitHub release'
+        default: 'true'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: "9.2.0" }
+      - name: Build
+        working-directory: motionblur-12111
+        run: |
+          gradle --no-daemon build
+          ls -la build/libs
+      - uses: actions/upload-artifact@v4
+        with: { name: motionblur-jar, path: motionblur-12111/build/libs/*.jar }
+      - name: Release
+        if: ${{ github.event.inputs.release == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete motionblur-1.21.11 --cleanup-tag --yes || true
+          gh release create motionblur-1.21.11 motionblur-12111/build/libs/motionblur-*.jar --title "Motion Blur 1.21.11" --notes "Motion Blur 1.0 for Minecraft 1.21.11 Fabric. Frame-blending motion blur. B toggles, N cycles strength 30/45/60/75/88. Config: config/motionblur.properties. Needs Fabric API."
