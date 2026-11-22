@@ -17,7 +17,6 @@ jobs:
         run: |
           J=$(find . ~/.gradle -name "minecraft-merged*1.21.11*.jar" 2>/dev/null | grep -v sources | head -1); echo "JAR $J"
           [ -z "$J" ] && find / -name "*.jar" -path "*1.21.11*" 2>/dev/null | head -20
-          javap -p -c -cp "$J" net.minecraft.client.gl.Framebuffer | awk '/public void blitToScreen/{f=1} /public com.mojang.blaze3d.textures.GpuTexture getColorAttachment/{f=0} f' | grep -E "invoke|Field|getstatic|ldc|public|private" | cut -c1-230
-          echo "=== BlitRenderer / sampler"
-          javap -p -c -cp "$J" net.minecraft.client.gl.RenderPassImpl 2>&1 | head -3
-          javap -p -cp "$J" net.minecraft.client.gl.GlCommandEncoder 2>&1 | grep -iE "pass|Viewport|scissor" | head
+          javap -p -c -cp "$J" net.minecraft.client.gl.GlCommandEncoder | awk '/void presentTexture/{f=1} f&&/^$/{exit} f' | grep -E "invoke|getfield|getstatic|ldc|bipush|sipush|iconst|presentTexture" | cut -c1-230
+          echo "=== other presentTexture impls"
+          grep -rl presentTexture . 2>/dev/null | head -2; unzip -l "$J" | grep -iE "Encoder" | head
