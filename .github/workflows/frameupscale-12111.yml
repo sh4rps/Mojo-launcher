@@ -1,0 +1,32 @@
+name: FrameUpscale 1.21.11 build
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Publish a GitHub release'
+        default: 'true'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: "9.2.0" }
+      - name: Build
+        working-directory: frameupscale-12111
+        run: |
+          gradle --no-daemon build
+          ls -la build/libs
+      - uses: actions/upload-artifact@v4
+        with: { name: frameupscale-jar, path: frameupscale-12111/build/libs/*.jar }
+      - name: Release
+        if: ${{ github.event.inputs.release == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete frameupscale-1.21.11 --cleanup-tag --yes || true
+          gh release create frameupscale-1.21.11 frameupscale-12111/build/libs/frameupscale-*.jar --title "Frame Upscale 1.21.11" --notes "Frame Upscale 1.0 for Minecraft 1.21.11 Fabric. Renders at a lower resolution (default 75%) and upscales to the window for more FPS. U cycles 100/90/80/75/67/50 percent. Config: config/frameupscale.properties. Needs Fabric API."

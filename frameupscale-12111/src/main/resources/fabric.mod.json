@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "frameupscale",
+  "version": "${version}",
+  "name": "Frame Upscale",
+  "description": "Renders the game at a lower resolution and upscales it to your screen for more FPS. Press U to change the render scale.",
+  "environment": "client",
+  "mixins": ["frameupscale.mixins.json"],
+  "entrypoints": { "client": ["dev.robin.frameupscale.FrameUpscale"] },
+  "depends": { "fabricloader": ">=0.16.0", "minecraft": "~1.21.11", "java": ">=21", "fabric-api": "*" }
+}
