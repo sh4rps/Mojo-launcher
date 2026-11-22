@@ -1,0 +1,26 @@
+name: Robindium pack build
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Publish a GitHub release'
+        default: 'true'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        working-directory: robindium
+        run: python3 build_pack.py
+      - uses: actions/upload-artifact@v4
+        with: { name: robindium, path: robindium/Robindium-1.21.11.zip }
+      - name: Release
+        if: ${{ github.event.inputs.release == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete robindium-1.21.11 --cleanup-tag --yes || true
+          gh release create robindium-1.21.11 robindium/Robindium-1.21.11.zip --title "Robindium 1.21.11 (Sodium + Sodium Extra + Podium)" --notes "Robindium for Minecraft 1.21.11 Fabric: Sodium + Sodium Extra + Podium (disables Sodium's Pojav check), unmodified, downloaded from Modrinth. Unzip into your game folder (mods/)."
