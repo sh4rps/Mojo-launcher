@@ -17,13 +17,7 @@ jobs:
         run: |
           J=$(find . ~/.gradle -name "minecraft-merged*1.21.11*.jar" 2>/dev/null | grep -v sources | head -1); echo "JAR $J"
           [ -z "$J" ] && find / -name "*.jar" -path "*1.21.11*" 2>/dev/null | head -20
-          for c in net.minecraft.client.util.Window net.minecraft.client.gl.Framebuffer net.minecraft.client.gl.WindowFramebuffer net.minecraft.client.gl.SimpleFramebuffer; do echo "=== $c"; javap -p -cp "$J" $c 2>&1 | head -80; done
-          echo "=== MinecraftClient"
-          javap -p -c -cp "$J" net.minecraft.client.MinecraftClient > mc.txt 2>&1
-          grep -nE "^  (public|private|protected|static).*\(" mc.txt | grep -iE "resolution|render\(|framebuffer|blit|resize|scaleFactor" 
-          echo "--- onResolutionChanged body"
-          awk '/void onResolutionChanged/{f=1} f{print} /^$/{if(f)exit}' mc.txt | grep -E "invoke|Method|getfield" | head -40
-          echo "--- render body refs"
-          awk '/void render\(boolean\)/{f=1} f{print} /^$/{if(f)exit}' mc.txt | grep -iE "framebuffer|blit|Window|swap|present" | head -40
-          echo "=== GameRenderer render refs"
-          javap -p -c -cp "$J" net.minecraft.client.render.GameRenderer 2>&1 | grep -iE "Framebuffer|getFramebufferWidth|getFramebufferHeight|getScaleFactor" | sort | uniq -c | head -30
+          javap -p -c -cp "$J" net.minecraft.client.gl.Framebuffer | awk '/public void blitToScreen/{f=1} /public com.mojang.blaze3d.textures.GpuTexture getColorAttachment/{f=0} f' | grep -E "invoke|Field|getstatic|ldc|public|private" | cut -c1-230
+          echo "=== BlitRenderer / sampler"
+          javap -p -c -cp "$J" net.minecraft.client.gl.RenderPassImpl 2>&1 | head -3
+          javap -p -cp "$J" net.minecraft.client.gl.GlCommandEncoder 2>&1 | grep -iE "pass|Viewport|scissor" | head
