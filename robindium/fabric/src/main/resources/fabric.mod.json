@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "id": "robindium",
+  "provides": ["sodium-extra"],
+  "version": "${version}",
+  "name": "Robindium",
+  "description": "Robindium: Sodium Extra features (animations, particles, fog, render distance, FPS/coords HUD and more) for Sodium. Requires Sodium. Rebrand of Sodium Extra (LGPL-3.0) by Robin.",
+  "authors": [
+    {
+      "name": "Robin (Robindium rebrand)"
+    },
+    {
+      "name": "FlashyReese",
+      "contact": {
+        "homepage": "https://flashyreese.me"
+      }
+    }
+  ],
+  "contributors": [
+    "AMereBagatelle",
+    "DragonEggBedrockBreaking",
+    "EatMyVenom",
+    "HarvelsX",
+    "Kichura",
+    "Madis0"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/sodium-extra",
+    "sources": "https://github.com/FlashyReese/sodium-extra-fabric",
+    "issues": "https://github.com/FlashyReese/sodium-extra-fabric/issues"
+  },
+  "license": "LGPLv3",
+  "icon": "assets/sodium-extra/textures/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "preLaunch": [
+      "me.flashyreese.mods.sodiumextra.SodiumExtraFabricPreLaunch"
+    ],
+    "sodium:config_api_user": [
+      "me.flashyreese.mods.sodiumextra.client.config.SodiumExtraConfig"
+    ]
+  },
+  "custom": {
+    "modmenu": {
+      "parent": {
+        "id": "sodium"
+      },
+      "links": {
+        "modmenu.crowdin": "https://crowdin.com/project/sodium-extra",
+        "modmenu.curseforge": "https://curseforge.com/minecraft/mc-mods/sodium-extra",
+        "modmenu.discord": "https://flashyreese.me/discord",
+        "modmenu.donate": "https://ko-fi.com/flashyreese",
+        "modmenu.github_releases": "https://github.com/FlashyReese/sodium-extra-fabric/releases",
+        "modmenu.kofi": "https://ko-fi.com/flashyreese",
+        "modmenu.modrinth": "https://modrinth.com/mod/sodium-extra"
+      }
+    }
+  },
+  "accessWidener": "sodium-extra.accesswidener",
+  "mixins": [
+    "sodium-extra.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
+    "sodium": "${sodium_version}",
+    "minecraft": "${minecraft_version}"
+  },
+  "breaks": {
+    "iris": "<1.7.0",
+    "reeses-sodium-options": "<1.8.4"
+  },
+  "suggests": {
+    "greenlight": ">=0.1.0",
+    "reeses-sodium-options": ">=2.2.0"
+  }
+}

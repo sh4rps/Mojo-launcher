@@ -1,4 +1,4 @@
-name: Robindium pack build
+name: Robindium build
 on:
   workflow_dispatch:
     inputs:
@@ -12,15 +12,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: gradle/actions/setup-gradle@v4
       - name: Build
         working-directory: robindium
-        run: python3 build_pack.py
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon :fabric:build -x test
+          find . -path "*/build/libs/*.jar" | xargs ls -la
+      - name: Pick jar
+        run: |
+          mkdir -p out
+          for f in $(find robindium/fabric/build/libs -name "*.jar"); do case "$f" in *sources*|*dev*|*shadow*|*-all*) ;; *) cp "$f" out/ ;; esac; done
+          ls -la out
       - uses: actions/upload-artifact@v4
-        with: { name: robindium, path: robindium/Robindium-1.21.11.zip }
+        with: { name: robindium, path: out/*.jar }
       - name: Release
         if: ${{ github.event.inputs.release == 'true' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release delete robindium-1.21.11 --cleanup-tag --yes || true
-          gh release create robindium-1.21.11 robindium/Robindium-1.21.11.zip --title "Robindium 1.21.11 (Sodium + Sodium Extra + Podium)" --notes "Robindium for Minecraft 1.21.11 Fabric: Sodium + Sodium Extra + Podium (disables Sodium's Pojav check), unmodified, downloaded from Modrinth. Unzip into your game folder (mods/)."
+          gh release create robindium-1.21.11 out/*.jar --title "Robindium 1.21.11 (Fabric)" --notes "Robindium = Sodium Extra features under a new name (rebrand of Sodium Extra 0.9.5, LGPL-3.0). Requires Sodium 0.8.x for 1.21.11 (not included). Provides sodium-extra so other mods keep working."
