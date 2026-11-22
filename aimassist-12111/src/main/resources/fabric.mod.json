@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "aimassist",
+  "version": "${version}",
+  "name": "Soft Aim Assist",
+  "description": "Minimal soft aim lock: hit a player and the camera gently follows them; a strong mouse movement releases it.",
+  "environment": "client",
+  "mixins": ["aimassist.mixins.json"],
+  "entrypoints": { "client": ["dev.robin.aimassist.AimAssistClient"] },
+  "depends": { "fabricloader": ">=0.16.0", "minecraft": "~1.21.11", "java": ">=21", "fabric-api": "*" }
+}

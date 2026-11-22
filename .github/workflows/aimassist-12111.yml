@@ -1,0 +1,32 @@
+name: AimAssist 1.21.11 build
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Publish a GitHub release'
+        default: 'true'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: "9.2.0" }
+      - name: Build
+        working-directory: aimassist-12111
+        run: |
+          gradle --no-daemon build
+          ls -la build/libs
+      - uses: actions/upload-artifact@v4
+        with: { name: aimassist-jar, path: aimassist-12111/build/libs/*.jar }
+      - name: Release
+        if: ${{ github.event.inputs.release == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete aimassist-1.21.11 --cleanup-tag --yes || true
+          gh release create aimassist-1.21.11 aimassist-12111/build/libs/aimassist-*.jar --title "Soft Aim Assist 1.21.11" --notes "Soft Aim Assist 1.0 for Minecraft 1.21.11 Fabric. Hit a player and the camera softly follows them; a strong mouse movement releases the lock. Y toggles it. Needs Fabric API. Note: many servers ban aim assist."

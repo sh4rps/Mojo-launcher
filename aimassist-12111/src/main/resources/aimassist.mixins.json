@@ -1,0 +1,7 @@
+{
+  "required": true,
+  "package": "dev.robin.aimassist.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["EntityLookMixin"],
+  "injectors": { "defaultRequire": 1 }
+}
