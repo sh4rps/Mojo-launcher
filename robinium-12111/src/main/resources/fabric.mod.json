@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "robinium",
+  "version": "${version}",
+  "name": "Robinium",
+  "description": "Render distance 2-64 chunks, simulation distance 2-64, texture animations on/off. Lightweight, no Sodium/Vulkan needed, uses only tiny mixins so it works with other mods. Right Ctrl opens settings.",
+  "authors": ["Robin"],
+  "environment": "client",
+  "mixins": ["robinium.mixins.json"],
+  "entrypoints": { "client": ["dev.robin.robinium.Robinium"] },
+  "depends": { "fabricloader": ">=0.16.0", "minecraft": "~1.21.11", "java": ">=21", "fabric-api": "*" }
+}

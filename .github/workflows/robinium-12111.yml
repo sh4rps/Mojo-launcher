@@ -1,0 +1,32 @@
+name: Robinium 1.21.11 build
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Publish a GitHub release'
+        default: 'true'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: "9.2.0" }
+      - name: Build
+        working-directory: robinium-12111
+        run: |
+          gradle --no-daemon build
+          ls -la build/libs
+      - uses: actions/upload-artifact@v4
+        with: { name: robinium-jar, path: robinium-12111/build/libs/*.jar }
+      - name: Release
+        if: ${{ github.event.inputs.release == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete robinium-1.21.11 --cleanup-tag --yes || true
+          gh release create robinium-1.21.11 robinium-12111/build/libs/robinium-*.jar --title "Robinium 1.21.11" --notes "Robinium 1.0 for Minecraft 1.21.11 Fabric. Right Ctrl opens settings: render distance 2-64 chunks, simulation distance 2-64, texture animations on/off. No Sodium or Vulkan needed, tiny hooks only. Needs Fabric API."
