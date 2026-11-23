@@ -1,0 +1,32 @@
+name: Aggressive Chunk Gen 1.21.11 build
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Publish a GitHub release'
+        default: 'true'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: "9.2.0" }
+      - name: Build
+        working-directory: aggrchunk-12111
+        run: |
+          gradle --no-daemon build
+          ls -la build/libs
+      - uses: actions/upload-artifact@v4
+        with: { name: aggrchunk-jar, path: aggrchunk-12111/build/libs/*.jar }
+      - name: Release
+        if: ${{ github.event.inputs.release == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete aggrchunk-1.21.11 --cleanup-tag --yes || true
+          gh release create aggrchunk-1.21.11 aggrchunk-12111/build/libs/aggrchunk-*.jar --title "Aggressive Chunk Gen 1.21.11" --notes "Aggressive Chunk Gen 1.0 for Minecraft 1.21.11 Fabric. Pre-generates chunks around and ahead of the player (singleplayer or host) and uses all CPU cores for worldgen. /aggrchunk 0-3 sets Off/Normal/High/Extreme. Config: config/aggrchunk.properties. Needs Fabric API."

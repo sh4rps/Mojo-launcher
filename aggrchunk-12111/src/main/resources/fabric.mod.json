@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "aggrchunk",
+  "version": "${version}",
+  "name": "Aggressive Chunk Gen",
+  "description": "Pre-generates chunks around and ahead of the player (singleplayer / host) and uses more worker threads. /aggrchunk 0-3 to change level.",
+  "authors": ["Robin"],
+  "environment": "*",
+  "entrypoints": {
+    "preLaunch": ["dev.robin.aggrchunk.AggrPreLaunch"],
+    "main": ["dev.robin.aggrchunk.AggrChunk"]
+  },
+  "depends": { "fabricloader": ">=0.16.0", "minecraft": "~1.21.11", "java": ">=21", "fabric-api": "*" }
+}
