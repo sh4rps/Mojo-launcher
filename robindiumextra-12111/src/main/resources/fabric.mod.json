@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "robindiumextra",
+  "version": "${version}",
+  "name": "Robindium Extra",
+  "description": "Standalone performance settings (render distance limits for players, mobs, decor, block entities, particles + clouds/shadows). Does NOT need Sodium. Press Right Shift to open settings.",
+  "authors": ["Robin"],
+  "environment": "client",
+  "mixins": ["robindiumextra.mixins.json"],
+  "entrypoints": { "client": ["dev.robin.rdx.RobindiumExtra"] },
+  "depends": { "fabricloader": ">=0.16.0", "minecraft": "~1.21.11", "java": ">=21", "fabric-api": "*" }
+}
