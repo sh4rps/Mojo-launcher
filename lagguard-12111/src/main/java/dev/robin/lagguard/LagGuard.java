@@ -68,7 +68,7 @@ public class LagGuard implements ClientModInitializer {
         ensureLoaded();
         if (level == 3) return false;
         MinecraftClient mc = MinecraftClient.getInstance();
-        if (e == mc.player || e == mc.cameraEntity || e == mc.player.getVehicle() || e.hasPassengers()) return false;
+        if (e == mc.player || e == mc.getCameraEntity() || e == mc.player.getVehicle() || e.hasPassengers()) return false;
         double dx = e.getX() - cx, dy = e.getY() - cy, dz = e.getZ() - cz;
         double d = dx * dx + dy * dy + dz * dz;
         double lim = e instanceof PlayerEntity ? playerSq
