@@ -1,0 +1,23 @@
+name: Recon javap
+on: workflow_dispatch
+jobs:
+  r:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: "9.2.0" }
+      - name: Build skeleton
+        working-directory: spearboost-12111
+        run: gradle --no-daemon build -q || true
+      - name: javap
+        working-directory: spearboost-12111
+        run: |
+          J=$(find . -name "minecraft-merged*1.21.11*.jar" 2>/dev/null | grep -v sources | head -1)
+          echo "=== RenderLayers clinit"; javap -p -c -cp "$J" net.minecraft.client.render.RenderLayers | awk '/static \{\}/{p=1} p' | grep -E "LINES|lines|invoke|getstatic.*RenderPipelines" | head -40
+          echo "=== RenderLayer statics"; javap -p -cp "$J" net.minecraft.client.render.RenderLayer | grep -E "static|RenderSetup"
+          echo "=== RenderSetup"; unzip -l "$J" | awk '{print $4}' | grep -E "RenderSetup"; javap -p -cp "$J" net.minecraft.client.render.RenderSetup 2>&1 | head -40
+          echo "=== Pipeline builder"; javap -p -cp "$J" 'com.mojang.blaze3d.pipeline.RenderPipeline$Builder' | grep -iE "depth|withLocation|build|Snippet"
+          echo "=== lines pipeline"; javap -p -c -cp "$J" net.minecraft.client.gl.RenderPipelines | grep -B3 -A12 "RENDERTYPE_LINES_SNIPPET" | head -60
