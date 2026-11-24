@@ -61,6 +61,7 @@ public class TotemMemory implements ClientModInitializer {
         return throughWalls;
     }
     private static String loadedFor = "";
+    private static boolean screenWasOpen;
 
     private static String worldId(MinecraftClient mc) {
         var si = mc.getCurrentServerEntry();
@@ -100,7 +101,10 @@ public class TotemMemory implements ClientModInitializer {
         Boolean old = memory.put(key(mc, pos), has);
         if (st.getBlock() instanceof ChestBlock && st.contains(ChestBlock.CHEST_TYPE) && st.get(ChestBlock.CHEST_TYPE) != ChestType.SINGLE)
             memory.put(key(mc, pos.offset(ChestBlock.getFacing(st))), has);
-        if (old == null || old != has) save(mc);
+        if (old == null || old != has) {
+            save(mc);
+            if (mc.player != null) mc.player.sendMessage(Text.literal("Totem Memory: " + (st.isOf(Blocks.BARREL) ? "barrel" : "chest") + " saved - " + (has ? "HAS totem (highlighted)" : "no totem")), true);
+        }
     }
 
     @Override public void onInitializeClient() {
@@ -119,6 +123,13 @@ public class TotemMemory implements ClientModInitializer {
             }
             if (mc.world == null) return;
             ensureLoaded(mc);
+            boolean open = mc.currentScreen instanceof GenericContainerScreen;
+            if (open && !screenWasOpen) {
+                // fallback for servers: use the block you were looking at when the container opened
+                if ((lastUsed == null || !isStorage(mc.world.getBlockState(lastUsed))) && mc.crosshairTarget instanceof net.minecraft.util.hit.BlockHitResult bhr)
+                    lastUsed = bhr.getBlockPos();
+            }
+            screenWasOpen = open;
             if (mc.currentScreen instanceof GenericContainerScreen gs && lastUsed != null && gs.getScreenHandler() instanceof GenericContainerScreenHandler h) {
                 Inventory inv = h.getInventory();
                 boolean has = false;

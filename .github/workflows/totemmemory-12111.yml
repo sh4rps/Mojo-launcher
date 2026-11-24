@@ -29,4 +29,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release delete totemmemory-1.21.11 --cleanup-tag --yes || true
-          gh release create totemmemory-1.21.11 totemmemory-12111/build/libs/totemmemory-*.jar --title "Totem Memory 1.21.11" --notes "Totem Memory 1.1 (shows through walls) for Minecraft 1.21.11 Fabric. Outlines in yellow the chests and barrels you opened that hold Totems of Undying, and item frames holding a totem (within 256 blocks). H toggles. Needs Fabric API."
+          gh release create totemmemory-1.21.11 totemmemory-12111/build/libs/totemmemory-*.jar --title "Totem Memory 1.21.11" --notes "Totem Memory 1.2 (works on servers, shows a "saved" message when it remembers a chest, through walls) for Minecraft 1.21.11 Fabric. Outlines in yellow the chests and barrels you opened that hold Totems of Undying, and item frames holding a totem (within 256 blocks). H toggles. Needs Fabric API."
