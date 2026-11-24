@@ -43,6 +43,10 @@ public class CartConfig {
     /** After the shot, automatically step away from the cart (presses the right W/A/S/D keys, whatever way you face). */
     @SerialEntry public boolean retreat = true;
     @SerialEntry public int retreatTicks = 8;
+    /** Safe mode: fires only when far enough, healthy and protected (slab or shield); always backs off and sneaks until the blast. */
+    @SerialEntry public boolean safeMode = true;
+    @SerialEntry public int safeDistance = 4;
+    @SerialEntry public int safeMinHealth = 8;
     /** Keep shift held after the back-step until the TNT minecart has exploded, then stand up. */
     @SerialEntry public boolean sneakUntilBlast = true;
     /** Small instant push away from the cart, in hundredths of a block per tick of velocity. */
@@ -75,6 +79,16 @@ public class CartConfig {
                                 .description(OptionDescription.of(Text.literal("After the crossbow shot you automatically move away from the cart (the right W/A/S/D keys are pressed for you), so the blast hurts less.")))
                                 .binding(d.retreat, () -> c.retreat, v -> c.retreat = v)
                                 .controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<Boolean>createBuilder().name(Text.literal("SAFE MODE"))
+                                .description(OptionDescription.of(Text.literal("Only fires when you are far enough, healthy enough and protected by a slab or shield. Always backs off and sneaks until the blast.")))
+                                .binding(d.safeMode, () -> c.safeMode, v -> c.safeMode = v)
+                                .controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<Integer>createBuilder().name(Text.literal("Safe distance (blocks)"))
+                                .binding(d.safeDistance, () -> c.safeDistance, v -> c.safeDistance = v)
+                                .controller(o -> IntegerSliderControllerBuilder.create(o).range(2, 10).step(1)).build())
+                        .option(Option.<Integer>createBuilder().name(Text.literal("Safe minimum health"))
+                                .binding(d.safeMinHealth, () -> c.safeMinHealth, v -> c.safeMinHealth = v)
+                                .controller(o -> IntegerSliderControllerBuilder.create(o).range(0, 20).step(1)).build())
                         .option(Option.<Boolean>createBuilder().name(Text.literal("Sneak until blast"))
                                 .description(OptionDescription.of(Text.literal("Shift is held during the back-step and until the TNT minecart has exploded; you stand up only after the blast.")))
                                 .binding(d.sneakUntilBlast, () -> c.sneakUntilBlast, v -> c.sneakUntilBlast = v)
