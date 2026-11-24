@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "totemmemory",
+  "version": "${version}",
+  "name": "Totem Memory",
+  "description": "Highlights in yellow the chests and barrels you opened that contain Totems of Undying, and item frames holding a totem. H toggles.",
+  "authors": ["Robin"],
+  "environment": "client",
+  "entrypoints": { "client": ["dev.robin.totemmemory.TotemMemory"] },
+  "depends": { "fabricloader": ">=0.16.0", "minecraft": "~1.21.11", "java": ">=21", "fabric-api": "*" }
+}
