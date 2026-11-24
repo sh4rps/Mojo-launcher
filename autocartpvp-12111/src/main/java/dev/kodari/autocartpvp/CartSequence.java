@@ -3,7 +3,10 @@ package dev.kodari.autocartpvp;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.util.math.Box;
 import net.minecraft.item.CrossbowItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -22,14 +25,14 @@ import net.minecraft.util.math.Vec3d;
  * Bow mode (config off): rail, cart, then draw and release a Flame bow.
  */
 public class CartSequence {
-    enum Stage { IDLE, RAIL, CART, DRAW, LOAD, SHIELD, BURST, HOLD, RETREAT }
+    enum Stage { IDLE, RAIL, CART, DRAW, LOAD, SHIELD, BURST, HOLD, RETREAT, SNEAK }
 
     private Stage stage = Stage.IDLE;
     private BlockHitResult target;
     private BlockPos railPos;
     private int wait, originalSlot;
     private boolean loading, shieldOn, shieldUp;
-    private int retreatLeft;
+    private int retreatLeft, sneakTicks;
     private Vec3d cartCenter = Vec3d.ZERO;
 
     public boolean active() { return stage != Stage.IDLE; }
@@ -73,7 +76,7 @@ public class CartSequence {
         if (!cfg.enabled || mc.currentScreen != null || mc.player.currentScreenHandler != mc.player.playerScreenHandler) {
             cancel(mc, "Interrupted"); return;
         }
-        if (stage != Stage.HOLD && stage != Stage.RETREAT && mc.player.getEyePos().squaredDistanceTo(target.getPos()) > (double) ((cfg.range + 1) * (cfg.range + 1))) { cancel(mc, "Target out of range"); return; }
+        if (stage != Stage.HOLD && stage != Stage.RETREAT && stage != Stage.SNEAK && mc.player.getEyePos().squaredDistanceTo(target.getPos()) > (double) ((cfg.range + 1) * (cfg.range + 1))) { cancel(mc, "Target out of range"); return; }
         if (wait-- > 0) return;
 
         Equipment eq = Equipment.scan(mc.player.getInventory(), cfg.autoDetect);
@@ -82,8 +85,21 @@ public class CartSequence {
             case SHIELD -> raiseShield(mc, cfg);
             case BURST -> burst(mc, eq);
             case RETREAT -> {
-                if (retreatLeft-- <= 0) { releaseMove(); stage = Stage.IDLE; message(mc, "Boom"); }
-                else steerAway(mc);
+                if (retreatLeft-- <= 0) {
+                    releaseMove();
+                    if (cfg.sneakUntilBlast) { stage = Stage.SNEAK; sneakTicks = 0; mc.options.sneakKey.setPressed(true); }
+                    else { stage = Stage.IDLE; message(mc, "Boom"); }
+                } else steerAway(mc);
+            }
+            case SNEAK -> {
+                // stay low (shift) until the TNT minecart has exploded, then stand up
+                mc.options.sneakKey.setPressed(true);
+                sneakTicks++;
+                boolean cartLeft = !mc.world.getEntitiesByClass(Entity.class, new Box(cartCenter, cartCenter).expand(5.0),
+                        e -> e.getType() == EntityType.TNT_MINECART).isEmpty();
+                if ((!cartLeft && sneakTicks > 3) || sneakTicks > 120) {
+                    releaseMove(); stage = Stage.IDLE; message(mc, "Boom");
+                }
             }
             case HOLD -> {
                 mc.options.useKey.setPressed(false);
@@ -293,6 +309,7 @@ public class CartSequence {
         }
         mc.options.forwardKey.setPressed(f); mc.options.backKey.setPressed(b);
         mc.options.leftKey.setPressed(l); mc.options.rightKey.setPressed(r);
+        if (CartConfig.get().sneakUntilBlast) mc.options.sneakKey.setPressed(true);
     }
 
     private void releaseMove() {
@@ -300,7 +317,7 @@ public class CartSequence {
     }
 
     private void cancel(MinecraftClient mc, String why) {
-        if (stage == Stage.RETREAT) releaseMove();
+        if (stage == Stage.RETREAT || stage == Stage.SNEAK) releaseMove();
         mc.options.useKey.setPressed(false);
         if (mc.player.isUsingItem()) mc.interactionManager.stopUsingItem(mc.player);
         finish(mc);
