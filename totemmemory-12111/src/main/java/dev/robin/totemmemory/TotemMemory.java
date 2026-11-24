@@ -13,7 +13,11 @@ import net.minecraft.block.enums.ChestType;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.render.RenderLayers;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.platform.DepthTestFunction;
+import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderSetup;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexRendering;
 import net.minecraft.entity.Entity;
@@ -42,6 +46,20 @@ public class TotemMemory implements ClientModInitializer {
     private static final Map<String, Boolean> memory = new HashMap<>();   // "dim|x|y|z" -> holds a totem
     private static boolean enabled = true;
     private static BlockPos lastUsed;
+    private static RenderLayer throughWalls;
+
+    /** Same as vanilla lines, but with the depth test off so the outline shows through walls. */
+    private static RenderLayer layer() {
+        if (throughWalls == null) {
+            RenderPipeline p = RenderPipeline.builder(RenderPipelines.RENDERTYPE_LINES_SNIPPET)
+                    .withLocation(Identifier.of("totemmemory", "pipeline/lines_xray"))
+                    .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+                    .withDepthWrite(false)
+                    .build();
+            throughWalls = RenderLayer.of("totemmemory_lines_xray", RenderSetup.builder(p).build());
+        }
+        return throughWalls;
+    }
     private static String loadedFor = "";
 
     private static String worldId(MinecraftClient mc) {
@@ -113,7 +131,7 @@ public class TotemMemory implements ClientModInitializer {
             MinecraftClient mc = MinecraftClient.getInstance();
             if (!enabled || mc.world == null || mc.player == null) return;
             Vec3d cam = mc.gameRenderer.getCamera().getCameraPos();
-            VertexConsumer vc = ctx.consumers().getBuffer(RenderLayers.lines());
+            VertexConsumer vc = ctx.consumers().getBuffer(layer());
             var ms = ctx.matrices();
             String dim = mc.world.getRegistryKey().getValue().toString();
             double r2 = RANGE * RANGE;

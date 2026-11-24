@@ -3,7 +3,7 @@
   "id": "totemmemory",
   "version": "${version}",
   "name": "Totem Memory",
-  "description": "Highlights in yellow the chests and barrels you opened that contain Totems of Undying, and item frames holding a totem. H toggles.",
+  "description": "Highlights in yellow (through walls) the chests and barrels you opened that contain Totems of Undying, and item frames holding a totem. H toggles.",
   "authors": ["Robin"],
   "environment": "client",
   "entrypoints": { "client": ["dev.robin.totemmemory.TotemMemory"] },
