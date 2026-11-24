@@ -38,6 +38,12 @@ import org.lwjgl.glfw.GLFW;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import net.minecraft.block.entity.BarrelBlockEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.block.entity.ShulkerBoxBlockEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.chunk.WorldChunk;
 
 /** Remembers which chests/barrels you opened hold Totems of Undying and outlines them (and totem item frames) in yellow. */
 public class TotemMemory implements ClientModInitializer {
@@ -62,6 +68,37 @@ public class TotemMemory implements ClientModInitializer {
     }
     private static String loadedFor = "";
     private static boolean screenWasOpen;
+    /** Singleplayer only: containers that really hold a totem right now (read straight from the integrated server). */
+    private static volatile Set<BlockPos> scanned = Collections.emptySet();
+    private static int scanTimer;
+
+    private static void scanSingleplayer(MinecraftClient mc) {
+        var server = mc.getServer();
+        if (server == null || mc.player == null) { scanned = Collections.emptySet(); return; }
+        if (scanTimer-- > 0) return;
+        scanTimer = 20;
+        final var dimKey = mc.world.getRegistryKey();
+        final int pcx = mc.player.getChunkPos().x, pcz = mc.player.getChunkPos().z;
+        server.execute(() -> {
+            Set<BlockPos> found = new HashSet<>();
+            try {
+                ServerWorld sw = server.getWorld(dimKey);
+                if (sw != null) {
+                    int r = (int) (RANGE / 16) + 1;
+                    for (int cx = pcx - r; cx <= pcx + r; cx++) for (int cz = pcz - r; cz <= pcz + r; cz++) {
+                        WorldChunk ch = sw.getChunkManager().getWorldChunk(cx, cz);
+                        if (ch == null) continue;
+                        for (BlockEntity be : ch.getBlockEntities().values()) {
+                            if (!(be instanceof ChestBlockEntity || be instanceof BarrelBlockEntity || be instanceof ShulkerBoxBlockEntity)) continue;
+                            Inventory inv = (Inventory) be;
+                            for (int i = 0; i < inv.size(); i++) if (inv.getStack(i).isOf(Items.TOTEM_OF_UNDYING)) { found.add(be.getPos().toImmutable()); break; }
+                        }
+                    }
+                }
+            } catch (Throwable ignored) { }
+            scanned = found;
+        });
+    }
 
     private static String worldId(MinecraftClient mc) {
         var si = mc.getCurrentServerEntry();
@@ -123,6 +160,7 @@ public class TotemMemory implements ClientModInitializer {
             }
             if (mc.world == null) return;
             ensureLoaded(mc);
+            scanSingleplayer(mc);
             boolean open = mc.currentScreen instanceof GenericContainerScreen;
             if (open && !screenWasOpen) {
                 // fallback for servers: use the block you were looking at when the container opened
@@ -134,7 +172,7 @@ public class TotemMemory implements ClientModInitializer {
                 Inventory inv = h.getInventory();
                 boolean has = false;
                 for (int i = 0; i < inv.size(); i++) if (inv.getStack(i).isOf(Items.TOTEM_OF_UNDYING)) { has = true; break; }
-                record(mc, lastUsed, has);
+                if (mc.getServer() == null) record(mc, lastUsed, has);
             }
         });
 
@@ -148,6 +186,15 @@ public class TotemMemory implements ClientModInitializer {
             double r2 = RANGE * RANGE;
             Iterator<Map.Entry<String, Boolean>> it = memory.entrySet().iterator();
             VoxelShape unit = VoxelShapes.cuboid(0, 0, 0, 1, 1, 1);
+            if (mc.getServer() != null) {
+                // singleplayer: the real contents are known, so every container with a totem glows from the start
+                for (BlockPos pos : scanned) {
+                    double dx = pos.getX() + 0.5 - cam.x, dy = pos.getY() + 0.5 - cam.y, dz = pos.getZ() + 0.5 - cam.z;
+                    if (dx * dx + dy * dy + dz * dz > r2) continue;
+                    VertexRendering.drawOutline(ms, vc, unit, pos.getX() - cam.x, pos.getY() - cam.y, pos.getZ() - cam.z, YELLOW, 3.0f);
+                }
+                it = Collections.<String, Boolean>emptyMap().entrySet().iterator();
+            }
             while (it.hasNext()) {
                 var e = it.next();
                 if (!e.getValue()) continue;
