@@ -191,33 +191,12 @@ public class CartSequence {
         if (hd < 1.6) { cancel(mc, "Too close: step back 2 blocks"); return; }
         BlockPos pb = mc.player.getBlockPos();
         double ux = -hx / hd, uz = -hz / hd;       // unit vector player -> cart (horizontal)
-        // slab cell: 1 block in front of you, on the line to the cart (tries a few spots / heights)
-        BlockPos slabCell = null;
-        if (CartConfig.get().slabMode) {
-            if (eq.slab() < 0) message(mc, "No slab in hotbar: blast will hurt");
-            else {
-                outer:
-                for (double dd : new double[]{1.0, 1.3, 0.8, 1.6}) {
-                    for (int dy : new int[]{0, -1, 1}) {
-                        BlockPos t = new BlockPos(net.minecraft.util.math.MathHelper.floor(eye.x + ux * dd),
-                                pb.getY() + dy, net.minecraft.util.math.MathHelper.floor(eye.z + uz * dd));
-                        if (t.equals(pb) || t.equals(railPos) || t.equals(railPos.up())) continue;
-                        if (t.getSquaredDistance(railPos) < 2.0) continue;
-                        var st = mc.world.getBlockState(t);
-                        if (!(st.isAir() || st.isReplaceable())) continue;
-                        if (!mc.world.getBlockState(t.down()).isSideSolidFullSquare(mc.world, t.down(), Direction.UP)) continue;
-                        slabCell = t; break outer;
-                    }
-                }
-                if (slabCell == null) message(mc, "No room for a slab: blast will hurt");
-            }
-        }
         // fire cells on the arrow line just before the cart (several, so the arrow is lit wherever it flies through)
         java.util.List<BlockPos> fires = new java.util.ArrayList<>();
         for (double dd : new double[]{1.0, 1.4, 1.8, 0.8, 2.2}) {
             if (dd > hd - 0.6) continue;
             BlockPos f = new BlockPos(net.minecraft.util.math.MathHelper.floor(c.x + hx / hd * dd), railPos.getY(), net.minecraft.util.math.MathHelper.floor(c.z + hz / hd * dd));
-            if (f.equals(railPos) || f.equals(pb) || f.equals(pb.up()) || f.equals(slabCell) || fires.contains(f)) continue;
+            if (f.equals(railPos) || f.equals(pb) || f.equals(pb.up()) || fires.contains(f)) continue;
             var st = mc.world.getBlockState(f);
             if (!(st.isAir() || st.isReplaceable())) continue;
             if (!mc.world.getBlockState(f.down()).isSideSolidFullSquare(mc.world, f.down(), Direction.UP)) continue;
@@ -239,13 +218,6 @@ public class CartSequence {
             if (select(mc, eq.flint()) && mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, fh).isAccepted()) lit = true;
         }
         if (!lit) { cancel(mc, "Could not light the fire"); return; }
-        // 3b. one blast slab in front of you
-        if (slabCell != null) {
-            Equipment e2 = Equipment.scan(mc.player.getInventory(), CartConfig.get().autoDetect);
-            BlockPos sd = slabCell.down();
-            BlockHitResult h = new BlockHitResult(new Vec3d(sd.getX() + 0.5, sd.getY() + 1.0, sd.getZ() + 0.5), Direction.UP, sd, false);
-            if (!select(mc, e2.slab()) || !mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, h).isAccepted()) message(mc, "Could not place slab");
-        }
         // 4. aim at the cart and shoot the loaded crossbow through the fire
         float oldYaw = mc.player.getYaw(), oldPitch = mc.player.getPitch();
         double dx = c.x - eye.x, dy = c.y - eye.y, dz = c.z - eye.z;
