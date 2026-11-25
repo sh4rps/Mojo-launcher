@@ -27,11 +27,24 @@ public final class SafeSpots {
     private static final double POWER = 4.5;            // TNT minecart blast power (4.0 - 5.5)
     private static volatile List<BlockPos> safe = Collections.emptyList();
     private static int timer;
+    private static volatile BlockPos mark;
 
     private SafeSpots() { }
 
     public static void tick(MinecraftClient mc) {
         CartConfig cfg = CartConfig.get();
+        mark = null;
+        if (mc.player != null && mc.world != null && cfg.markDistance > 0
+                && Equipment.scan(mc.player.getInventory(), cfg.autoDetect).ready(cfg.crossbowMode)) {
+            // straight ahead (nearest compass direction), N blocks from the block you stand on; follow the ground up/down
+            Direction fd = mc.player.getHorizontalFacing();
+            BlockPos col = mc.player.getBlockPos().offset(fd, cfg.markDistance);
+            for (int dy = 2; dy >= -4; dy--) {
+                BlockPos b = col.up(dy);
+                if (mc.world.getBlockState(b).isSideSolidFullSquare(mc.world, b, Direction.UP)
+                        && (mc.world.getBlockState(b.up()).isAir() || mc.world.getBlockState(b.up()).isReplaceable())) { mark = b; break; }
+            }
+        }
         if (!cfg.showSafeSpots || mc.player == null || mc.world == null || mc.player.getPitch() < 12f) { safe = Collections.emptyList(); return; }
         // only when every AutoCart item is in the inventory (rail, TNT minecart, flint/crossbow...)
         if (!Equipment.scan(mc.player.getInventory(), cfg.autoDetect).ready(cfg.crossbowMode)) { safe = Collections.emptyList(); return; }
@@ -81,10 +94,15 @@ public final class SafeSpots {
 
     public static void render(MinecraftClient mc, MatrixStack ms, net.minecraft.client.render.VertexConsumerProvider consumers) {
         List<BlockPos> list = safe;
-        if (list.isEmpty() || mc.player == null) return;
+        BlockPos mk = mark;
+        if ((list.isEmpty() && mk == null) || mc.player == null) return;
         Vec3d cam = mc.gameRenderer.getCamera().getCameraPos();
         VertexConsumer vc = consumers.getBuffer(RenderLayers.lines());
         VoxelShape top = VoxelShapes.cuboid(0.04, 0.0, 0.04, 0.96, 0.02, 0.96);
+        if (mk != null) {
+            VoxelShape yb = VoxelShapes.cuboid(0.0, 0.0, 0.0, 1.0, 1.0, 1.0);
+            VertexRendering.drawOutline(ms, vc, yb, mk.getX() - cam.x, mk.getY() - cam.y, mk.getZ() - cam.z, 0xFFFFFF00, 4.0f);
+        }
         for (BlockPos p : list)
             VertexRendering.drawOutline(ms, vc, top, p.getX() - cam.x, p.getY() + 1.0 - cam.y, p.getZ() - cam.z, 0xFF55FF55, 3.0f);
     }

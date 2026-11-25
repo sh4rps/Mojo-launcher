@@ -30,6 +30,8 @@ public class CartConfig {
     @SerialEntry public boolean hud = true;
     /** Looking down: outline the blocks where the blast would hurt you little or not at all. */
     @SerialEntry public boolean showSafeSpots = true;
+    /** Yellow marker: the block this many blocks straight ahead of the block you stand on (when all items are in the inventory). 0 = off. */
+    @SerialEntry public int markDistance = 4;
     /** Highest estimated blast damage (half-hearts, no armor) a block may cause and still count as safe. */
     @SerialEntry public int safeDamage = 4;
     /** Ticks to hold the bow before releasing. A bow released under ~3 ticks never fires; 5 leaves margin for server lag. */
@@ -40,6 +42,10 @@ public class CartConfig {
     @SerialEntry public boolean autoLoad = true;
     /** Raise a shield (moved to the off-hand) before the blast: raised shields block explosion damage. */
     @SerialEntry public boolean blastShield = false;
+    /** Place any slab from the hotbar in front of you before the shot to soak up the blast. */
+    @SerialEntry public boolean slabMode = true;
+    /** 1 = bottom slab, 2 = double slab (full block, still low enough for the arrow to fly over). */
+    @SerialEntry public int slabLayers = 1;
     /** After the shot, automatically step away from the cart (presses the right W/A/S/D keys, whatever way you face). */
     @SerialEntry public boolean retreat = true;
     @SerialEntry public int retreatTicks = 8;
@@ -75,6 +81,10 @@ public class CartConfig {
                                 .description(OptionDescription.of(Text.literal("After the crossbow shot you automatically move away from the cart (the right W/A/S/D keys are pressed for you), so the blast hurts less.")))
                                 .binding(d.retreat, () -> c.retreat, v -> c.retreat = v)
                                 .controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<Integer>createBuilder().name(Text.literal("Yellow marker distance (0 = off)"))
+                                .description(OptionDescription.of(Text.literal("Marks in yellow the block this many blocks straight ahead of the block you stand on, where the cart is best placed.")))
+                                .binding(d.markDistance, () -> c.markDistance, v -> c.markDistance = v)
+                                .controller(o -> IntegerSliderControllerBuilder.create(o).range(0, 8).step(1)).build())
                         .option(Option.<Boolean>createBuilder().name(Text.literal("Show safe blocks (look down)"))
                                 .description(OptionDescription.of(Text.literal("When you look down, blocks where a cart blast would hurt you little or not at all are outlined in green.")))
                                 .binding(d.showSafeSpots, () -> c.showSafeSpots, v -> c.showSafeSpots = v)
@@ -93,6 +103,14 @@ public class CartConfig {
                         .option(Option.<Integer>createBuilder().name(Text.literal("Back-step push (0 = off)"))
                                 .binding(d.retreatPush, () -> c.retreatPush, v -> c.retreatPush = v)
                                 .controller(o -> IntegerSliderControllerBuilder.create(o).range(0, 60).step(5)).build())
+                        .option(Option.<Boolean>createBuilder().name(Text.literal("Blast slab in front of you"))
+                                .description(OptionDescription.of(Text.literal("Any slab in your hotbar is placed on the ground in front of you before the shot. It blocks part of the explosion; the arrow flies over it.")))
+                                .binding(d.slabMode, () -> c.slabMode, v -> c.slabMode = v)
+                                .controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<Integer>createBuilder().name(Text.literal("Slab layers (1 or 2)"))
+                                .description(OptionDescription.of(Text.literal("2 stacks a second slab on the first (needs 2 slabs of the same kind in the stack).")))
+                                .binding(d.slabLayers, () -> c.slabLayers, v -> c.slabLayers = v)
+                                .controller(o -> IntegerSliderControllerBuilder.create(o).range(1, 2).step(1)).build())
                         .option(Option.<Boolean>createBuilder().name(Text.literal("Blast shield (no explosion damage)"))
                                 .description(OptionDescription.of(Text.literal("Needs a shield in your inventory. It is moved to the off-hand and raised before the shot, so the TNT minecart blast cannot hurt you (face the cart).")))
                                 .binding(d.blastShield, () -> c.blastShield, v -> c.blastShield = v)
