@@ -21,4 +21,4 @@ jobs:
           cp robincord/app/build/outputs/apk/release/app-release.apk Robincord.apk
           ls -la Robincord.apk
           gh release delete robincord -y --cleanup-tag || true
-          gh release create robincord Robincord.apk --title "Robincord" --notes "v1.3: keeps itself alive, tells you (one-tap notification) if Android turns Accessibility off, and battery/autostart shortcut. Robincord screen recorder: internal + mic audio, pause/resume, up to 1080p / 90 fps / 48 Mbps, saves to internal storage or SD card."
+          gh release create robincord Robincord.apk --title "Robincord" --notes "v1.4: lighter on the game while recording (encoder real-time priority, background drain thread, no per-frame garbage). v1.3: keeps itself alive, tells you (one-tap notification) if Android turns Accessibility off, and battery/autostart shortcut. Robincord screen recorder: internal + mic audio, pause/resume, up to 1080p / 90 fps / 48 Mbps, saves to internal storage or SD card."

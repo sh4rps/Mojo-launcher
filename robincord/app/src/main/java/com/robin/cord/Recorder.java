@@ -53,6 +53,7 @@ final class Recorder {
     private int vTrack = -1, aTrack = -1;
     private boolean muxStarted;
     private final Object ml = new Object();
+    private final MediaCodec.BufferInfo writeInfo = new MediaCodec.BufferInfo();
     private final ArrayList<Pend> pend = new ArrayList<>();
 
     /** Live meters for the UI: peak level 0..32767 (decaying) and a status line. */
@@ -142,6 +143,8 @@ final class Recorder {
         vf.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
         vf.setLong(MediaFormat.KEY_REPEAT_PREVIOUS_FRAME_AFTER, 1500000L / fps);
         try { vf.setInteger("max-fps-to-encoder", fps); } catch (Throwable ignore) { }
+        // keep the encoder steady and real-time so frames do not pile up and steal GPU/CPU time from the game
+        try { vf.setInteger(MediaFormat.KEY_PRIORITY, 0); vf.setInteger(MediaFormat.KEY_OPERATING_RATE, fps); } catch (Throwable ignore) { }
         if (mime.equals(MediaFormat.MIMETYPE_VIDEO_AVC)) {
             vf.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileHigh);
         }
@@ -312,9 +315,8 @@ final class Recorder {
     private void write(boolean video, ByteBuffer buf, MediaCodec.BufferInfo bi, long pts) {
         synchronized (ml) {
             if (muxStarted) {
-                MediaCodec.BufferInfo o = new MediaCodec.BufferInfo();
-                o.set(bi.offset, bi.size, pts, bi.flags);
-                try { muxer.writeSampleData(video ? vTrack : aTrack, buf, o); } catch (Throwable t) { Log.w(TAG, "write", t); }
+                writeInfo.set(bi.offset, bi.size, pts, bi.flags);   // reused: no per-frame garbage (GC pauses cause stutter)
+                try { muxer.writeSampleData(video ? vTrack : aTrack, buf, writeInfo); } catch (Throwable t) { Log.w(TAG, "write", t); }
             } else {
                 Pend p = new Pend();
                 p.video = video; p.pts = pts; p.flags = bi.flags;
@@ -341,6 +343,8 @@ final class Recorder {
     }
 
     private void videoLoop() {
+        // draining finished frames is not urgent: run it at background priority so the game keeps the CPU cores
+        try { android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND); } catch (Throwable ignore) { }
         MediaCodec.BufferInfo bi = new MediaCodec.BufferInfo();
         long lastPts = -1;
         try {
