@@ -33,6 +33,8 @@ public final class SafeSpots {
     public static void tick(MinecraftClient mc) {
         CartConfig cfg = CartConfig.get();
         if (!cfg.showSafeSpots || mc.player == null || mc.world == null || mc.player.getPitch() < 12f) { safe = Collections.emptyList(); return; }
+        // only when every AutoCart item is in the inventory (rail, TNT minecart, flint/crossbow...)
+        if (!Equipment.scan(mc.player.getInventory(), cfg.autoDetect).ready(cfg.crossbowMode)) { safe = Collections.emptyList(); return; }
         if (timer-- > 0) return;
         timer = 8;
         double reach = cfg.range + 1.0;
