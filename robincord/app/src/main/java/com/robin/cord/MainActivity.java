@@ -119,6 +119,11 @@ public class MainActivity extends Activity {
             startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName())));
         } });
         k.addView(ai, lp(-1, 44, 0, 8, 0, 0));
+        Button ka = btn("Stop Android from turning it off (battery + autostart)", 0xFF2A2A31);
+        ka.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { keepAlive(); } });
+        k.addView(ka, lp(-1, 44, 0, 8, 0, 0));
+        k.addView(tv("Xiaomi / HyperOS also: Recents > long-press Robincord > Lock. Settings > Apps > Robincord > Autostart ON, "
+                + "Battery saver > No restrictions. Robincord shows a notification if Android switches Accessibility off anyway.", 12, DIM, false));
         root.addView(k);
 
         // ---- audio
@@ -168,6 +173,7 @@ public class MainActivity extends Activity {
         buildList();
         updateSd();
         updateA11y();
+        GuardService.start(this);
     }
 
     @Override protected void onPause() {
@@ -216,6 +222,23 @@ public class MainActivity extends Activity {
                 }
             }
         }, 150);
+    }
+
+    private void keepAlive() {
+        try {
+            startActivity(new Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + getPackageName())));
+        } catch (Throwable t) {
+            try { startActivity(new Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)); } catch (Throwable ignored) { }
+        }
+        h.postDelayed(new Runnable() { public void run() {
+            try {
+                Intent i = new Intent();
+                i.setComponent(new android.content.ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutostartManagementActivity"));
+                startActivity(i);
+            } catch (Throwable t) {
+                try { startActivity(new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName()))); } catch (Throwable ignored) { }
+            }
+        } }, 600);
     }
 
     private boolean a11yOn() {
