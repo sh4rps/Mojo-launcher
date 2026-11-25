@@ -87,7 +87,7 @@ public class CartSequence {
             case RETREAT -> {
                 if (retreatLeft-- <= 0) {
                     releaseMove();
-                    if (cfg.sneakUntilBlast || cfg.safeMode) { stage = Stage.SNEAK; sneakTicks = 0; mc.options.sneakKey.setPressed(true); }
+                    if (cfg.sneakUntilBlast) { stage = Stage.SNEAK; sneakTicks = 0; mc.options.sneakKey.setPressed(true); }
                     else { stage = Stage.IDLE; message(mc, "Boom"); }
                 } else steerAway(mc);
             }
@@ -226,13 +226,6 @@ public class CartSequence {
         }
         if (fires.isEmpty()) { cancel(mc, "No free solid ground for fire between you and the cart"); return; }
 
-        // safe mode: refuse to fire unless the blast can not hurt much
-        CartConfig sc = CartConfig.get();
-        if (sc.safeMode) {
-            if (hd < sc.safeDistance) { cancel(mc, "Safe mode: too close, step back to " + sc.safeDistance + " blocks"); return; }
-            if (mc.player.getHealth() + mc.player.getAbsorptionAmount() < sc.safeMinHealth) { cancel(mc, "Safe mode: health too low"); return; }
-            if (slabCell == null && !shieldOn) { cancel(mc, "Safe mode: no slab placed and no shield, not firing"); return; }
-        }
         // 1. rail
         if (!select(mc, eq.rail()) || !mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, target).isAccepted()) { cancel(mc, "Rail placement failed"); return; }
         // 2. TNT minecart
@@ -266,7 +259,7 @@ public class CartSequence {
         cartCenter = c;
         CartConfig rc = CartConfig.get();
         if (shieldUp) { stage = Stage.HOLD; wait = Math.max(5, rc.shieldHold); }
-        else if ((rc.retreat || rc.safeMode) && rc.retreatTicks > 0) {
+        else if (rc.retreat && rc.retreatTicks > 0) {
             stage = Stage.RETREAT; retreatLeft = rc.retreatTicks; wait = 0;
             Vec3d away = new Vec3d(mc.player.getX() - c.x, 0, mc.player.getZ() - c.z);
             if (away.lengthSquared() > 1.0E-4 && rc.retreatPush > 0) {
@@ -316,7 +309,7 @@ public class CartSequence {
         }
         mc.options.forwardKey.setPressed(f); mc.options.backKey.setPressed(b);
         mc.options.leftKey.setPressed(l); mc.options.rightKey.setPressed(r);
-        if (CartConfig.get().sneakUntilBlast || CartConfig.get().safeMode) mc.options.sneakKey.setPressed(true);
+        if (CartConfig.get().sneakUntilBlast) mc.options.sneakKey.setPressed(true);
     }
 
     private void releaseMove() {

@@ -18,6 +18,9 @@ public class AutoCartClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(mc -> {
             while (key.wasPressed()) if (mc.currentScreen == null) sequence.start(mc);
             sequence.tick(mc);
+            SafeSpots.tick(mc);
         });
+        net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents.AFTER_ENTITIES.register(ctx ->
+                SafeSpots.render(MinecraftClient.getInstance(), ctx.matrices(), ctx.consumers()));
     }
 }
