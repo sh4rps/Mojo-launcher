@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "autocart2",
+  "version": "${version}",
+  "name": "AutoCart2",
+  "description": "Cover-block TNT minecart blast: places a full block as cover, aligns and aims, then rail, cart, fire and crossbow. V to start.",
+  "authors": ["Robin"],
+  "environment": "client",
+  "entrypoints": { "client": ["dev.robin.autocart2.AutoCart2"] },
+  "depends": { "fabricloader": ">=0.16.0", "minecraft": "~1.21.11", "java": ">=21", "fabric-api": "*" }
+}

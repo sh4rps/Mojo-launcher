@@ -1,0 +1,32 @@
+name: AutoCart2 1.21.11 build
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Publish a GitHub release'
+        default: 'true'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: "9.2.0" }
+      - name: Build
+        working-directory: autocart2-12111
+        run: |
+          gradle --no-daemon build
+          ls -la build/libs
+      - uses: actions/upload-artifact@v4
+        with: { name: autocart2-jar, path: autocart2-12111/build/libs/*.jar }
+      - name: Release
+        if: ${{ github.event.inputs.release == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete autocart2-1.21.11 --cleanup-tag --yes || true
+          gh release create autocart2-1.21.11 autocart2-12111/build/libs/autocart2-*.jar --title "AutoCart2 1.21.11" --notes "AutoCart2 v1 for Minecraft 1.21.11 Fabric. V: places a full block as cover, centres and aims over it, then rail, TNT minecart, fire and crossbow shot, then a second block on top of the cover. Config: config/autocart2.properties. Needs Fabric API. Do not run together with AutoCartPvP (same V key)."
