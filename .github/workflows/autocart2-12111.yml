@@ -29,4 +29,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release delete autocart2-1.21.11 --cleanup-tag --yes || true
-          gh release create autocart2-1.21.11 autocart2-12111/build/libs/autocart2-*.jar --title "AutoCart2 1.21.11" --notes "AutoCart2 v1 for Minecraft 1.21.11 Fabric. V: places a full block as cover, centres and aims over it, then rail, TNT minecart, fire and crossbow shot, then a second block on top of the cover. Config: config/autocart2.properties. Needs Fabric API. Do not run together with AutoCartPvP (same V key)."
+          gh release create autocart2-1.21.11 autocart2-12111/build/libs/autocart2-*.jar --title "AutoCart2 1.21.11" --notes "AutoCart2 v1.1 for Minecraft 1.21.11 Fabric. Aim at any block and press V: one full block as cover next to the cart, rail, TNT minecart, lit with flint and steel, you crouch until it blows; hotbar is restored. Needs Fabric API. Do not run together with AutoCartPvP (same V key)."
