@@ -47,18 +47,27 @@ public final class Highlight {
     private static void draw(MinecraftClient mc, MatrixStack ms, VertexConsumerProvider consumers) {
         if (mc.player == null || mc.world == null || consumers == null || ms == null || mc.currentScreen != null) return;
         if (!ready(mc)) return;
-        if (!(mc.crosshairTarget instanceof BlockHitResult bhr) || bhr.getType() != HitResult.Type.BLOCK || bhr.getSide() == Direction.DOWN) return;
-        BlockPos base = bhr.getBlockPos();
-        BlockPos rail = base.up();
-        var rs = mc.world.getBlockState(rail);
-        boolean free = (rs.isAir() || rs.isReplaceable()) && mc.world.getBlockState(rail.up()).isAir();
-        Vec3d eye = mc.player.getEyePos();
-        double hx = rail.getX() + 0.5 - eye.x, hz = rail.getZ() + 0.5 - eye.z;
-        boolean farEnough = Math.sqrt(hx * hx + hz * hz) >= 2.2;
-        int color = (free && farEnough) ? 0xFFFFFF00 : 0xFFFF3030;
+        // counting starts at the block you stand on: the next block in a direction is no. 1, then 2 ... 5
+        Direction front = mc.player.getHorizontalFacing();
+        Direction[] dirs = {front, front.rotateYClockwise(), front.rotateYCounterclockwise()};   // ahead, right, left
         Vec3d cam = mc.gameRenderer.getCamera().getCameraPos();
         VertexConsumer vc = consumers.getBuffer(RenderLayers.lines());
         VoxelShape box = VoxelShapes.cuboid(-0.003, -0.003, -0.003, 1.003, 1.003, 1.003);
-        VertexRendering.drawOutline(ms, vc, box, base.getX() - cam.x, base.getY() - cam.y, base.getZ() - cam.z, color, 5.0f);
+        BlockPos me = mc.player.getBlockPos();
+        for (Direction d : dirs) {
+            for (int n : new int[]{4, 5}) {
+                BlockPos col = me.offset(d, n);
+                BlockPos g = null;                       // follow the ground up or down
+                for (int dy = 2; dy >= -4; dy--) {
+                    BlockPos b = col.up(dy);
+                    var st = mc.world.getBlockState(b);
+                    var up = mc.world.getBlockState(b.up());
+                    if (st.isSideSolidFullSquare(mc.world, b, Direction.UP) && (up.isAir() || up.isReplaceable())) { g = b; break; }
+                }
+                if (g == null) continue;
+                int color = n == 5 ? 0xFFFFFF00 : 0xFFFFC800;   // 5th = bright yellow (aim/press V here), 4th = softer yellow
+                VertexRendering.drawOutline(ms, vc, box, g.getX() - cam.x, g.getY() - cam.y, g.getZ() - cam.z, color, n == 5 ? 5.0f : 3.0f);
+            }
+        }
     }
 }
