@@ -18,8 +18,35 @@ import net.minecraft.util.shape.VoxelShapes;
 public final class Highlight {
     private Highlight() { }
 
+    private static boolean has(MinecraftClient mc, net.minecraft.item.Item it) {
+        for (int i = 0; i < 9; i++) if (mc.player.getInventory().getStack(i).isOf(it)) return true;
+        return false;
+    }
+
+    /** Only when the hotbar really holds a working kit. */
+    private static boolean ready(MinecraftClient mc) {
+        if (!has(mc, net.minecraft.item.Items.TNT_MINECART)) return false;
+        boolean block = false;
+        for (int i = 0; i < 9; i++) {
+            var st = mc.player.getInventory().getStack(i);
+            if (st.getItem() instanceof net.minecraft.item.BlockItem bi) {
+                var b = bi.getBlock();
+                if (!(b instanceof net.minecraft.block.FallingBlock) && b != net.minecraft.block.Blocks.TNT
+                        && b.getDefaultState().isFullCube(mc.world, BlockPos.ORIGIN) && !b.getDefaultState().hasBlockEntity()) { block = true; break; }
+            }
+        }
+        if (!block) return false;
+        return (has(mc, net.minecraft.item.Items.ACTIVATOR_RAIL) && has(mc, net.minecraft.item.Items.REDSTONE_BLOCK))
+                || (has(mc, net.minecraft.item.Items.RAIL) && has(mc, net.minecraft.item.Items.FLINT_AND_STEEL) && has(mc, net.minecraft.item.Items.CROSSBOW));
+    }
+
     public static void render(MinecraftClient mc, MatrixStack ms, VertexConsumerProvider consumers) {
-        if (mc.player == null || mc.world == null || consumers == null) return;
+        try { draw(mc, ms, consumers); } catch (Throwable ignored) { }
+    }
+
+    private static void draw(MinecraftClient mc, MatrixStack ms, VertexConsumerProvider consumers) {
+        if (mc.player == null || mc.world == null || consumers == null || ms == null || mc.currentScreen != null) return;
+        if (!ready(mc)) return;
         if (!(mc.crosshairTarget instanceof BlockHitResult bhr) || bhr.getType() != HitResult.Type.BLOCK || bhr.getSide() == Direction.DOWN) return;
         BlockPos base = bhr.getBlockPos();
         BlockPos rail = base.up();

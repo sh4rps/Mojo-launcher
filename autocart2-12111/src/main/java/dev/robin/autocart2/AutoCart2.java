@@ -16,14 +16,14 @@ public class AutoCart2 implements ClientModInitializer {
         KeyBinding key = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.autocart2.activate", GLFW.GLFW_KEY_V, KeyBinding.Category.create(Identifier.of("autocart2", "controls"))));
         boolean clash = FabricLoader.getInstance().isModLoaded("autocartpvp");
-        ClientTickEvents.END_CLIENT_TICK.register(mc -> {
+        ClientTickEvents.END_CLIENT_TICK.register(mc -> { try {
             while (key.wasPressed()) {
                 if (mc.currentScreen != null) continue;
                 if (clash) { if (mc.player != null) mc.player.sendMessage(Text.literal("[AutoCart2] Remove the AutoCartPvP mod: both use V and fight each other"), true); }
                 else seq.start(mc);
             }
             if (!clash) seq.tick(mc);
-        });
+        } catch (Throwable t) { t.printStackTrace(); } });
         net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents.AFTER_ENTITIES.register(ctx ->
                 Highlight.render(net.minecraft.client.MinecraftClient.getInstance(), ctx.matrices(), ctx.consumers()));
     }
