@@ -16,5 +16,8 @@ jobs:
         working-directory: spearboost-12111
         run: |
           J=$(find . -name "minecraft-merged*1.21.11*.jar" 2>/dev/null | grep -v sources | head -1)
-          echo "=== IOR"; javap -p -cp "$J" net.minecraft.client.gui.hud.InGameOverlayRenderer | cut -c1-200
-          echo "=== IOR code"; javap -p -c -cp "$J" net.minecraft.client.gui.hud.InGameOverlayRenderer | awk '/renderFloatingItem\(|void method_[0-9]*\(.*DrawContext/{p=1} p' | grep -E "^  [a-z]|invoke|getfield|ldc|fconst|bipush|sipush" | cut -c1-210 | head -120
+          echo "=== OQ"; javap -p -cp "$J" net.minecraft.client.render.command.OrderedRenderCommandQueue | cut -c1-260
+          echo "=== RL"; javap -p -cp "$J" net.minecraft.client.render.RenderLayers | grep -iE "translucent|item|entity" | cut -c1-200
+          echo "=== IRS"; javap -p -cp "$J" net.minecraft.client.render.item.ItemRenderState | cut -c1-220
+          echo "=== layer enum"; javap -p -cp "$J" 'net.minecraft.client.render.item.ItemRenderState$LayerRenderState' | cut -c1-220
+          echo "=== ItemCmd"; javap -p -cp "$J" 'net.minecraft.client.render.command.RenderCommandQueue' 2>&1 | head -5
