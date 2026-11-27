@@ -24,5 +24,7 @@ public class AutoCart2 implements ClientModInitializer {
             }
             if (!clash) seq.tick(mc);
         });
+        net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents.AFTER_ENTITIES.register(ctx ->
+                Highlight.render(net.minecraft.client.MinecraftClient.getInstance(), ctx.matrices(), ctx.consumers()));
     }
 }
