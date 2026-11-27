@@ -3,10 +3,10 @@
   "id": "totemtweak",
   "version": "${version}",
   "name": "Totem Tweaker",
-  "description": "Move the totem pop animation (left/right, up/down, forward/back) and change its size. O opens the settings.",
+  "description": "Move the totem pop (1.21 / 1.21.1) animation (left/right, up/down, forward/back) and change its size. O opens the settings.",
   "authors": ["Robin"],
   "environment": "client",
   "entrypoints": { "client": ["dev.robin.totemtweak.TotemTweak"] },
   "mixins": ["totemtweak.mixins.json"],
-  "depends": { "fabricloader": ">=0.16.0", "minecraft": "~1.21.11", "java": ">=21", "fabric-api": "*" }
+  "depends": { "fabricloader": ">=0.16.0", "minecraft": ">=1.21 <=1.21.1", "java": ">=21", "fabric-api": "*" }
 }

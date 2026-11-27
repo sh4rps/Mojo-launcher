@@ -38,7 +38,7 @@ public class SettingsScreen extends Screen {
         int w = 220, x = width / 2 - w / 2, y = Math.max(20, height / 2 - 70);
         slides.add(new Slide(x, y, w, "Left <-> Right", -Cfg.X_MAX, Cfg.X_MAX, () -> Cfg.x, v -> Cfg.x = v, false));
         slides.add(new Slide(x, y + 24, w, "Down <-> Up", -Cfg.Y_MAX, Cfg.Y_MAX, () -> Cfg.y, v -> Cfg.y = v, false));
-        slides.add(new Slide(x, y + 48, w, "Back <-> Forward", Cfg.Z_MIN, Cfg.Z_MAX, () -> Cfg.z, v -> Cfg.z = v, false));
+        slides.add(new Slide(x, y + 48, w, "Back <-> Forward (zoom)", Cfg.Z_MIN, Cfg.Z_MAX, () -> Cfg.z, v -> Cfg.z = v, false));
         slides.add(new Slide(x, y + 72, w, "Size", Cfg.S_MIN, Cfg.S_MAX, () -> Cfg.size, v -> Cfg.size = v, true));
         for (Slide s : slides) addDrawableChild(s);
         addDrawableChild(ButtonWidget.builder(Text.literal("Preview"), b -> preview()).dimensions(x, y + 100, 106, 20).build());
