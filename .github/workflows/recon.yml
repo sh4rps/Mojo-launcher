@@ -16,7 +16,6 @@ jobs:
         working-directory: spearboost-12111
         run: |
           J=$(find . -name "minecraft-merged*1.21.11*.jar" 2>/dev/null | grep -v sources | head -1)
-          echo "=== GameRenderer"; javap -p -cp "$J" net.minecraft.client.render.GameRenderer | grep -iE "floating|Item|render\(|Totem"
-          echo "=== floating code"; javap -p -c -cp "$J" net.minecraft.client.render.GameRenderer | awk '/renderFloatingItem\(/{p=1} p' | grep -E "invoke|getfield|ldc|fload|fconst" | head -70
-          echo "=== DrawContext item"; javap -p -cp "$J" net.minecraft.client.gui.DrawContext | grep -iE "drawItem|Item\(|getMatrices|fill\(|setShaderColor|Alpha"
-          echo "=== Inv hud"; javap -p -cp "$J" net.minecraft.client.gui.hud.InGameHud | grep -iE "floating|totem|overlay"
+          echo "=== GR all"; javap -p -cp "$J" net.minecraft.client.render.GameRenderer | grep -vE "^  (private|public|static|protected).*(Shader|Pipeline|Fog)" | cut -c1-170 | head -90
+          echo "=== showFloatingItem"; javap -p -c -cp "$J" net.minecraft.client.render.GameRenderer | awk '/void showFloatingItem/{p=1} p' | head -30
+          echo "=== who uses floating"; for c in $(unzip -Z1 "$J" | grep -E "net/minecraft/client/(render|gui)/.*\.class$" | grep -vE "\$" | sed 's/.class$//;s#/#.#g'); do javap -p -c -cp "$J" "$c" 2>/dev/null | grep -qi "floatingItem" && echo $c; done
