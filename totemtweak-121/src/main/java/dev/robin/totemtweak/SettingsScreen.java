@@ -5,16 +5,13 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class SettingsScreen extends Screen {
-    private int age;
-    private final java.util.List<Slide> slides = new java.util.ArrayList<>();
+    private static int hand = 0;     // 0 = main hand, 1 = off hand (remembered while the game runs)
 
     public SettingsScreen() { super(Text.literal("Totem Tweaker")); }
 
@@ -27,36 +24,29 @@ public class SettingsScreen extends Screen {
         }
         float val() { return min + (float) value * (max - min); }
         @Override protected void updateMessage() {
-            setMessage(Text.literal(name + ": " + (pct ? Math.round(val() * 100) + "%" : String.format("%.1f", val()))));
+            setMessage(Text.literal(name + ": " + (pct ? Math.round(val() * 100) + "%" : String.format("%.2f", val()))));
         }
         @Override protected void applyValue() { set.accept(val()); Cfg.clamp(); }
-        void refresh() { value = (get.get() - min) / (max - min); updateMessage(); }
     }
 
     @Override protected void init() {
-        slides.clear();
-        int w = 220, x = width / 2 - w / 2, y = Math.max(20, height / 2 - 70);
-        slides.add(new Slide(x, y, w, "Left <-> Right", -Cfg.X_MAX, Cfg.X_MAX, () -> Cfg.x, v -> Cfg.x = v, false));
-        slides.add(new Slide(x, y + 24, w, "Down <-> Up", -Cfg.Y_MAX, Cfg.Y_MAX, () -> Cfg.y, v -> Cfg.y = v, false));
-        slides.add(new Slide(x, y + 48, w, "Back <-> Forward (zoom)", Cfg.Z_MIN, Cfg.Z_MAX, () -> Cfg.z, v -> Cfg.z = v, false));
-        slides.add(new Slide(x, y + 72, w, "Size", Cfg.S_MIN, Cfg.S_MAX, () -> Cfg.size, v -> Cfg.size = v, true));
-        for (Slide s : slides) addDrawableChild(s);
-        addDrawableChild(ButtonWidget.builder(Text.literal("Preview"), b -> preview()).dimensions(x, y + 100, 106, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Reset"), b -> { Cfg.reset(); for (Slide s : slides) s.refresh(); }).dimensions(x + 114, y + 100, 106, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> close()).dimensions(x, y + 124, w, 20).build());
-        preview();
+        int w = 220, x = width / 2 - w / 2, y = Math.max(34, height / 2 - 80);
+        final int h = hand;
+        addDrawableChild(ButtonWidget.builder(Text.literal(h == 0 ? "Hand: MAIN HAND  (click for off hand)" : "Hand: OFF HAND  (click for main hand)"), b -> {
+            hand = 1 - hand; clearAndInit();
+        }).dimensions(x, y - 26, w, 20).build());
+        addDrawableChild(new Slide(x, y, w, "Left <-> Right", -Cfg.X_MAX, Cfg.X_MAX, () -> Cfg.x[h], v -> Cfg.x[h] = v, false));
+        addDrawableChild(new Slide(x, y + 24, w, "Down <-> Up", -Cfg.Y_MAX, Cfg.Y_MAX, () -> Cfg.y[h], v -> Cfg.y[h] = v, false));
+        addDrawableChild(new Slide(x, y + 48, w, "Back <-> Forward", Cfg.Z_MIN, Cfg.Z_MAX, () -> Cfg.z[h], v -> Cfg.z[h] = v, false));
+        addDrawableChild(new Slide(x, y + 72, w, "Size", Cfg.S_MIN, Cfg.S_MAX, () -> Cfg.size[h], v -> Cfg.size[h] = v, true));
+        addDrawableChild(ButtonWidget.builder(Text.literal("Reset this hand"), b -> { Cfg.reset(h); clearAndInit(); }).dimensions(x, y + 100, 106, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> close()).dimensions(x + 114, y + 100, 106, 20).build());
     }
-
-    private void preview() {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if (mc.gameRenderer != null) mc.gameRenderer.showFloatingItem(new ItemStack(Items.TOTEM_OF_UNDYING));
-    }
-
-    @Override public void tick() { if (++age % 42 == 0) preview(); }   // keeps the totem popping while you adjust
 
     @Override public void render(DrawContext ctx, int mx, int my, float delta) {
         super.render(ctx, mx, my, delta);
-        ctx.drawCenteredTextWithShadow(textRenderer, title, width / 2, Math.max(20, height / 2 - 70) - 16, 0xFFFFFFFF);
+        ctx.drawCenteredTextWithShadow(textRenderer, title, width / 2, Math.max(34, height / 2 - 80) - 40, 0xFFFFFFFF);
+        ctx.drawCenteredTextWithShadow(textRenderer, Text.literal("Hold a Totem of Undying to see the change"), width / 2, Math.max(34, height / 2 - 80) + 128, 0xFFAAAAAA);
     }
 
     @Override public boolean shouldPause() { return false; }

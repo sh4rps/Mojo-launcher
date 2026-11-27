@@ -3,7 +3,7 @@
   "id": "totemtweak",
   "version": "${version}",
   "name": "Totem Tweaker",
-  "description": "Move the totem pop (1.21 / 1.21.1) animation (left/right, up/down, forward/back) and change its size. O opens the settings.",
+  "description": "Move and resize the Totem of Undying you hold in the main hand or off hand. O opens the settings.",
   "authors": ["Robin"],
   "environment": "client",
   "entrypoints": { "client": ["dev.robin.totemtweak.TotemTweak"] },

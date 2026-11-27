@@ -2,6 +2,6 @@
   "required": true,
   "package": "dev.robin.totemtweak.mixin",
   "compatibilityLevel": "JAVA_21",
-  "client": ["TotemOverlayMixin"],
+  "client": ["HeldTotemMixin"],
   "injectors": { "defaultRequire": 1 }
 }
