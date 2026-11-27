@@ -186,7 +186,7 @@ public class Sequence {
                 BlockHitResult h = new BlockHitResult(new Vec3d(sup.getX() + 0.5, sup.getY() + 1.0, sup.getZ() + 0.5), Direction.UP, sup, false);
                 if (!hold(mc, hb(mc, "block")) || !mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, h).isAccepted()) { cancel(mc, "Could not place the cover block"); return; }
                 msg(mc, "1: cover block");
-                stage = Stage.RAIL; wait = 2;
+                stage = Stage.RAIL; wait = 0;
             }
             case RAIL -> {
                 BlockPos base = railPos.down();
@@ -194,14 +194,14 @@ public class Sequence {
                 int slot = hb(mc, redstoneMode ? "arail" : "rail");
                 if (!hold(mc, slot) || !mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, rh).isAccepted()) { cancel(mc, "Rail placement failed"); return; }
                 msg(mc, "2: rail");
-                stage = Stage.CART; wait = 2;
+                stage = Stage.CART; wait = 1;
             }
             case CART -> {
                 if (!(mc.world.getBlockState(railPos).isOf(Blocks.RAIL) || mc.world.getBlockState(railPos).isOf(Blocks.ACTIVATOR_RAIL))) { cancel(mc, "Rail did not appear"); return; }
                 BlockHitResult onRail = new BlockHitResult(new Vec3d(railPos.getX() + 0.5, railPos.getY() + 0.1, railPos.getZ() + 0.5), Direction.UP, railPos, false);
                 if (!hold(mc, hb(mc, "cart")) || !mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, onRail).isAccepted()) { cancel(mc, "Minecart placement failed"); return; }
                 msg(mc, "3: TNT minecart");
-                stage = redstoneMode ? Stage.POWER : Stage.LOAD; wait = 2;
+                stage = redstoneMode ? Stage.POWER : Stage.LOAD; wait = 0;
             }
             // ---------- redstone mode
             case POWER -> {
@@ -219,7 +219,7 @@ public class Sequence {
                 BlockHitResult h = new BlockHitResult(new Vec3d(sup.getX() + 0.5, sup.getY() + 1.0, sup.getZ() + 0.5), Direction.UP, sup, false);
                 if (!hold(mc, hb(mc, "rblock")) || !mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, h).isAccepted()) { cancel(mc, "Could not place the redstone block"); return; }
                 msg(mc, "4: redstone block - cart is powering up");
-                stage = Stage.PRIMED; wait = 1; ticks = 60;
+                stage = Stage.PRIMED; wait = 0; ticks = 60;
             }
             case PRIMED -> {
                 boolean primed = false;
@@ -243,7 +243,7 @@ public class Sequence {
                 if (mc.player.getItemUseTime() >= CrossbowItem.getPullTime(main, mc.player) + 1) {
                     mc.options.useKey.setPressed(false);
                     mc.interactionManager.stopUsingItem(mc.player);
-                    stage = Stage.SHOOT; wait = 3;
+                    stage = Stage.SHOOT; wait = 1;
                 }
             }
             case SHOOT -> shoot(mc);
