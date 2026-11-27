@@ -1,0 +1,21 @@
+name: Recon javap
+on: workflow_dispatch
+jobs:
+  r:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: "9.2.0" }
+      - name: Build
+        working-directory: totemtweak-121
+        run: gradle --no-daemon build -q 2>&1 | tail -30 || true
+      - name: javap
+        working-directory: totemtweak-121
+        run: |
+          J=$(find . ~/.gradle -name "minecraft-merged*1.21*.jar" 2>/dev/null | grep -v sources | head -1)
+          echo "JAR $J"
+          echo "=== GR"; javap -p -cp "$J" net.minecraft.client.render.GameRenderer | grep -iE "floating|Item"
+          echo "=== code"; javap -p -c -cp "$J" net.minecraft.client.render.GameRenderer | awk '/void renderFloatingItem\(/{p=1} /void renderHand|public void tick|void render\(/{if(p&&!/renderFloatingItem/)p=0} p' | grep -E "^  [a-z]|invoke|getfield|ldc|fconst" | cut -c1-200 | head -90
