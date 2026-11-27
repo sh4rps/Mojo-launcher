@@ -1,0 +1,22 @@
+name: Recon javap
+on: workflow_dispatch
+jobs:
+  r:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: "9.2.0" }
+      - name: Build skeleton
+        working-directory: spearboost-12111
+        run: gradle --no-daemon build -q || true
+      - name: javap
+        working-directory: spearboost-12111
+        run: |
+          J=$(find . -name "minecraft-merged*1.21.11*.jar" 2>/dev/null | grep -v sources | head -1)
+          echo "=== GameRenderer"; javap -p -cp "$J" net.minecraft.client.render.GameRenderer | grep -iE "floating|Item|render\(|Totem"
+          echo "=== floating code"; javap -p -c -cp "$J" net.minecraft.client.render.GameRenderer | awk '/renderFloatingItem\(/{p=1} p' | grep -E "invoke|getfield|ldc|fload|fconst" | head -70
+          echo "=== DrawContext item"; javap -p -cp "$J" net.minecraft.client.gui.DrawContext | grep -iE "drawItem|Item\(|getMatrices|fill\(|setShaderColor|Alpha"
+          echo "=== Inv hud"; javap -p -cp "$J" net.minecraft.client.gui.hud.InGameHud | grep -iE "floating|totem|overlay"
