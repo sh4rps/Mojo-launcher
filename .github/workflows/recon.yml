@@ -16,6 +16,5 @@ jobs:
         working-directory: spearboost-12111
         run: |
           J=$(find . -name "minecraft-merged*1.21.11*.jar" 2>/dev/null | grep -v sources | head -1)
-          echo "=== GR all"; javap -p -cp "$J" net.minecraft.client.render.GameRenderer | grep -vE "^  (private|public|static|protected).*(Shader|Pipeline|Fog)" | cut -c1-170 | head -90
-          echo "=== showFloatingItem"; javap -p -c -cp "$J" net.minecraft.client.render.GameRenderer | awk '/void showFloatingItem/{p=1} p' | head -30
-          echo "=== who uses floating"; for c in $(unzip -Z1 "$J" | grep -E "net/minecraft/client/(render|gui)/.*\.class$" | grep -vE "\$" | sed 's/.class$//;s#/#.#g'); do javap -p -c -cp "$J" "$c" 2>/dev/null | grep -qi "floatingItem" && echo $c; done
+          echo "=== IOR"; javap -p -cp "$J" net.minecraft.client.gui.hud.InGameOverlayRenderer | cut -c1-200
+          echo "=== IOR code"; javap -p -c -cp "$J" net.minecraft.client.gui.hud.InGameOverlayRenderer | awk '/renderFloatingItem\(|void method_[0-9]*\(.*DrawContext/{p=1} p' | grep -E "^  [a-z]|invoke|getfield|ldc|fconst|bipush|sipush" | cut -c1-210 | head -120
