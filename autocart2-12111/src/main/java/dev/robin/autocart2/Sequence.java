@@ -224,7 +224,7 @@ public class Sequence {
             case PRIMED -> {
                 boolean primed = false;
                 for (TntMinecartEntity c : mc.world.getEntitiesByClass(TntMinecartEntity.class, new Box(cartC, cartC).expand(1.5), e -> true)) if (c.isPrimed()) primed = true;
-                if (primed) { mc.player.getInventory().setSelectedSlot(originalSlot); stage = Stage.SNEAK; sneakTicks = 0; msg(mc, "Cart lit - stay behind the block"); }
+                if (primed) { mc.player.getInventory().setSelectedSlot(originalSlot); stage = Stage.IDLE; msg(mc, "Cart lit - stay behind the block"); }
                 else if (ticks > 90) cancel(mc, "Cart did not light. Is the rail an ACTIVATOR rail?");
             }
             // ---------- arrow mode
@@ -279,7 +279,7 @@ public class Sequence {
         if (!shot) { cancel(mc, "Crossbow shot failed"); return; }
         mc.player.getInventory().setSelectedSlot(originalSlot);
         msg(mc, "5: shot - stay behind the block");
-        stage = Stage.SNEAK; sneakTicks = 0;
+        stage = Stage.IDLE;
     }
 
     private void cancel(MinecraftClient mc, String why) {

@@ -47,16 +47,16 @@ public final class Highlight {
     private static void draw(MinecraftClient mc, MatrixStack ms, VertexConsumerProvider consumers) {
         if (mc.player == null || mc.world == null || consumers == null || ms == null || mc.currentScreen != null) return;
         if (!ready(mc)) return;
-        // counting starts at the block you stand on: the next block in a direction is no. 1, then 2 ... 5
-        Direction front = mc.player.getHorizontalFacing();
-        Direction[] dirs = {front, front.rotateYClockwise(), front.rotateYCounterclockwise()};   // ahead, right, left
+        // a circle around you: the ring of blocks 5 away (bright) and the ring 4 away (softer), all sides
         Vec3d cam = mc.gameRenderer.getCamera().getCameraPos();
         VertexConsumer vc = consumers.getBuffer(RenderLayers.lines());
         VoxelShape box = VoxelShapes.cuboid(-0.003, -0.003, -0.003, 1.003, 1.003, 1.003);
         BlockPos me = mc.player.getBlockPos();
-        for (Direction d : dirs) {
-            for (int n : new int[]{4, 5}) {
-                BlockPos col = me.offset(d, n);
+        for (int dx = -6; dx <= 6; dx++) {
+            for (int dz = -6; dz <= 6; dz++) {
+                int n = (int) Math.round(Math.sqrt(dx * dx + dz * dz));
+                if (n != 4 && n != 5) continue;
+                BlockPos col = me.add(dx, 0, dz);
                 BlockPos g = null;                       // follow the ground up or down
                 for (int dy = 2; dy >= -4; dy--) {
                     BlockPos b = col.up(dy);
@@ -65,8 +65,8 @@ public final class Highlight {
                     if (st.isSideSolidFullSquare(mc.world, b, Direction.UP) && (up.isAir() || up.isReplaceable())) { g = b; break; }
                 }
                 if (g == null) continue;
-                int color = n == 5 ? 0xFFFFFF00 : 0xFFFFC800;   // 5th = bright yellow (aim/press V here), 4th = softer yellow
-                VertexRendering.drawOutline(ms, vc, box, g.getX() - cam.x, g.getY() - cam.y, g.getZ() - cam.z, color, n == 5 ? 5.0f : 3.0f);
+                int color = n == 5 ? 0xFFFFFF00 : 0xFFFFC800;   // 5 away = bright yellow (aim and press V here), 4 away = softer yellow
+                VertexRendering.drawOutline(ms, vc, box, g.getX() - cam.x, g.getY() - cam.y, g.getZ() - cam.z, color, n == 5 ? 4.0f : 2.5f);
             }
         }
     }
