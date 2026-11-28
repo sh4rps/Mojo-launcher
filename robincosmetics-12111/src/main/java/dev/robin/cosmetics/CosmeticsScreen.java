@@ -27,15 +27,10 @@ public class CosmeticsScreen extends Screen {
 
     @Override protected void init() {
         int w = 260, x = width / 2 - w / 2, y = Math.max(28, height / 2 - 110);
-        // ---- capes: 6 buttons in a row
-        int bw = (w - 5 * 3) / 6;
-        for (int i = 0; i <= Capes.COUNT; i++) {
-            final int idx = i;
-            String label = Capes.NAMES[i];
-            addDrawableChild(ButtonWidget.builder(Text.literal(Cfg.cape == i ? "[" + shortName(label) + "]" : shortName(label)), b -> {
-                Cfg.cape = idx; Cfg.save(); clearAndInit();
-            }).dimensions(x + i * (bw + 3), y + 14, bw, 20).build());
-        }
+        // ---- cape: click = next, right side arrows not needed (cycles through all)
+        addDrawableChild(ButtonWidget.builder(Text.literal("Cape: " + Capes.NAMES[Cfg.cape] + "  (click = next)"), b -> {
+            Cfg.cape = (Cfg.cape + 1) % (Capes.COUNT + 1); Cfg.save(); clearAndInit();
+        }).dimensions(x, y + 14, w, 20).build());
         // ---- fire hands
         int fy = y + 56;
         addDrawableChild(ButtonWidget.builder(Text.literal("Left hand fire: " + (Cfg.fireLeft ? "ON" : "OFF")), b -> {
@@ -44,10 +39,13 @@ public class CosmeticsScreen extends Screen {
         addDrawableChild(ButtonWidget.builder(Text.literal("Right hand fire: " + (Cfg.fireRight ? "ON" : "OFF")), b -> {
             Cfg.fireRight = !Cfg.fireRight; Cfg.save(); clearAndInit();
         }).dimensions(x + w / 2 + 2, fy, w / 2 - 2, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Fire style: " + Fire.STYLES[Cfg.style]), b -> {
+            Cfg.style = (Cfg.style + 1) % Fire.STYLES.length; Cfg.save(); clearAndInit();
+        }).dimensions(x, fy + 24, w, 20).build());
         addDrawableChild(ButtonWidget.builder(Text.literal("Fire colour: " + Fire.NAMES[Cfg.color]), b -> {
             Cfg.color = (Cfg.color + 1) % Fire.NAMES.length; Cfg.save(); clearAndInit();
-        }).dimensions(x, fy + 24, w, 20).build());
-        int sy = fy + 48;
+        }).dimensions(x, fy + 48, w, 20).build());
+        int sy = fy + 72;
         if (Cfg.color == Fire.NAMES.length - 1) {
             addDrawableChild(new Slide(x, sy, w, "Red", 0, 255, Cfg.r, v -> { Cfg.r = v; Cfg.save(); }));
             addDrawableChild(new Slide(x, sy + 22, w, "Green", 0, 255, Cfg.g, v -> { Cfg.g = v; Cfg.save(); }));

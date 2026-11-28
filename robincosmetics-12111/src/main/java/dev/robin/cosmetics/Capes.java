@@ -8,8 +8,8 @@ import net.minecraft.util.Identifier;
 
 /** Five procedurally animated capes, drawn into one dynamic texture that is re-uploaded every other tick. */
 public final class Capes {
-    public static final int COUNT = 5;
-    public static final String[] NAMES = {"Off", "Inferno", "Rainbow", "Ocean", "Galaxy", "Storm"};
+    public static final int COUNT = 8;
+    public static final String[] NAMES = {"Off", "Inferno", "Rainbow", "Ocean", "Galaxy", "Storm", "Matrix", "Lava", "Aurora"};
     private static final Identifier ID = Identifier.of("robincosmetics", "animated_cape");
     private static NativeImageBackedTexture tex;
     private static AssetInfo.TextureAsset asset;
@@ -76,6 +76,28 @@ public final class Capes {
                 int h = hash(x, y, t / 6);
                 if ((h & 31) == 0) { int s = 140 + (h >> 8 & 115); return (s << 16) | (s << 8) | s; }
                 return (rr << 16) | (gg << 8) | bb;
+            }
+            case 6: { // Matrix: falling green digital rain
+                int col = x % 32, speed = 1 + (hash(col, 1, 0) & 3);
+                int head = (int) ((t * 0.35 * speed + (hash(col, 7, 0) & 63)) % 40);
+                int dd = head - y; if (dd < 0) dd += 40;
+                int g = dd == 0 ? 255 : dd < 14 ? (int) (230 * (1 - dd / 14.0)) : 0;
+                int flick = (hash(col, y, t / 5) & 3) == 0 ? 25 : 0;
+                int base = 18 + flick;
+                return ((dd == 0 ? 180 : 0) << 16) | (Math.min(255, g + base) << 8) | (dd == 0 ? 200 : 0);
+            }
+            case 7: { // Lava: dark crust with glowing flowing cracks
+                double a = Math.sin(x * 0.45 + Math.sin(y * 0.35 + time * 0.2) * 2.2 + time * 0.15);
+                double b = Math.sin(y * 0.5 - time * 0.25 + x * 0.25);
+                double crack = clamp(1.0 - Math.abs(a * b) * 3.2);
+                int rr = (int) (45 + 210 * crack), gg = (int) (8 + 150 * crack * crack), bb = (int) (4 + 20 * crack * crack * crack);
+                return (Math.min(255, rr) << 16) | (Math.min(255, gg) << 8) | Math.min(255, bb);
+            }
+            case 8: { // Aurora: soft green to purple curtains
+                double w = 0.5 + 0.5 * Math.sin(x * 0.3 + Math.sin(y * 0.25 + time * 0.12) * 1.8 - time * 0.1);
+                double fade = clamp(1.15 - v * 0.7);
+                int rr = (int) ((20 + 140 * w * w) * fade + 8), gg = (int) ((60 + 190 * (1 - w)) * fade + 10), bb = (int) ((70 + 150 * w) * fade + 20);
+                return (Math.min(255, rr) << 16) | (Math.min(255, gg) << 8) | Math.min(255, bb);
             }
             default: { // Storm: dark clouds with travelling lightning
                 double cl = 0.5 + 0.5 * Math.sin(x * 0.4 + time * 0.2) * Math.sin(y * 0.5 - time * 0.15);
