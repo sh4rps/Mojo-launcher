@@ -1,0 +1,33 @@
+name: Recon javap
+on: workflow_dispatch
+jobs:
+  r:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: "9.2.0" }
+      - name: Build skeleton
+        working-directory: totemtweak-12111
+        run: gradle --no-daemon build -q 2>&1 | tail -3 || true
+      - name: javap
+        working-directory: totemtweak-12111
+        run: |
+          J=$(find . -name "minecraft-merged*1.21.11*.jar" 2>/dev/null | grep -v sources | head -1)
+          F=$(find ~/.gradle . -name "fabric-rendering-v1*.jar" 2>/dev/null | grep -v sources | head -1)
+          F2=$(find ~/.gradle . -name "fabric-api-0*.jar" 2>/dev/null | grep -v sources | head -1)
+          echo "FABRIC $F"
+          p() { echo "##### $1"; javap -p -cp "$J:$F" "$1" 2>&1 | grep -vE "^Compiled|method_|field_|static \{\}" | cut -c1-230 | head -${2:-40}; }
+          p net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry 15
+          p net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements 30
+          p net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement 8
+          echo "##### DrawContext"; javap -p -cp "$J" net.minecraft.client.gui.DrawContext | grep -E "drawItem|drawStackOverlay|drawGuiTexture|drawText|fill\(|getMatrices|drawItemInSlot|Overlay" | cut -c1-230
+          p net.minecraft.entity.effect.StatusEffectInstance 40
+          echo "##### effect icon"; javap -p -cp "$J" net.minecraft.client.gui.hud.InGameHud | grep -iE "effect|getEffect" | cut -c1-200
+          echo "##### ItemStack"; javap -p -cp "$J" net.minecraft.item.ItemStack | grep -iE "damage|isDamageable|getMaxDamage|ItemBar|isItemBarVisible" | cut -c1-200
+          echo "##### SimpleOption"; javap -p -cp "$J" net.minecraft.client.option.SimpleOption | grep -E "value|setValue" | cut -c1-200
+          echo "##### GameOptions"; javap -p -cp "$J" net.minecraft.client.option.GameOptions | grep -iE "gamma|getHideGui|hudHidden|debugEnabled" | cut -c1-200
+          echo "##### Window"; javap -p -cp "$J" net.minecraft.client.util.Window | grep -E "ScaledWidth|ScaledHeight" 
+          echo "##### Text/Format"; javap -p -cp "$J" net.minecraft.entity.effect.StatusEffects | grep -E "SPEED|NIGHT" | head -3
