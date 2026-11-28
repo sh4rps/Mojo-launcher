@@ -17,18 +17,8 @@ jobs:
         run: |
           J=$(find . -name "minecraft-merged*1.21.11*.jar" 2>/dev/null | grep -v sources | head -1)
           p() { echo "##### $1"; javap -p -cp "$J" "$1" 2>&1 | grep -vE "^Compiled|method_|field_|static \{\}" | cut -c1-250 | head -${2:-70}; }
-          p net.minecraft.client.render.entity.PlayerEntityRenderer 40
-          p net.minecraft.client.render.entity.model.PlayerEntityModel 30
-          p net.minecraft.client.model.ModelPart 60
-          p net.minecraft.client.render.command.OrderedRenderCommandQueue 40
-          p net.minecraft.client.model.Model 25
-          p net.minecraft.client.model.ModelPartBuilder 30
-          p net.minecraft.client.model.TexturedModelData 15
-          p net.minecraft.client.model.ModelData 12
-          p net.minecraft.client.model.ModelPartData 15
-          p net.minecraft.client.render.entity.feature.FeatureRenderer 15
-          p net.minecraft.client.render.entity.feature.FeatureRendererContext 8
-          p net.minecraft.client.render.entity.LivingEntityRenderer 40
-          p net.minecraft.client.render.entity.model.BipedEntityModel 40
-          echo "##### renderRightArm code"; javap -p -c -cp "$J" net.minecraft.client.render.entity.PlayerEntityRenderer | awk '/void renderRightArm\(/{p=1} /void renderLeftArm\(|void renderArm\(/{if(p)p=0} p' | grep -E "^  [a-z]|invoke|getfield|putfield" | cut -c1-230 | head -50
-          echo "##### renderArm code"; javap -p -c -cp "$J" net.minecraft.client.render.entity.PlayerEntityRenderer | awk '/void renderArm\(/{p=1} p' | grep -E "^  [a-z]|invoke|getfield|putfield" | cut -c1-230 | head -50
+          echo "##### RCQ"; javap -p -cp "$J" net.minecraft.client.render.command.RenderCommandQueue | grep -iE "ModelPart|submitModel" | cut -c1-400
+          echo "##### layers"; javap -p -cp "$J" net.minecraft.client.render.RenderLayers | grep -E "entityCutout|entityTranslucent|entitySolid|eyes|Emissive" | cut -c1-200
+          echo "##### skintype"; javap -p -cp "$J" net.minecraft.entity.player.PlayerSkinType | head -8
+          echo "##### LightmapTM"; javap -p -constants -cp "$J" net.minecraft.client.render.LightmapTextureManager | grep -i MAX
+          echo "##### OverlayTexture"; javap -p -constants -cp "$J" net.minecraft.client.render.OverlayTexture | grep -iE "DEFAULT|static"
