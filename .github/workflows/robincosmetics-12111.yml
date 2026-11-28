@@ -29,4 +29,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release delete robincosmetics-1.21.11 --cleanup-tag --yes || true
-          gh release create robincosmetics-1.21.11 robincosmetics-12111/build/libs/robincosmetics-*.jar --title "Robin Cosmetics 1.21.11" --notes "Robin Cosmetics 1.1 (8 capes, 6 fire styles, 12 fire colours + rainbow + custom) for Minecraft 1.21.11 Fabric: animated capes and animated fire on both hands in any colour. Open from the Robin Cosmetics button in the pause menu or with J. Only you see it. Needs Fabric API."
+          gh release create robincosmetics-1.21.11 robincosmetics-12111/build/libs/robincosmetics-*.jar --title "Robin Cosmetics 1.21.11" --notes "Robin Cosmetics 1.2 (3D blocky animated flame hands, 8 capes) for Minecraft 1.21.11 Fabric: animated capes and animated fire on both hands in any colour. Open from the Robin Cosmetics button in the pause menu or with J. Only you see it. Needs Fabric API."

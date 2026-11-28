@@ -33,27 +33,34 @@ public class CosmeticsScreen extends Screen {
         }).dimensions(x, y + 14, w, 20).build());
         // ---- fire hands
         int fy = y + 56;
-        addDrawableChild(ButtonWidget.builder(Text.literal("Left hand fire: " + (Cfg.fireLeft ? "ON" : "OFF")), b -> {
+        addDrawableChild(ButtonWidget.builder(Text.literal("Left hand flame: " + (Cfg.fireLeft ? "ON" : "OFF")), b -> {
             Cfg.fireLeft = !Cfg.fireLeft; Cfg.save(); clearAndInit();
         }).dimensions(x, fy, w / 2 - 2, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Right hand fire: " + (Cfg.fireRight ? "ON" : "OFF")), b -> {
+        addDrawableChild(ButtonWidget.builder(Text.literal("Right hand flame: " + (Cfg.fireRight ? "ON" : "OFF")), b -> {
             Cfg.fireRight = !Cfg.fireRight; Cfg.save(); clearAndInit();
         }).dimensions(x + w / 2 + 2, fy, w / 2 - 2, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Fire style: " + Fire.STYLES[Cfg.style]), b -> {
-            Cfg.style = (Cfg.style + 1) % Fire.STYLES.length; Cfg.save(); clearAndInit();
-        }).dimensions(x, fy + 24, w, 20).build());
-        addDrawableChild(ButtonWidget.builder(Text.literal("Fire colour: " + Fire.NAMES[Cfg.color]), b -> {
+        addDrawableChild(ButtonWidget.builder(Text.literal("Flame colour: " + Fire.NAMES[Cfg.color]), b -> {
             Cfg.color = (Cfg.color + 1) % Fire.NAMES.length; Cfg.save(); clearAndInit();
+        }).dimensions(x, fy + 24, w, 20).build());
+        addDrawableChild(ButtonWidget.builder(Text.literal("Extra sparks: " + (Cfg.sparks ? "ON" : "OFF")), b -> {
+            Cfg.sparks = !Cfg.sparks; Cfg.save(); clearAndInit();
         }).dimensions(x, fy + 48, w, 20).build());
-        int sy = fy + 72;
+        int sy0 = fy + 72;
+        if (Cfg.sparks) {
+            addDrawableChild(ButtonWidget.builder(Text.literal("Sparks style: " + Fire.STYLES[Cfg.style]), b -> {
+                Cfg.style = (Cfg.style + 1) % Fire.STYLES.length; Cfg.save(); clearAndInit();
+            }).dimensions(x, sy0, w, 20).build());
+            sy0 += 24;
+        }
+        int sy = sy0;
         if (Cfg.color == Fire.NAMES.length - 1) {
             addDrawableChild(new Slide(x, sy, w, "Red", 0, 255, Cfg.r, v -> { Cfg.r = v; Cfg.save(); }));
             addDrawableChild(new Slide(x, sy + 22, w, "Green", 0, 255, Cfg.g, v -> { Cfg.g = v; Cfg.save(); }));
             addDrawableChild(new Slide(x, sy + 44, w, "Blue", 0, 255, Cfg.b, v -> { Cfg.b = v; Cfg.save(); }));
             sy += 66;
         }
-        addDrawableChild(new Slide(x, sy, w, "Fire amount", 1, 6, Cfg.amount, v -> { Cfg.amount = v; Cfg.save(); }));
-        addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> close()).dimensions(x, sy + 28, w, 20).build());
+        if (Cfg.sparks) { addDrawableChild(new Slide(x, sy, w, "Sparks amount", 1, 6, Cfg.amount, v -> { Cfg.amount = v; Cfg.save(); })); sy += 24; }
+        addDrawableChild(ButtonWidget.builder(Text.literal("Done"), b -> close()).dimensions(x, sy + 4, w, 20).build());
     }
 
     private static String shortName(String s) { return s.length() > 7 ? s.substring(0, 7) : s; }
@@ -63,7 +70,7 @@ public class CosmeticsScreen extends Screen {
         int y = Math.max(28, height / 2 - 110);
         ctx.drawCenteredTextWithShadow(textRenderer, title, width / 2, y - 14, 0xFFFFFFFF);
         ctx.drawTextWithShadow(textRenderer, Text.literal("Cape (only you see it)"), width / 2 - 130, y + 3, 0xFFFFAA00);
-        ctx.drawTextWithShadow(textRenderer, Text.literal("Fire on hands (only you see it)"), width / 2 - 130, y + 45, 0xFFFFAA00);
+        ctx.drawTextWithShadow(textRenderer, Text.literal("Flame hands (only you see it)"), width / 2 - 130, y + 45, 0xFFFFAA00);
     }
 
     @Override public boolean shouldPause() { return false; }

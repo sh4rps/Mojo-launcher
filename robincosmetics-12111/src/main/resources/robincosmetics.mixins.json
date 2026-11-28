@@ -2,6 +2,6 @@
   "required": true,
   "package": "dev.robin.cosmetics.mixin",
   "compatibilityLevel": "JAVA_21",
-  "client": ["PlayerSkinMixin"],
+  "client": ["PlayerSkinMixin", "LivingRendererInvoker", "PlayerRendererMixin"],
   "injectors": { "defaultRequire": 1 }
 }

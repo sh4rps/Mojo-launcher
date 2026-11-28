@@ -31,7 +31,7 @@ public final class Fire {
     private static void run(MinecraftClient mc) {
         t++;
         ClientPlayerEntity p = mc.player;
-        if (p == null || mc.world == null || (!Cfg.fireLeft && !Cfg.fireRight)) return;
+        if (p == null || mc.world == null || (!Cfg.fireLeft && !Cfg.fireRight) || !Cfg.sparks) return;
         boolean first = mc.options.getPerspective().isFirstPerson();
         boolean rightMain = p.getMainArm() == Arm.RIGHT;
         if (Cfg.fireRight) emit(mc, hand(mc, p, first, 1.0));
@@ -78,6 +78,9 @@ public final class Fire {
             mc.world.addImportantParticleClient(new DustParticleEffect((rr << 16) | (gg << 8) | bb, size), at.x + ox, at.y + oy, at.z + oz, 0, vy, 0);
         }
     }
+
+    /** The flame colour (0xRRGGBB) for the selected preset; rainbow cycles over time. */
+    public static int baseColour(int time) { int old = t; t = time; try { return colour(); } finally { t = old; } }
 
     private static int colour() {
         if (Cfg.color == 12) return java.awt.Color.HSBtoRGB(((t * 6) % 360) / 360f, 0.9f, 1f) & 0xFFFFFF;

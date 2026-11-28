@@ -23,6 +23,7 @@ public class RobinCosmetics implements ClientModInitializer {
                 while (key.wasPressed()) if (mc.currentScreen == null && mc.player != null) mc.setScreen(new CosmeticsScreen(null));
                 Capes.tick();
                 Fire.tick(mc);
+                FlameFx.tick();
             } catch (Throwable t) { t.printStackTrace(); }
         });
         // "Robin Cosmetics" button in the pause menu and on the title screen
