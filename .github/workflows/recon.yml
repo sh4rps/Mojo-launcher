@@ -1,0 +1,34 @@
+name: Recon javap
+on: workflow_dispatch
+jobs:
+  r:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21" }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: "9.2.0" }
+      - name: Build skeleton
+        working-directory: totemtweak-12111
+        run: gradle --no-daemon build -q 2>&1 | tail -3 || true
+      - name: javap
+        working-directory: totemtweak-12111
+        run: |
+          J=$(find . -name "minecraft-merged*1.21.11*.jar" 2>/dev/null | grep -v sources | head -1)
+          p() { echo "##### $1"; javap -p -cp "$J" "$1" 2>&1 | grep -vE "^Compiled|method_|field_|static \{\}" | cut -c1-250 | head -${2:-70}; }
+          p net.minecraft.client.render.entity.PlayerEntityRenderer 40
+          p net.minecraft.client.render.entity.model.PlayerEntityModel 30
+          p net.minecraft.client.model.ModelPart 60
+          p net.minecraft.client.render.command.OrderedRenderCommandQueue 40
+          p net.minecraft.client.model.Model 25
+          p net.minecraft.client.model.ModelPartBuilder 30
+          p net.minecraft.client.model.TexturedModelData 15
+          p net.minecraft.client.model.ModelData 12
+          p net.minecraft.client.model.ModelPartData 15
+          p net.minecraft.client.render.entity.feature.FeatureRenderer 15
+          p net.minecraft.client.render.entity.feature.FeatureRendererContext 8
+          p net.minecraft.client.render.entity.LivingEntityRenderer 40
+          p net.minecraft.client.render.entity.model.BipedEntityModel 40
+          echo "##### renderRightArm code"; javap -p -c -cp "$J" net.minecraft.client.render.entity.PlayerEntityRenderer | awk '/void renderRightArm\(/{p=1} /void renderLeftArm\(|void renderArm\(/{if(p)p=0} p' | grep -E "^  [a-z]|invoke|getfield|putfield" | cut -c1-230 | head -50
+          echo "##### renderArm code"; javap -p -c -cp "$J" net.minecraft.client.render.entity.PlayerEntityRenderer | awk '/void renderArm\(/{p=1} p' | grep -E "^  [a-z]|invoke|getfield|putfield" | cut -c1-230 | head -50
