@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Aim at a block, press V. Everything is taken from the HOTBAR only (nothing is pulled out of your inventory):
+ * Aim at a block, press V. (Looking steeply DOWN instead: the mod walks you to the right distance first.) Everything is taken from the HOTBAR only (nothing is pulled out of your inventory):
  *  1) one full block as cover
  *  2) rail + TNT minecart
  *  3) lighting - best: ACTIVATOR RAIL + REDSTONE BLOCK in the hotbar (cart is primed by the powered activator rail, fuse ~4 s)
@@ -36,7 +36,7 @@ import java.util.List;
  * Every step shows a small message in the action bar so a failure tells exactly where it stopped.
  */
 public class Sequence {
-    enum Stage { IDLE, COVER, RAIL, CART, POWER, PRIMED, LOAD, SHOOT, SNEAK }
+    enum Stage { IDLE, ADJUST, COVER, RAIL, CART, POWER, PRIMED, LOAD, SHOOT, SNEAK }
 
     private Stage stage = Stage.IDLE;
     private boolean redstoneMode;
@@ -44,6 +44,8 @@ public class Sequence {
     private Vec3d cartC = Vec3d.ZERO, aim = Vec3d.ZERO;
     private int wait, originalSlot, ticks, sneakTicks;
     private boolean loading;
+    private Vec3d dest = Vec3d.ZERO;
+    private int settle;
     private final List<BlockPos> fires = new ArrayList<>();
 
     boolean active() { return stage != Stage.IDLE; }
@@ -102,6 +104,33 @@ public class Sequence {
         var rs = mc.world.getBlockState(railPos);
         if (!(rs.isAir() || rs.isReplaceable()) || !mc.world.getBlockState(railPos.up()).isAir()) { msg(mc, "No free space above that block"); return; }
         cartC = new Vec3d(railPos.getX() + 0.5, railPos.getY() + 0.25, railPos.getZ() + 0.5);
+        if (mc.player.getPitch() > 55f) {
+            // looking down: the mod walks you to the right distance (about 5 blocks from the cart spot) by itself
+            Vec3d p = mc.player.getEntityPos();
+            double ux0 = p.x - cartC.x, uz0 = p.z - cartC.z, l = Math.sqrt(ux0 * ux0 + uz0 * uz0);
+            if (l < 0.3) { float yawR = (float) Math.toRadians(mc.player.getYaw()); ux0 = Math.sin(yawR); uz0 = -Math.cos(yawR); l = 1; }
+            ux0 /= l; uz0 /= l;
+            dest = null;
+            for (double d : new double[]{5.0, 4.8, 5.2, 4.5, 5.5}) {
+                int bx = MathHelper.floor(cartC.x + ux0 * d), bz = MathHelper.floor(cartC.z + uz0 * d);
+                for (int dy = 2; dy >= -3 && dest == null; dy--) {
+                    BlockPos g = new BlockPos(bx, railPos.getY() - 1 + dy, bz);
+                    if (mc.world.getBlockState(g).isSideSolidFullSquare(mc.world, g, Direction.UP)
+                            && mc.world.getBlockState(g.up()).isAir() && mc.world.getBlockState(g.up(2)).isAir()) dest = new Vec3d(bx + 0.5, g.getY() + 1, bz + 0.5);
+                }
+                if (dest != null) break;
+            }
+            if (dest == null) { msg(mc, "No flat ground about 5 blocks away on your side"); return; }
+            originalSlot = mc.player.getInventory().getSelectedSlot();
+            stage = Stage.ADJUST; wait = 0; ticks = 0; settle = 0;
+            msg(mc, "Adjusting your position...");
+            return;
+        }
+        plan(mc);
+    }
+
+    /** Works out cover block, fire cells and aim from where you stand now, then starts placing. */
+    private void plan(MinecraftClient mc) {
         Vec3d eye = mc.player.getEyePos();
         double hx = cartC.x - eye.x, hz = cartC.z - eye.z, hd = Math.sqrt(hx * hx + hz * hz);
         if (hd < 2.2) { msg(mc, "Too close: step back a little"); return; }
@@ -181,6 +210,18 @@ public class Sequence {
         if (stage != Stage.SNEAK && ++ticks > 100) { cancel(mc, "Timed out at step " + stage); return; }
         if (wait-- > 0) return;
         switch (stage) {
+            case ADJUST -> {
+                if (settle > 0) { if (--settle == 0) { stage = Stage.IDLE; plan(mc); } return; }
+                Vec3d p = mc.player.getEntityPos();
+                double dx = dest.x - p.x, dz = dest.z - p.z;
+                if (Math.sqrt(dx * dx + dz * dz) < 0.4) {
+                    releaseMove(mc); settle = 4; return;
+                }
+                double yawR = Math.toRadians(mc.player.getYaw());
+                double f = dx * -Math.sin(yawR) + dz * Math.cos(yawR), sd = dx * -Math.cos(yawR) + dz * -Math.sin(yawR);
+                mc.options.forwardKey.setPressed(f > 0.2); mc.options.backKey.setPressed(f < -0.2);
+                mc.options.rightKey.setPressed(sd > 0.2); mc.options.leftKey.setPressed(sd < -0.2);
+            }
             case COVER -> {
                 BlockPos sup = cover.down();
                 BlockHitResult h = new BlockHitResult(new Vec3d(sup.getX() + 0.5, sup.getY() + 1.0, sup.getZ() + 0.5), Direction.UP, sup, false);
@@ -282,7 +323,14 @@ public class Sequence {
         stage = Stage.IDLE;
     }
 
+    private void releaseMove(MinecraftClient mc) {
+        mc.options.forwardKey.setPressed(false); mc.options.backKey.setPressed(false);
+        mc.options.leftKey.setPressed(false); mc.options.rightKey.setPressed(false);
+        KeyBinding.updatePressedStates();
+    }
+
     private void cancel(MinecraftClient mc, String why) {
+        releaseMove(mc);
         mc.options.useKey.setPressed(false);
         if (mc.player.isUsingItem()) mc.interactionManager.stopUsingItem(mc.player);
         KeyBinding.updatePressedStates();

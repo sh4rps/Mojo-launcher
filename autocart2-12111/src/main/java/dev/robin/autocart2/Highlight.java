@@ -47,6 +47,13 @@ public final class Highlight {
     private static void draw(MinecraftClient mc, MatrixStack ms, VertexConsumerProvider consumers) {
         if (mc.player == null || mc.world == null || consumers == null || ms == null || mc.currentScreen != null) return;
         if (!ready(mc)) return;
+        if (mc.player.getPitch() > 55f && mc.crosshairTarget instanceof net.minecraft.util.hit.BlockHitResult bh
+                && bh.getType() == net.minecraft.util.hit.HitResult.Type.BLOCK && bh.getSide() != Direction.DOWN) {
+            // looking down: this block is where the cart will go (you are walked to the right distance automatically)
+            Vec3d c0 = mc.gameRenderer.getCamera().getCameraPos();
+            VertexRendering.drawOutline(ms, consumers.getBuffer(RenderLayers.lines()), VoxelShapes.cuboid(-0.003, -0.003, -0.003, 1.003, 1.003, 1.003),
+                    bh.getBlockPos().getX() - c0.x, bh.getBlockPos().getY() - c0.y, bh.getBlockPos().getZ() - c0.z, 0xFFFFFF00, 5.0f);
+        }
         // a circle around you: the ring of blocks 5 away (bright) and the ring 4 away (softer), all sides
         Vec3d cam = mc.gameRenderer.getCamera().getCameraPos();
         VertexConsumer vc = consumers.getBuffer(RenderLayers.lines());
