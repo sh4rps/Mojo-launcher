@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "robincosmetics",
+  "version": "${version}",
+  "name": "Robin Cosmetics",
+  "description": "5 animated capes and animated fire on both hands in any colour. Open from the pause menu button or with the J key.",
+  "authors": ["Robin"],
+  "environment": "client",
+  "entrypoints": { "client": ["dev.robin.cosmetics.RobinCosmetics"] },
+  "mixins": ["robincosmetics.mixins.json"],
+  "depends": { "fabricloader": ">=0.16.0", "minecraft": "~1.21.11", "java": ">=21", "fabric-api": "*" }
+}
