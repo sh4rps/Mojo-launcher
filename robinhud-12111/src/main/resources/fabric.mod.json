@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "robinhud",
+  "version": "${version}",
+  "name": "Robin HUD",
+  "description": "Potion HUD, armor HUD, inventory HUD and Fullbright. H opens the settings.",
+  "authors": ["Robin"],
+  "environment": "client",
+  "entrypoints": { "client": ["dev.robin.hud.RobinHud"] },
+  "mixins": ["robinhud.mixins.json"],
+  "depends": { "fabricloader": ">=0.16.0", "minecraft": "~1.21.11", "java": ">=21", "fabric-api": "*" }
+}
