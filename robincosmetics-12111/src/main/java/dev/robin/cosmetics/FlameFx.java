@@ -1,6 +1,7 @@
 package dev.robin.cosmetics;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.model.Dilation;
 import net.minecraft.client.model.ModelData;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.model.ModelPartBuilder;
@@ -17,7 +18,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.Random;
 
-/** Blocky 3D pixel flames wrapped around each hand (a real model, drawn glowing), with a flickering animated texture. */
+/** Flat (2D pixel-art) animated flames painted around each hand: a thin shell hugging the hand whose texture is transparent where there is no flame. */
 public final class FlameFx {
     private static final Identifier ID = Identifier.of("robincosmetics", "flame_hands");
     private static final int FULL_LIGHT = 15728880;
@@ -32,44 +33,28 @@ public final class FlameFx {
     // ------------------------------------------------------------------ one hand's model (separate instance per hand:
     // the render queue reads the part later, so two hands must not share one set of part values)
     private static final class Hand {
-        final ModelPart root, base; final ModelPart[] tongues = new ModelPart[8]; final boolean isRight;
+        final ModelPart root, shell; final boolean isRight;
 
         Hand(boolean isRight) {
             this.isRight = isRight;
             ModelData md = new ModelData();
-            ModelPartData r = md.getRoot();
-            ModelPartBuilder cube = ModelPartBuilder.create().uv(0, 0).cuboid(-2f, -2f, -2f, 4f, 4f, 4f);
-            r.addChild("base", cube, ModelTransform.NONE);
-            for (int i = 0; i < tongues.length; i++) r.addChild("t" + i, ModelPartBuilder.create().uv(0, 0).cuboid(-2f, -2f, -2f, 4f, 4f, 4f), ModelTransform.NONE);
-            root = TexturedModelData.of(md, 16, 8).createModel();
-            base = root.getChild("base");
-            for (int i = 0; i < tongues.length; i++) tongues[i] = root.getChild("t" + i);
+            md.getRoot().addChild("shell", ModelPartBuilder.create().uv(0, 0).cuboid(-2f, -2.5f, -2f, 4f, 5f, 4f, new Dilation(0.42f)), ModelTransform.NONE);
+            root = TexturedModelData.of(md, 16, 9).createModel();
+            shell = root.getChild("shell");
         }
 
-        void update(boolean slim, int t) {
-            double time = t * 0.35;
-            float cx = (isRight ? -1f : 1f) * (slim ? 0.5f : 1f);          // arm centre relative to the shoulder pivot
-            float halfW = slim ? 1.5f : 2f;
-            base.setOrigin(cx, 8.4f, 0f);
-            base.xScale = (halfW + 0.55f) / 2f; base.zScale = 1.42f; base.yScale = 1.0f + 0.05f * (float) Math.sin(time * 1.3);
-            for (int i = 0; i < tongues.length; i++) {
-                double a = i * (Math.PI * 2 / tongues.length) + 0.4;
-                float px = cx + (float) Math.cos(a) * (halfW + 0.55f), pz = (float) Math.sin(a) * 2.55f;
-                double fl = 0.5 + 0.5 * Math.sin(time * 1.4 + i * 1.9) * Math.cos(time * 0.7 + i);
-                float h = 0.38f + 0.42f * (float) fl;                      // tongue height factor, flickers
-                ModelPart p = tongues[i];
-                p.setOrigin(px, 6.4f - h * 1.2f, pz);
-                p.xScale = 0.42f; p.zScale = 0.42f; p.yScale = h;
-                p.pitch = (float) (Math.sin(a) * 0.25 * fl); p.roll = (float) (-Math.cos(a) * 0.25 * fl); p.yaw = (float) (i * 0.6);
-            }
+        void update(boolean slim) {
+            float cx = (isRight ? -1f : 1f) * (slim ? 0.5f : 1f);      // arm centre relative to the shoulder pivot
+            shell.setOrigin(cx, 7.9f, 0f);
+            shell.xScale = slim ? 0.8f : 1f;                              // the shell is modelled 4 wide; slim arms are 3 wide
         }
     }
 
-    // ------------------------------------------------------------------ texture (16x8, a 4x4 flame tile repeated on every face)
+    // ------------------------------------------------------------------ texture (16x9 box unwrap of the 4x5x4 shell)
     private static void ensure() {
         if (tex != null || failed) return;
         try {
-            tex = new NativeImageBackedTexture("robincosmetics_flame", 16, 8, true);
+            tex = new NativeImageBackedTexture("robincosmetics_flame", 16, 9, true);
             MinecraftClient.getInstance().getTextureManager().registerTexture(ID, tex);
             left = new Hand(false); right = new Hand(true);
             paint(); tex.upload();
@@ -87,16 +72,28 @@ public final class FlameFx {
         NativeImage img = tex.getImage();
         if (img == null) return;
         int base = Fire.baseColour(tick);
-        int core = mix(base, 0xFFEEB9, 0.82), light = mix(base, 0xFFD23C, 0.55), rim = mix(base, 0x000000, 0.42);
-        for (int y = 0; y < 8; y++) for (int x = 0; x < 16; x++) {
-            int tx = x & 3, ty = y & 3;
-            boolean centre = (tx == 1 || tx == 2) && (ty == 1 || ty == 2);
-            boolean corner = (tx == 0 || tx == 3) && (ty == 0 || ty == 3);
-            int c;
-            if (centre) c = RND.nextInt(5) == 0 ? light : core;
-            else if (corner) c = RND.nextInt(3) == 0 ? base : rim;
-            else { int r = RND.nextInt(4); c = r == 0 ? light : r == 1 ? rim : base; }
-            img.setColorArgb(x, y, 0xFF000000 | c);
+        int core = mix(base, 0xFFEEB9, 0.82), light = mix(base, 0xFFD23C, 0.55), rim = mix(base, 0x000000, 0.35);
+        for (int y = 0; y < 9; y++) for (int x = 0; x < 16; x++) img.setColorArgb(x, y, 0);        // transparent
+        double time = tick * 0.35;
+        // the four side faces sit at u = 0,4,8,12 and v = 4..8 (4 wide, 5 tall); row 4 of a face is the bottom (fingers)
+        for (int u = 0; u < 16; u++) {
+            int fx = u & 3;
+            double h = 2.2 + 1.7 * Math.sin(time * 1.5 + u * 1.35) * Math.cos(time * 0.8 + u * 0.7) + (RND.nextInt(3) - 1) * 0.55;
+            h = Math.max(1.2, Math.min(5.4, h));
+            for (int r = 0; r < 5; r++) {                       // r = rows up from the bottom of the shell
+                if (r >= h) break;
+                double q = r / h;
+                int c = q < 0.28 ? core : q < 0.55 ? light : q < 0.82 ? base : rim;
+                if (q >= 0.55 && RND.nextInt(4) == 0) c = light;
+                img.setColorArgb(u, 8 - r, 0xFF000000 | c);
+            }
+            // glowing cream spot on the middle of every face, like the bright centre in a flame glove
+            if (fx == 1 || fx == 2) { img.setColorArgb(u, 8, 0xFF000000 | core); img.setColorArgb(u, 7, 0xFF000000 | (RND.nextInt(4) == 0 ? light : core)); }
+        }
+        // underside of the fist (u 8..11, v 0..3): cream centre, flickering rim
+        for (int yy = 0; yy < 4; yy++) for (int xx = 0; xx < 4; xx++) {
+            boolean mid = (xx == 1 || xx == 2) && (yy == 1 || yy == 2);
+            img.setColorArgb(8 + xx, yy, 0xFF000000 | (mid ? core : RND.nextInt(3) == 0 ? light : base));
         }
     }
 
@@ -112,7 +109,7 @@ public final class FlameFx {
         ensure();
         if (failed || tex == null) return;
         Hand h = isRight ? right : left;
-        h.update(slim, tick);
+        h.update(slim);
         ms.push();
         arm.applyTransform(ms);
         queue.submitModelPart(h.root, ms, RenderLayers.entityTranslucentEmissive(ID), FULL_LIGHT, OverlayTexture.DEFAULT_UV, null);
